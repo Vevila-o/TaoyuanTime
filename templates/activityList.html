@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活動管理</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/activityList.css' %}">
+</head>
+<body>
+    <!-- 左側導覽列 -->
+  <div class="sidebar">
+
+    <!-- Logo 區域 -->
+    <div class="sidebar-logo">
+      <h6>桃園市政府</h6>
+      <small style='color:white'>活動資訊管理後台</small>
+    </div>
+
+    <!-- 選單 -->
+    <div class="sidebar-menu mt-2">
+      <a href="{% url 'dashboard' %}" >
+        <i class="bi bi-speedometer2"></i> 儀表板
+      </a>
+      <a href="{% url 'activityList' %}" class="active">
+        <i class="bi bi-calendar-event"></i> 活動管理
+      </a>      
+      <a href="{% url 'pushManagement' %}">
+        <i class="bi bi-megaphone"></i> 推播管理
+      </a>
+      <a href="{% url 'userManagement' %}">
+        <i class="bi bi-people"></i> 使用者管理
+      </a>
+      <hr>
+      <a href="#">
+        <i class="bi bi-box-arrow-right"></i> 登出
+      </a>
+    </div>
+  </div>
+
+  <!--主要內容 -->
+  <div class="main-content">
+
+    <!--頂部標題 -->
+    <div class="topbar">
+      <h5><i class='bi bi-calendar-event'></i> 活動管理</h5>
+      <a href='{% url 'activityAdd' %}' class="btn-add">+ 新增活動</a>
+    </div>
+
+    <!--搜尋 -->
+      <!-- 文字篩選 -->
+    <div class="filter-bar">
+      <input type="text" class='filter-input' placeholder='搜尋活動名稱...'>
+      
+      <!-- 狀態篩選 -->
+      <select name="" id="" class="filter-select">
+        <option value="all">全部狀態</option>
+        <option value="active">上架中</option>
+        <option value="inactive">已下架</option>
+        <option value="draft">草稿</option>
+      </select>
+
+      <!-- 地區篩選 -->
+      <select name="" id="" class="filter-select">
+        <option value="all">全部地區</option>
+        <option value="Chungli">中壢區</option>
+        <option value="Taoyuan">桃園區</option>
+      </select>
+    </div>
+
+    <!--活動列表 -->
+    <div class="table-card">
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>活動名稱</th>
+            <th>地區</th>
+            <th>開始時間</th>
+            <th>結束時間</th>
+            <th>狀態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="activity-title">活動1</td>
+            <td>中壢區</td>
+            <td>2026/05/27</td>
+            <td>2026/06/03</td>
+            <td><span class="badge active">上架中</span></td>
+            <td class="action-btns">
+            <a href="{% url 'activityEdit' id=1 %}" class="btn-edit">編輯</a>             
+            <button class="btn-inactive">下架</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+</body>
+</html>
