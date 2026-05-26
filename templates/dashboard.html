@@ -1,0 +1,237 @@
+  {% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>桃園市政府 — 活動管理後台</title>
+
+  <!-- Bootstrap 5 — 負責版面排版和基本樣式 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap Icons — 負責圖示 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- Chart.js — 負責圖表 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">  
+</head>
+<body>
+  <!-- 左側導覽列 -->
+  <div class="sidebar">
+
+    <!-- Logo 區域 -->
+    <div class="sidebar-logo">
+      <h6>桃園市政府</h6>
+      <small style='color:white'>活動資訊管理後台</small>
+    </div>
+
+    <!-- 選單 -->
+    <div class="sidebar-menu mt-2">
+      <a href="{% url 'dashboard' %}" class="active">
+        <i class="bi bi-speedometer2"></i> 儀表板
+      </a>
+      <a href="{% url 'activityList' %}">
+        <i class="bi bi-calendar-event"></i> 活動管理
+      </a>
+      <a href="{% url 'pushManagement' %}">
+        <i class="bi bi-megaphone"></i> 推播管理
+      </a>
+      <a href="{% url 'userManagement' %}">
+        <i class="bi bi-people"></i> 使用者管理
+      </a>
+      <hr>
+      <a href="#">
+        <i class="bi bi-box-arrow-right"></i> 登出
+      </a>
+    </div>
+  </div>
+
+  <!-- 主要內容區 -->
+  <div class="main-content">
+
+    <!-- 頂部標題列 -->
+    <div class="topbar">
+      <h5><i class="bi bi-speedometer2"></i> 儀表板總覽</h5>
+      <small>最後更新：2026/05/22</small>
+    </div>
+
+    <!-- 數據卡片 -->
+    <div class="row g-3 mb-4">
+
+      <div class="col-3">
+        <div class="stat-card">
+          <div class="label">活動總數</div>
+          <div class="number">48</div>
+          <div class="trend up">↑ 較上月 +6</div>
+        </div>
+      </div>
+
+      <div class="col-3">
+        <div class="stat-card blue">
+          <div class="label">上架中活動</div>
+          <div class="number">32</div>
+          <div class="trend muted">草稿 10 ／ 下架 6</div>
+        </div>
+      </div>
+
+      <div class="col-3">
+        <div class="stat-card orange">
+          <div class="label">LINE 訂閱人數</div>
+          <div class="number">1,243</div>
+          <div class="trend up">↑ 較上月 +87</div>
+        </div>
+      </div>
+
+      <div class="col-3">
+        <div class="stat-card">
+          <div class="label">本月推播次數</div>
+          <div class="number">15</div>
+          <div class="trend muted">成功率 98.2%</div>
+        </div>
+      </div>
+
+    </div>
+    
+        <!-- 圖表 -- >
+        <!-- 圖表區塊 -->
+    <div class="row g-3 mb-4 align-items-stretch">
+
+      <!-- 折線圖 -->
+      <div class="col-8">
+        <div class="chart-card">
+          <h6>每月活動點擊數</h6>
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 甜甜圈圖 -->
+      <div class="col-4">
+        <div class="chart-card">
+          <h6>活動類型分佈</h6>
+          <canvas id="doughnutChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row g-3 mb-4 align-items-stretch">
+
+  <!-- 橫條圖 -->
+      <div class="col-6">
+        <div class="chart-card">
+          <h6>活動排行（點擊數）</h6>
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 圓餅圖 -->
+      <div class="col-6">
+        <div class="chart-card">
+          <h6>使用者性別比例</h6>
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 報名到場率 -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="chart-card">
+          <h6>報名到場率(需報名活動)</h6>
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>活動名稱</th>
+                <th>報名人數</th>
+                <th>實際到場</th>
+                <th>到場率</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>活動1</td>
+                <td>120</td>
+                <td>108</td>
+                <td class="rate green">90%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js 圖表資料 -->
+  <script>
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: ['1月','2月','3月','4月','5月','6月'],
+        datasets: [{
+          label: '點擊數',
+          data: [820, 932, 1100, 874, 1320, 1540],
+          borderColor: '#003876',
+          backgroundColor: 'rgba(0,56,118,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#003876'
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    new Chart(document.getElementById('doughnutChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['節慶','展覽','市集','親子','藝文','其他'],
+        datasets: [{
+          data: [30, 20, 18, 15, 10, 7],
+          backgroundColor: ['#003876','#0066CC','#E85C1E','#28a745','#ffc107','#aaa']
+        }]
+      },
+      options: {
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+      }
+    });
+
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ['地景藝術節','中壢市集','龍潭燈會','桃園花彩節','大溪大禧'],
+        datasets: [{
+          data: [1540, 1243, 980, 874, 756],
+          backgroundColor: '#0066CC'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true } }
+      }
+    });
+
+    new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: ['女性','男性','未填寫'],
+        datasets: [{
+          data: [54, 38, 8],
+          backgroundColor: ['#E85C1E','#003876','#aaa']
+        }]
+      },
+      options: {
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+/* 整個頁面深藍色背景 */
+.login-page {
+  min-height: 100vh;
+  background-color: #003876;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 白色登入卡片 */
+.login-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  width: 360px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Logo 區域 */
+.login-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.login-logo h5 {
+  color: #003876;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.login-logo p {
+  color: #999;
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* 錯誤訊息 */
+.login-error {
+  background: #f8d7da;
+  color: #dc3545;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* 欄位群組 */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 13px;
+  color: #444;
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* 輸入框 */
+.form-input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Microsoft JhengHei', sans-serif;
+}
+
+.form-input:focus {
+  border-color: #0066CC;
+}
+
+/* 登入按鈕 */
+.btn-login {
+  width: 100%;
+  background: #003876;
+  color: white;
+  border: none;
+  padding: 11px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-family: 'Microsoft JhengHei', sans-serif;
+}
+
+.btn-login:hover {
+  background: #0066CC;
+}
