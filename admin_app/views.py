@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from events.models import Activity
 # Create your views here.
 
 '''
@@ -15,7 +16,34 @@ def dashboard(request):
 
 ## 後台活動列表
 def activityList(request):
-  return render(request, 'activityList.html')
+  activities = Activity.objects.select_related('source_website').order_by('-start_date', '-created_at')
+
+  keyword = request.GET.get('q', '').strip()
+  status = request.GET.get('status', 'all')
+  district = request.GET.get('district', 'all')
+
+  if keyword:
+    activities = activities.filter(title__icontains=keyword)
+  if status != 'all':
+    activities = activities.filter(status=status)
+  if district != 'all':
+    activities = activities.filter(district=district)
+
+  districts = (
+    Activity.objects
+    .exclude(district='')
+    .values_list('district', flat=True)
+    .distinct()
+    .order_by('district')
+  )
+
+  return render(request, 'activityList.html', {
+    'activities': activities[:100],
+    'districts': districts,
+    'selected_keyword': keyword,
+    'selected_status': status,
+    'selected_district': district,
+  })
 
 ## 活動新增
 def activityAdd(request):

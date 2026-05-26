@@ -12,9 +12,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+DATABASE_PROJECT_DIR = BASE_DIR / 'Database'
+
+if DATABASE_PROJECT_DIR.exists():
+    sys.path.insert(0, str(DATABASE_PROJECT_DIR))
 
 
 # Quick-start development settings - unsuitable for production
@@ -42,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'myapp',
     'admin_app',
+    'events',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +86,7 @@ WSGI_APPLICATION = 'IMintergrateSys.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DATABASE_PROJECT_DIR / 'db.sqlite3',
     }
 }
 
@@ -127,3 +133,4 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

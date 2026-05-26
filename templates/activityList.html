@@ -52,24 +52,25 @@
 
     <!--搜尋 -->
       <!-- 文字篩選 -->
-    <div class="filter-bar">
-      <input type="text" class='filter-input' placeholder='搜尋活動名稱...'>
+    <form class="filter-bar" method="get">
+      <input type="text" class='filter-input' name="q" value="{{ selected_keyword }}" placeholder='搜尋活動名稱...'>
       
       <!-- 狀態篩選 -->
-      <select name="" id="" class="filter-select">
-        <option value="all">全部狀態</option>
-        <option value="active">上架中</option>
-        <option value="inactive">已下架</option>
-        <option value="draft">草稿</option>
+      <select name="status" class="filter-select" onchange="this.form.submit()">
+        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>全部狀態</option>
+        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>上架中</option>
+        <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>已下架</option>
+        <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>草稿</option>
       </select>
 
       <!-- 地區篩選 -->
-      <select name="" id="" class="filter-select">
-        <option value="all">全部地區</option>
-        <option value="Chungli">中壢區</option>
-        <option value="Taoyuan">桃園區</option>
+      <select name="district" class="filter-select" onchange="this.form.submit()">
+        <option value="all" {% if selected_district == 'all' %}selected{% endif %}>全部地區</option>
+        {% for district in districts %}
+          <option value="{{ district }}" {% if selected_district == district %}selected{% endif %}>{{ district }}</option>
+        {% endfor %}
       </select>
-    </div>
+    </form>
 
     <!--活動列表 -->
     <div class="table-card">
@@ -85,17 +86,37 @@
           </tr>
         </thead>
         <tbody>
+          {% for activity in activities %}
           <tr>
-            <td class="activity-title">活動1</td>
-            <td>中壢區</td>
-            <td>2026/05/27</td>
-            <td>2026/06/03</td>
-            <td><span class="badge active">上架中</span></td>
+            <td class="activity-title">
+              {% if activity.source_url %}
+                <a href="{{ activity.source_url }}" target="_blank" rel="noopener">{{ activity.title }}</a>
+              {% else %}
+                {{ activity.title }}
+              {% endif %}
+            </td>
+            <td>{{ activity.district|default:"-" }}</td>
+            <td>{{ activity.start_date|date:"Y/m/d H:i"|default:"-" }}</td>
+            <td>{{ activity.end_date|date:"Y/m/d H:i"|default:"-" }}</td>
+            <td>
+              {% if activity.status == 'active' %}
+                <span class="badge active">上架中</span>
+              {% elif activity.status == 'inactive' %}
+                <span class="badge inactive">已下架</span>
+              {% else %}
+                <span class="badge draft">草稿</span>
+              {% endif %}
+            </td>
             <td class="action-btns">
-            <a href="{% url 'activityEdit' id=1 %}" class="btn-edit">編輯</a>             
+            <a href="{% url 'activityEdit' id=activity.id %}" class="btn-edit">編輯</a>             
             <button class="btn-inactive">下架</button>
             </td>
           </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">目前沒有符合條件的活動</td>
+          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
