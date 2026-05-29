@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import SourceWebsite, Activity, Tag, UserProfile, Subscription, ActionLog
 
-
+# Register your models here.
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('title','source_agency','district','start_date','end_date','status','is_free', 'item_type', 'quality_level', 'line_ready', 'ai_ready', 'recommendation_ready')
@@ -46,3 +46,4 @@ class ActionLogAdmin(admin.ModelAdmin):
     search_fields = ('user__display_name','user__line_user_id','activity__title')
     list_filter = ('action_type',)
     readonly_fields = ('metadata','created_at')
+ 

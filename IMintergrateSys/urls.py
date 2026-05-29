@@ -16,16 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from admin_app import views
-
+from admin_app.views import login, dashboard, activityList, activityAdd, activityEdit, pushManagement, userManagement
+from myapp.views import callback
 urlpatterns = [
-    path('', views.login, name = 'login'), #登入畫面(目前沒有登入控制)
+    path('', login, name = 'login'), #登入畫面(目前沒有登入控制)
     path('admin/', admin.site.urls),
-    path('dashboard/', views.dashboard, name = 'dashboard'), # 首頁儀表板
-    path('activityList/', views.activityList, name = 'activityList'), # 活動列表
-    path('activityList/activityAdd/', views.activityAdd, name = 'activityAdd'), # 新增活動
-    path('activityList/Edit/<int:id>/', views.activityEdit, name = 'activityEdit'), # 編輯活動
-    path('push', views.pushManagement, name = 'pushManagement'), # 推播管理
-    path('User', views.userManagement, name = 'userManagement'), # 使用者管理
+    path('dashboard/', dashboard, name = 'dashboard'), # 首頁儀表板
+    path('activityList/', activityList, name = 'activityList'), # 活動列表
+    path('activityList/activityAdd/', activityAdd, name = 'activityAdd'), # 新增活動
+    path('activityList/Edit/<int:id>/', activityEdit, name = 'activityEdit'), # 編輯活動
+    path('push', pushManagement, name = 'pushManagement'), # 推播管理
+    path('User', userManagement, name = 'userManagement'), # 使用者管理
+    path('callback', callback, name='line_callback'), #LINE Bot
 
 ]

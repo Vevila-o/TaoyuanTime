@@ -15,20 +15,25 @@ import os
 import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATABASE_PROJECT_DIR = BASE_DIR / 'Database'
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Database 路徑
+DATABASE_PROJECT_DIR = BASE_DIR / 'Database'
 if DATABASE_PROJECT_DIR.exists():
     sys.path.insert(0, str(DATABASE_PROJECT_DIR))
+
+# LINE bot key
+SECRET_KEY = os.environ.get('DJANGO_SECRET', 'dev-secret-for-tyaihub')
+LINE_CHANNEL_ACCESS_TOKEN = 'shz2N9kbg8kcBkLhxzGPvjzS/khHRrH5MMQ7RL4zLA7ExoVWoNHi6NQpC61wyPGw2kFBRYQL8aNKXWO/NJtg/PlDtPv/pNpZxh64OUbOd2z3UwtMOqqFYvB3VDYBbX8zljl+Cgj5X2JG6Eo6MiqrywdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_SECRET = 'cb03e4fac7021905fbdd5460ec7699e9'
+
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7drh(*k+9+zu3592t615yjgsu*fe#=1tpzc48+7m$33$vxut6d'
-LINE_CHNNEL_ACCESS_TOKEN = ''
-LINE_CHANNEL_SECRET = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

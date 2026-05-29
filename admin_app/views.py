@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from events.models import Activity
 # Create your views here.
 
@@ -7,6 +7,17 @@ admin_app 後台管理相關
 ''' 
 # 登入(還沒有登入控制)
 def login(request):
+  if request.method == 'POST':
+    # 簡單的登入邏輯（暫時不驗證，直接進入 dashboard）
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+    
+    # TODO: 後續需要添加實際的身份驗證邏輯
+    if username and password:  # 簡單的非空驗證
+      return redirect('dashboard')
+    else:
+      return render(request, 'login.html', {'error': '帳號或密碼不能為空'})
+  
   return render(request, 'login.html')
 
 
