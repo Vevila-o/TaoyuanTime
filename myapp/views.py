@@ -18,7 +18,7 @@ from linebot.models import (
 from events.models import UserProfile, Tag, Activity, Subscription
 
 # 🎯 這裡完完整整引入組員寫在 services.py 裡的所有武器，一行都不用改！
-from myapp.service.service import (
+from .service import (
     recommend_activities_for_user,
     search_activities_by_conditions,
     log_user_action
