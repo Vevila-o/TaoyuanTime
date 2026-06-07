@@ -1,0 +1,15 @@
+<div class="sidebar">
+  <div class="sidebar-logo"><h6>桃園市政府</h6><small style="color:white">活動資訊管理後台</small></div>
+  <div class="sidebar-menu mt-2">
+    <a href="{% url 'dashboard' %}" {% if active_page == 'dashboard' %}class="active"{% endif %}><i class="bi bi-speedometer2"></i> 儀表板</a>
+    <a href="{% url 'operations' %}" {% if active_page == 'operations' %}class="active"{% endif %}><i class="bi bi-tools"></i> 營運工具</a>
+    <a href="{% url 'operationJobs' %}" {% if active_page == 'operation_jobs' %}class="active"{% endif %}><i class="bi bi-list-task"></i> 任務進度</a>
+    <a href="{% url 'lineQuerySimulator' %}" {% if active_page == 'line_simulator' %}class="active"{% endif %}><i class="bi bi-chat-dots"></i> LINE 查詢模擬</a>
+    <a href="{% url 'activityList' %}" {% if active_page == 'activities' %}class="active"{% endif %}><i class="bi bi-calendar-event"></i> 活動管理</a>
+    <a href="{% url 'tagReview' %}" {% if active_page == 'tags' %}class="active"{% endif %}><i class="bi bi-tags"></i> Tag 審核</a>
+    <a href="{% url 'pushManagement' %}" {% if active_page == 'push' %}class="active"{% endif %}><i class="bi bi-megaphone"></i> 推播管理</a>
+    <a href="{% url 'userManagement' %}" {% if active_page == 'users' %}class="active"{% endif %}><i class="bi bi-people"></i> 使用者管理</a>
+    <a href="{% url 'crawlJobs' %}" {% if active_page == 'crawl' %}class="active"{% endif %}><i class="bi bi-cloud-download"></i> 爬蟲任務</a>
+    <a href="{% url 'activityChanges' %}" {% if active_page == 'changes' %}class="active"{% endif %}><i class="bi bi-bell"></i> 活動異動</a>
+  </div>
+</div>

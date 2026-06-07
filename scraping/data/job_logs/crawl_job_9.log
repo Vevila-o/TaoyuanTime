@@ -1,0 +1,811 @@
+Queued jobs=1
+Running crawler pipeline...
+\n[tycg_events] Starting scrape with Fetcher (limit: 100)...
+[tycg_events] Fetching: https://www.tycg.gov.tw/ActiveMonthList.aspx?n=8&sms=7883
+[tycg_events] Processing 0 detail URLs.
+\n[culture] Starting scrape with Fetcher (limit: 100)...
+[culture] Fetching: https://culture.tycg.gov.tw/News.aspx?n=11099&sms=14558
+[culture] Processing 20 detail URLs.
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1636293
+[culture] Parsed: ¤¤­ì¤å³Ð¶é°Ï ¡m§Y¨è±Ï­ì3-¬Ãºê¦A¨£¡n | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635647
+[culture] Parsed: ¡u2026¤¤µØ¯½´U¤sµe·|²Ä28©¡¦~«×¤j®i¡v ®ç¶é¤å¤Æ§½ºë±m§e | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635646
+[culture] Parsed: ªo±m°O¿ý¿Ë¤l·Å±¡¡uÃÀ¦â¦Û­Y¡X¶¾¨q»È³Ð§@­Ó®i¡v ®ç¶é¤å¤Æ§½·ÅÄÉ | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635645
+[culture] Parsed: ¡u³\·çÀs®Ñªk»P¸ÖÃý³Ð§@®i¡X¶°¥j¶}Á~¡v ®ç¶é¤å¤Æ§½¶©­«¶}®i | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1634008
+[culture] Parsed: ? 2026®ç¶é»Ô«n¤å¤Æ¸`¨t¦C¬¡°ÊÄá¼vÄvÁÉ ¶}©l¼x¥ó¡I | L:False | AI:False
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1633284
+[culture] Parsed: ? 2026®ç¶é»Ô«n¤å¤Æ³Ð·NÃ¸µe¤jÁÉ ¶}©l¼x¥ó¡I ¥Î§Aªº³Ð·N | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1627903
+[culture] Parsed: 2026®ç¶é»Ô«n¤å¤Æ¸` 6/5-7/25 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1626009
+[culture] Parsed: 115¦~®ç¶é¼vÃÀÁ¿®y²Ä¥|³õ-¸­¥@½å¥DÁ¿¡G¤W«Òªºµø¨¤-ªÅ©çÄá¼v | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623833
+[culture] Parsed: ªF¤è¡E¥ú¡E§Æ±æ ¢w ¥xÆWªF¤è¬ü¾Ç¤j®i | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623023
+[culture] Parsed: »Èªe¨¦­µ¼@¹Î¡X¡eª±¨ã°êªº©_¤Û¤§®È¡f¤H°¸»R¥x­µ¼Ö¼@ | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623018
+[culture] Parsed: 2026¦~®L©u¥©ªê¤j«¬»R»O¼@¡u»Èªe©Çµsªº¯¦±K¡v | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621727
+[culture] Parsed: ¡i¥»¸`¥Ø¾A¥Î¤å¤Æ¹ô¡j´LÄP°ê»Ú¦³­­¤½¥q¡m¦è¹C°O»~Âô¶Â®a©±¡n | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621546
+[culture] Parsed: 2026®ç¶éÃÀ³N¨µºtÆ[­µ³õ-¤Eºq¨àµ£¼@¹Î¡mªF³¢¡BÂy¤H¡B¯T¡n¨à | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621448
+[culture] Parsed: ¤¤Ãc«C¤Ö¦~ºÞ©¶¼Ö¹Î²Ä29¦¸©w´Á­µ¼Ö·| | L:True | AI:False
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621446
+[culture] Parsed: ¡u·m±Ï¨ü°§¨à¡v2026¥@¬É©M¥­·|¨àµ£À¸¼@·Oµ½¤½ºt | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620952
+[culture] Parsed: ¤¤­ì¤å³Ð¶é°Ï¡mE¸¹¥X¤f¡n2026³Ð·N²¦·~©u | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620888
+[culture] Parsed: Ìñ¤s®Ñ·|²Ä¤Q¤C©¡Áp®i | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620884
+[culture] Parsed: ¤j¦aª¾­µ-³¯©[¦aªoµe­Ó®i | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620876
+[culture] Parsed: ¥Ë¯S¿Oªwªº®É¥úÀG¹D | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620872
+[culture] Parsed: ¡m¤Ü¥X¨Ó~¿W¤@µL¤G¡Atwo two¯SÀu¡n¤¯©M°ê¤¤ºÞ¼Ö¹Î²Ä22 | L:True | AI:True
+\n[youth] Starting scrape with Fetcher (limit: 100)...
+[youth] Fetching: https://youth.tycg.gov.tw/News.aspx?n=5622&sms=11012
+[youth] Processing 20 detail URLs.
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1636307
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621570
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1634764
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1634875
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1634484
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1635512
+[youth] Parsed: ¡i½Òµ{¡j«C³Ð¸ê·½¤¤¤ß ?¡u¼v¡v°_ª`·N¡Gµu¼v­µ°Å¿è¤u§@§{ | L:False | AI:False
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1635510
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1631170
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1631166
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1630634
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1629707
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1628746
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1628776
+[youth] Parsed: ¡i·s»D¡j®ç¶é·s³Ð¶i­xInnoVEX 2026 Äâ¤â°ê»Ú³»¦y¥[ | L:False | AI:False
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1626887
+[youth] Parsed: ¡i·s»D¡j¥þ¥x­º³ÐÂ¾·~²y¹Î´C¦X¡I¡uTAOYUAN Cheer  | L:False | AI:False
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1625667
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1625301
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621900
+[youth] Parsed: ¡i·s»D¡j®ç«C¦~§½Äâ¤â·~¬É«e¶i®Õ¶é °ö¤O«C¦~AI®É¥N¼Æ¦ìÄvª§¤O | L:False | AI:False
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621861
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621672
+[youth] Parsed: ?2026¥xÆW³]­p®i¡U2026®ç¶é«C¦~³]­p«°¥«®i¼x¥ó¶}¶]? | L:False | AI:False
+[youth] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621496
+\n[hakka] Starting scrape with Fetcher (limit: 100)...
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News.aspx?n=11372&sms=14705
+[hakka] Processing 20 detail URLs.
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1634494
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1600026
+[hakka] Parsed: ®ç¶é¥«¬F©²115¦~«×¶}³]«È®a¬ã²ß½Òµ{¹ê¬I­pµe | L:False | AI:False
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1596656
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1588159
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1383305
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1316740
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1636885
+[hakka] Parsed: ¡u2026¥_»OÆW«È»yÁ¿¬G¨Æ¤ñÁÉ¡v±o¼ú¦W³æ | L:False | AI:False
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1633166
+[hakka] Parsed: ¡i¤½§i¡j115¦~®ç¶é¥««È»yÁ~¶Ç®v°ö°V½Òµ{²Ä¤K³õ¦¸¤Î²Ä¤E³õ¦¸¥¿ | L:False | AI:False
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1633165
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1628135
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1386978
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1622204
+[hakka] Parsed: ¡i¤½§i¡j¡u2026¥_»OÆW«È»yÁ¿¬G¨Æ¤ñÁÉ¡v°ÑÁÉ²Õ§O»P¥X³õ¶¶§Ç§ó | L:False | AI:False
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1621529
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1474252
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1618844
+[hakka] Parsed: «È®a©e­û·|¡u115¾Ç¦~«È»y¨I®û¦¡±Ð¾Ç­pµe¡v§Y¤é°_¶}©ñ¥Ó½Ð¦Ü5 | L:False | AI:False
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1618888
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1449770
+[hakka] Parsed: ¡i¤½§i¡j¡u2026¥_»OÆW«È»yÁ¿¬G¨Æ¤ñÁÉ¡v³ø¦W©µªø¦Ü4¤ë30¤é | L:False | AI:False
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1614818
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1614096
+[hakka] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1611051
+\n[agriculture] Starting scrape with Fetcher (limit: 100)...
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News.aspx?n=10591&sms=14301
+[agriculture] Processing 16 detail URLs.
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1625358
+[agriculture] Parsed: 2026®ç¶éÄª¦Ë¹A¹C½ì | L:True | AI:True
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1619568
+[agriculture] Parsed: 2026ªá²{¥x¤C¡ÐÂ¸²yª÷°w¹A¹C½ì | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1613577
+[agriculture] Parsed: 2026®ç¶é±m¦â®ü¨¡©u | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1591843
+[agriculture] Parsed: 2025®ç¶é¥P¯ó¹Å¦~µØ | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1591841
+[agriculture] Parsed: 2025®ç¶éªá±m¸` | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1556268
+[agriculture] Parsed: 2025®ç¶é½¬ªá©u | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1559246
+[agriculture] Parsed: 2025Äª¦Ë¹A¹C©u | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1449063
+[agriculture] Parsed: 2025ªá²{¥x¤C Â¸²yª÷°w¹A¹C½ì | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1441227
+[agriculture] Parsed: 2025®ç¶é±m¦â®ü¨¡©u | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1377764
+[agriculture] Parsed: 2024®ç¶é¥P¯ó¹Å¦~µØ²±¤jµn³õ¡Aªá¥Ð¹C¼Ö¶éÁÜ±z¦@Á¸²±Á| | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1377760
+[agriculture] Parsed: 2024¤j·Ë¤ô©¤ªá¥c¹A¹C | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1370350
+[agriculture] Parsed: 2024·Ë®üªá¥c¹A¹C½ì-¬î©u®i°Ï 10/10~10/20¥Ð¶é | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1316618
+[agriculture] Parsed: 2024 ®ç¶é½¬ªá©u 6/29~8/4 »P§A©¯ºÖ¬Û½¬¡I | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1293587
+[agriculture] Parsed: 2024Äª¦Ë¬¯YA¹A¹C©u | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1292325
+[agriculture] Parsed: 2024ªá²{¥x¤C Â¸²yª÷°w¹A¹C½ì | L:False | AI:False
+[agriculture] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1257153
+[agriculture] Parsed: ·Ë®ü¬K©u¹A¹C~ªá¶¡¹C©u | L:False | AI:False
+\n[economic] Starting scrape with Fetcher (limit: 100)...
+[economic] Fetching: https://edb.tycg.gov.tw/News.aspx?n=3749&sms=9954
+[economic] Processing 20 detail URLs.
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1633304
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1627938
+[economic] Parsed: ®ç¶é­º³Ð¨T¨®¾P°â»{ÃÒ°ö°V ¥´³y¸Û«H¨®¥«·s¨å½d | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1629700
+[economic] Parsed: ®ç¥«©²±a»â¤¤¤p¥ø·~­u¬ü®¼¶iª¿¨¦°ª®p·| ·m§ð¥þ²y¨ÑÀ³Ãì | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1629253
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1626446
+[economic] Parsed: AI ¼vµø¡B¸ó°ê­¹¤O¡I®ç¶é¨®¯¸«á¯¸°Ó°é¡uªF«n¨È¼v­¹²±¨å¡v¤j©ñ | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1623022
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1622441
+[economic] Parsed: ¥«³õ°Ó°éª½¼½½Òµ{µn³õ ®ç¥«©²§U¼Æ¦ì¦æ¾P¶}©Ý·s°Ó¾÷ | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1622047
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1620981
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1008838
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1618184
+[economic] Parsed: ¡y2026 ®ç¶é§N¶¼¸`¡z¶}©l©Û°ÓÅo! | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1618000
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1617572
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1428777
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1426671
+[economic] Parsed: 115¦~«×®ç¶é¥«¤u¼t§CºÒ¤Æ»²¾É­pµe »²¾É¥Ó½Ð¶·ª¾ | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1617068
+[economic] Parsed: ¹ªÀy¤½¦³¥«³õ¼Æ¦ì¤ä¥I ¨CÅu³Ì°ª¨É¤d¤¸¸É§U | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1615314
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1615561
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1615206
+[economic] Parsed: Á|¿ì¡u®ç¶é¥«¥­Âí°Ï¥­Âí¬q1153¦a¸¹¥«³õ¥Î¦a¶}µo®×¡v¦a¤è»¡©ú | L:False | AI:False
+[economic] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1614601
+\n[travel_openapi] Starting scrape with TravelOpenApiFetcher (limit: 100)...
+[travel_openapi] Fetching OpenAPI endpoint: https://travel.tycg.gov.tw/open-api/zh-tw/Event/Calendar?year=2026&page=1
+[travel_openapi] calendar records: 12
+[travel_openapi] Fetching OpenAPI endpoint: https://travel.tycg.gov.tw/open-api/zh-tw/Event/Calendar?year=2027&page=1
+[travel_openapi] calendar records: 0
+[travel_openapi] Fetching OpenAPI endpoint: https://travel.tycg.gov.tw/open-api/zh-tw/Event/Activity
+[travel_openapi] activity records: 7
+[travel_openapi] Fetching OpenAPI endpoint: https://travel.tycg.gov.tw/open-api/zh-tw/Event/News?page=1
+[travel_openapi] news records: 12
+[travel_openapi] Processing 31 detail URLs.
+[travel_openapi] Detail fallback failed for https://travel.tycg.gov.tw/zh-tw/event/calendardetail/968: HTTP Error 404: Not Found
+[travel_openapi] Parsed: 2026®ç¶éºÞ¼Ö¹Å¦~µØ | L:True | AI:False
+[travel_openapi] Detail fallback failed for https://travel.tycg.gov.tw/zh-tw/event/calendardetail/965: HTTP Error 404: Not Found
+[travel_openapi] Parsed: ®ç¶é¬Ã¯]®ü©¤¥DÃD¹Cµ{ | L:True | AI:False
+[travel_openapi] Parsed: 2026°ê»Ú°¨³N¸`®ç¶éµn³õ °¨³õ°¨³N°ê»Ú¥æ¬yÁÉ¦êÁp«C¦~°ö¨|»P | L:False | AI:False
+[travel_openapi] Parsed: 2026®ç¶éÀs©£¦Ì¤z¸`À£¶bµn³õ ­º³Ð»R¥x¼@¡m¬ü¨ý·í®a¡n»P¤õ§â | L:False | AI:False
+[travel_openapi] Parsed: 2026¯«¤á°¨©ÔªQ¶}©ñ³ø¦W¡@®ç¶é¥«¥Á°ÑÁÉ°eµÎµØ¼Ö®ç®ç¦æ§õ½c | L:False | AI:False
+[travel_openapi] Parsed: ¡i°{Ä£¬Ã¯]®ü©¤¡j¥DÃD¹Cµ{¡B¦nÂ§®M²¼¥¿¦¡¶}½æ¡A­­©wª©µÎµØÂ§²°Åå | L:False | AI:False
+[travel_openapi] Parsed: ¤j·Ë¥~»y¾ÉÄýªA°È¤W½u | L:False | AI:False
+[travel_openapi] Detail fallback failed for https://travel.tycg.gov.tw/zh-tw/event/calendardetail/744: HTTP Error 404: Not Found
+[travel_openapi] Parsed: ±´¯Á¥_¾î | L:False | AI:False
+[travel_openapi] Detail fallback failed for https://travel.tycg.gov.tw/zh-tw/event/calendardetail/792: HTTP Error 404: Not Found
+[travel_openapi] Parsed: ®ç¶é100¸J | L:False | AI:False
+[travel_openapi] Parsed: ®ç¶é®L¤é¿Ë¤lÀ¸¤ô­º¿ï¡A¤p¯Q¨Ó¦t¤º·ËÀ¸¤ô°Ï 6¤ë6¤é°_¶}©ñ | L:False | AI:False
+[travel_openapi] Parsed: ®ç¶é¥«¸ó§½³B¥[³tÅSÀç³õ¦Xªk¤Æ 3³õ»¡©ú·|6¤ë¤W¦¯³°Äòµn³õ | L:False | AI:False
+[travel_openapi] Parsed: ®ç¶éÆ[¥ú«e¶i°¨¨Ó¦è¨È µÎµØ¼s§iÂI«G¦N¶©©Y³Ì¼ö°Ó°é | L:False | AI:False
+[travel_openapi] Parsed: ®ç¶éÀ]²±¤jµn³õ¥x¥_°ê»ÚÆ[¥ú³ÕÄý·| ¨«¶i¬Ã¯]®ü©¤¡D·P¨ü®ç¶éÀØ®ü | L:False | AI:False
+[travel_openapi] Parsed: ®ç¶é­º«×ÅD¤W¬P¤Ú§JDiscovery¨t¦C«°¥«ªM 5¤ë6¤é¥þ¥x | L:False | AI:False
+[travel_openapi] Detail fallback failed for https://travel.tycg.gov.tw/zh-tw/event/calendardetail/931: HTTP Error 404: Not Found
+[travel_openapi] Parsed: ¼Ö®ç¶éP@rk Go/¨Ó¥h¶é¦t©z | L:False | AI:False
+[travel_openapi] Parsed: ¸òµÛµÎµØª±®ç¶é¡I©â­­¶q¡uµÎµØ¼Ö®ç®ç¦æ§õ½c¡v¦¬ÂÃ§ð²¤¤@¦¸´x´¤ | L:True | AI:False
+[travel_openapi] Parsed: ¹H¤Ïµo®iÆ[¥ú±ø¨Ò¸gµô»@¤§«Dªk®È±J¦W³æ¦Ü115¦~4¤ë30¤é¤î | L:False | AI:False
+[travel_openapi] Parsed: «C¬K¤s®ü½u | L:False | AI:False
+[travel_openapi] Parsed: Às©£¦Ì¤z¶Â¥Õ¤j¼p¡Bªøµó®b¼ö¾xµn³õ ©ú¤é¤õ§â¬èºÖµ¥§A¨Ó | L:False | AI:False
+[travel_openapi] Parsed: 115¦~Às¼æ¤¸®dÃÀ³N¿O·|®iÄý | L:False | AI:False
+[travel_openapi] Parsed: 2026®ç¶é¿O·| | L:False | AI:False
+[travel_openapi] Parsed: 2026¾|¦Bªá©u | L:False | AI:False
+[travel_openapi] Parsed: ¡m§L§L¦³²z¡n¯S®i | L:False | AI:False
+[travel_openapi] Parsed: ¡m¥þ¤è¦ìÂ¾³õÀøÂ¡¯Z¡n IP ´¡µe®i | L:False | AI:False
+[travel_openapi] Parsed: Horse¨Ó¤F¡I°«°}¨«¬K¥h¡I | L:False | AI:False
+[travel_openapi] Parsed: 2026®ç¶éÃÀ³N¨µºt¤K¼w³õ¡Ð§Y±N¦¨¯u¤õ»R¹Î¡m¬Ã¤õ°¨À¸¹Î¡n¤õ»R | L:False | AI:False
+[travel_openapi] Parsed: ¡m®L«½§J¶©¨t¦C¡GªL¯\²EªºAI¥ì¨l¶é¡nªL¯\²E­Ó®i | L:False | AI:False
+[travel_openapi] Parsed: ¦t¤º·Ë·Å¬u¥V¤é¹Å¦~µØ | L:False | AI:False
+[travel_openapi] Parsed: 2026¨¤ªO¤s±öªá©u | L:False | AI:False
+[travel_openapi] Parsed: ¡m2025¥ÃÄò¥úÀô¹Ò³Ð·N®i¡n | L:False | AI:False
+[travel_openapi] Parsed: 2026®ç¶é ON AIR ¸ó¦~±ß·| | L:False | AI:False
+\n[tycg_events_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[tycg_events_rss] Fetching: https://www.tycg.gov.tw/OpenData.aspx?SN=6EE17DD61E44335F
+[tycg_events_rss] Processing 0 detail URLs.
+\n[economic_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[economic_rss] Fetching: https://edb.tycg.gov.tw/OpenData.aspx?SN=F1B1153D28102C6F
+[economic_rss] Processing 50 detail URLs.
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1633304
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1627938
+[economic_rss] Parsed: ®ç¶é­º³Ð¨T¨®¾P°â»{ÃÒ°ö°V ¥´³y¸Û«H¨®¥«·s¨å½d | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1629700
+[economic_rss] Parsed: ®ç¥«©²±a»â¤¤¤p¥ø·~­u¬ü®¼¶iª¿¨¦°ª®p·| ·m§ð¥þ²y¨ÑÀ³Ãì | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1629253
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1626446
+[economic_rss] Parsed: AI ¼vµø¡B¸ó°ê­¹¤O¡I®ç¶é¨®¯¸«á¯¸°Ó°é¡uªF«n¨È¼v­¹²±¨å¡v¤j©ñ | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1623022
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1622441
+[economic_rss] Parsed: ¥«³õ°Ó°éª½¼½½Òµ{µn³õ ®ç¥«©²§U¼Æ¦ì¦æ¾P¶}©Ý·s°Ó¾÷ | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1622047
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1620981
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1008838
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1618184
+[economic_rss] Parsed: ¡y2026 ®ç¶é§N¶¼¸`¡z¶}©l©Û°ÓÅo! | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1618000
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1617572
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1428777
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1426671
+[economic_rss] Parsed: 115¦~«×®ç¶é¥«¤u¼t§CºÒ¤Æ»²¾É­pµe »²¾É¥Ó½Ð¶·ª¾ | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1617068
+[economic_rss] Parsed: ¹ªÀy¤½¦³¥«³õ¼Æ¦ì¤ä¥I ¨CÅu³Ì°ª¨É¤d¤¸¸É§U | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1615314
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1615561
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1615206
+[economic_rss] Parsed: Á|¿ì¡u®ç¶é¥«¥­Âí°Ï¥­Âí¬q1153¦a¸¹¥«³õ¥Î¦a¶}µo®×¡v¦a¤è»¡©ú | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1614601
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1614719
+[economic_rss] Parsed: ®ç¶é10®a­¹«~·~ªÌ©º¾ÔªF¨Ê¡I 4¤Ñ¨gÅó2.7»õ°Ó¾÷ | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1613429
+[economic_rss] Parsed: ¡i¬¡°Ê¤½§i¡jPNP§U§ð¤¤¤p¥ø·~§G§½¥þ²y¥«³õ¤u§@§{ | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1613320
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1613065
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1610070
+[economic_rss] Parsed: ®ç¶é¦¨¥ßª«¬y´¼¼z¹BÄwÁp·ù ¥«©²°Ñ³X¥ÃÁpª«¬y¶}µo¦@±À²£·~¤É¯Å | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1610050
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1608811
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1609027
+[economic_rss] Parsed: °Ñ³X¹d²»¥ø·~ ±i¥«ªøªÖ©w§U¤O±j¤Æ®ç¶éAI¨ÑÀ³Ãì | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1608831
+[economic_rss] Parsed: ¡i¤½§i¡j115¦~«×¡u®ç¶é¥«¬F©²¸gÀÙµo®i§½¸É§U²£·~´C¦X·|Ä³¤Î®i | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1608445
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1608681
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1608071
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1607022
+[economic_rss] Parsed: ??±µ­y Amazon ¥þ²y¨ÑÀ³Ãì¡U®ç¶é¥´³yºñ¦â¬ì§Þ°ê»Ú¦X§@ | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1605610
+[economic_rss] Parsed: ©¾­s¦n¥«·s¬K¼Ö¡I¡u¥­ÂíµL¼Äªo¶º¡B©Ôµá¼Ö¯MµH¡v¦WÅu±j¶Õ§Ö°{ 1 | L:False | AI:False
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1605200
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1605149
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1605086
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1603736
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1603120
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1603508
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1603258
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1603034
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1602784
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1601834
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1601778
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1600599
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1599645
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1598551
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1597423
+[economic_rss] Fetching: https://edb.tycg.gov.tw/News_Content.aspx?n=3749&s=1596435
+\n[agriculture_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/OpenData.aspx?SN=90130BAB3EBBCA03
+[agriculture_rss] Processing 16 detail URLs.
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1625358
+[agriculture_rss] Parsed: 2026®ç¶éÄª¦Ë¹A¹C½ì | L:True | AI:True
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1619568
+[agriculture_rss] Parsed: 2026ªá²{¥x¤C¡ÐÂ¸²yª÷°w¹A¹C½ì | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1613577
+[agriculture_rss] Parsed: 2026®ç¶é±m¦â®ü¨¡©u | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1591843
+[agriculture_rss] Parsed: 2025®ç¶é¥P¯ó¹Å¦~µØ | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1591841
+[agriculture_rss] Parsed: 2025®ç¶éªá±m¸` | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1556268
+[agriculture_rss] Parsed: 2025®ç¶é½¬ªá©u | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1559246
+[agriculture_rss] Parsed: 2025Äª¦Ë¹A¹C©u | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1449063
+[agriculture_rss] Parsed: 2025ªá²{¥x¤C Â¸²yª÷°w¹A¹C½ì | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1441227
+[agriculture_rss] Parsed: 2025®ç¶é±m¦â®ü¨¡©u | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1377764
+[agriculture_rss] Parsed: 2024®ç¶é¥P¯ó¹Å¦~µØ²±¤jµn³õ¡Aªá¥Ð¹C¼Ö¶éÁÜ±z¦@Á¸²±Á| | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1377760
+[agriculture_rss] Parsed: 2024¤j·Ë¤ô©¤ªá¥c¹A¹C | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1370350
+[agriculture_rss] Parsed: 2024·Ë®üªá¥c¹A¹C½ì-¬î©u®i°Ï 10/10~10/20¥Ð¶é | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1316618
+[agriculture_rss] Parsed: 2024 ®ç¶é½¬ªá©u 6/29~8/4 »P§A©¯ºÖ¬Û½¬¡I | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1293587
+[agriculture_rss] Parsed: 2024Äª¦Ë¬¯YA¹A¹C©u | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1292325
+[agriculture_rss] Parsed: 2024ªá²{¥x¤C Â¸²yª÷°w¹A¹C½ì | L:False | AI:False
+[agriculture_rss] Fetching: https://agriculture.tycg.gov.tw/News_Content.aspx?n=10591&s=1257153
+[agriculture_rss] Parsed: ·Ë®ü¬K©u¹A¹C~ªá¶¡¹C©u | L:False | AI:False
+\n[culture_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[culture_rss] Fetching: https://culture.tycg.gov.tw/OpenData.aspx?SN=F78550DFC41C052C
+[culture_rss] Processing 48 detail URLs.
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1636293
+[culture_rss] Parsed: ¤¤­ì¤å³Ð¶é°Ï ¡m§Y¨è±Ï­ì3-¬Ãºê¦A¨£¡n | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635647
+[culture_rss] Parsed: ¡u2026¤¤µØ¯½´U¤sµe·|²Ä28©¡¦~«×¤j®i¡v ®ç¶é¤å¤Æ§½ºë±m§e | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635646
+[culture_rss] Parsed: ªo±m°O¿ý¿Ë¤l·Å±¡¡uÃÀ¦â¦Û­Y¡X¶¾¨q»È³Ð§@­Ó®i¡v ®ç¶é¤å¤Æ§½·ÅÄÉ | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635645
+[culture_rss] Parsed: ¡u³\·çÀs®Ñªk»P¸ÖÃý³Ð§@®i¡X¶°¥j¶}Á~¡v ®ç¶é¤å¤Æ§½¶©­«¶}®i | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1634008
+[culture_rss] Parsed: ? 2026®ç¶é»Ô«n¤å¤Æ¸`¨t¦C¬¡°ÊÄá¼vÄvÁÉ ¶}©l¼x¥ó¡I | L:False | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1633284
+[culture_rss] Parsed: ? 2026®ç¶é»Ô«n¤å¤Æ³Ð·NÃ¸µe¤jÁÉ ¶}©l¼x¥ó¡I ¥Î§Aªº³Ð·N | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1627903
+[culture_rss] Parsed: 2026®ç¶é»Ô«n¤å¤Æ¸` 6/5-7/25 | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1626009
+[culture_rss] Parsed: 115¦~®ç¶é¼vÃÀÁ¿®y²Ä¥|³õ-¸­¥@½å¥DÁ¿¡G¤W«Òªºµø¨¤-ªÅ©çÄá¼v | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623833
+[culture_rss] Parsed: ªF¤è¡E¥ú¡E§Æ±æ ¢w ¥xÆWªF¤è¬ü¾Ç¤j®i | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623023
+[culture_rss] Parsed: »Èªe¨¦­µ¼@¹Î¡X¡eª±¨ã°êªº©_¤Û¤§®È¡f¤H°¸»R¥x­µ¼Ö¼@ | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623018
+[culture_rss] Parsed: 2026¦~®L©u¥©ªê¤j«¬»R»O¼@¡u»Èªe©Çµsªº¯¦±K¡v | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621727
+[culture_rss] Parsed: ¡i¥»¸`¥Ø¾A¥Î¤å¤Æ¹ô¡j´LÄP°ê»Ú¦³­­¤½¥q¡m¦è¹C°O»~Âô¶Â®a©±¡n | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621546
+[culture_rss] Parsed: 2026®ç¶éÃÀ³N¨µºtÆ[­µ³õ-¤Eºq¨àµ£¼@¹Î¡mªF³¢¡BÂy¤H¡B¯T¡n¨à | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621448
+[culture_rss] Parsed: ¤¤Ãc«C¤Ö¦~ºÞ©¶¼Ö¹Î²Ä29¦¸©w´Á­µ¼Ö·| | L:True | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621446
+[culture_rss] Parsed: ¡u·m±Ï¨ü°§¨à¡v2026¥@¬É©M¥­·|¨àµ£À¸¼@·Oµ½¤½ºt | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620952
+[culture_rss] Parsed: ¤¤­ì¤å³Ð¶é°Ï¡mE¸¹¥X¤f¡n2026³Ð·N²¦·~©u | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620888
+[culture_rss] Parsed: Ìñ¤s®Ñ·|²Ä¤Q¤C©¡Áp®i | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620884
+[culture_rss] Parsed: ¤j¦aª¾­µ-³¯©[¦aªoµe­Ó®i | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620876
+[culture_rss] Parsed: ¥Ë¯S¿Oªwªº®É¥úÀG¹D | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620872
+[culture_rss] Parsed: ¡m¤Ü¥X¨Ó~¿W¤@µL¤G¡Atwo two¯SÀu¡n¤¯©M°ê¤¤ºÞ¼Ö¹Î²Ä22 | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620870
+[culture_rss] Parsed: ¡mÃÀ°_¡P¥¼§¹ªº¼Ö³¹¡n©¾­s°ê¤p²¦·~­µ¼Ö·| | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620868
+[culture_rss] Parsed: ¡m¤»·P¼Ö³¹¡n ·s©ú°ê¤¤²Ä32©¡²¦·~­µ¼Ö·| | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620862
+[culture_rss] Parsed: ¤j¦¨°ê¥Á¤¤¾Ç²Ä¤G¤Q©¡²¦·~­µ¼Ö·|¡iOp.25 No. 20¡j | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620856
+[culture_rss] Parsed: Â¾¨k¤H¥Í4-¯ºÆÒ²½¨å | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620850
+[culture_rss] Parsed: ®ç¶é¥«°ê¼Ö¹Î-¥Áºq­·ªö | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620552
+[culture_rss] Parsed: ªZ³®¤Q¤Í®ÑµeªÀ-¦A²{ªZ³® | L:False | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1618421
+[culture_rss] Parsed: ¤Q¤C¦~®v¥Í±¡½Ë¤Æ§@±mµ§·L¥ú ¡uª±¡D¯º¡Dµe¡v ¤ô±mÁp®iÅåÆAµn³õ | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1618811
+[culture_rss] Parsed: ¡u½wºCªº§Ö-¬_¾A¤¤³Ð§@®i¡v ²fÁå«áªº§Î¦â¨ó«µ | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1618809
+[culture_rss] Parsed: ¡u©ÎÅD¦b²W¡X³¯§Ó²W¤»¤Q­º®i¡v ®ç¶é¥«¬F©²¤å¤Æ§½²±¤jµn³õ | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1616788
+[culture_rss] Parsed: ¡uÃÀ®ð­·µØ¡v¤¤°ê¤åÃÀ¤u§@ªÌ¨ó·|Áp®i | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1616787
+[culture_rss] Parsed: ®ç¶é¥«Äá¼vÃÀ³N¨ó·|2026¦~·|­û¼v®i | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1616141
+[culture_rss] Parsed: 2026®ç¶éÀs©£¦Ì¤z¸`-¤á¥~¼@³õ¡m¬ü¨ý·í®a¡n | L:False | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1616173
+[culture_rss] Parsed: ®ç¶é¥«¥ß¬ü³NÀ]¿ì²z¡u¤p®È¤H¡P¤j®Èµ{¡v¯S®i(~6/14) | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1593013
+[culture_rss] Parsed: Án¤§ÅT®b:®c±TÂ@°Êµe­µ¼Ö·| | L:False | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1439279
+[culture_rss] Parsed: 114¦~®ç¶é¥«¡u¼vÃÀÁ¿®y¡v²Ä¤G³õ 4/14 ­S¼z¬Â¥DÁ¿¡G±´¯Á | L:False | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1365850
+[culture_rss] Parsed: ´°«C»RÁÐ¹Î9¤ë21¤é°_¶i¾n¡u°¨¥®ÃÀ©Ò¡v¶}¿ì¨àµ£»RÁÐ¤u§@§{ ±a | L:False | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1437706
+[culture_rss] Parsed: 2025³³ÃÀ®i¡m³³²§¬Pº©¹C¡n | L:False | AI:False
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1619819
+[culture_rss] Parsed: ¤¤¿³°ê¤¤²Ä37©¡­µ¼Ö¯Z²¦·~­µ¼Ö·| ¡yÅ]¤Û¡C¼K´ËªL¡z | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621410
+[culture_rss] Parsed: ®ç¶é¥«¤j¦¨°ê¤p­µ¼Ö¯Z²Ä27©¡²¦·~­µ¼Ö·|¡u¾Ð°_ª±¼ÖTogeth | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1618531
+[culture_rss] Parsed: ª½²Ãªº¬üÄRªá¶é ¡X °ª¦aÆgºq½g | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1619615
+[culture_rss] Parsed: ÁnÁn¤£®§-¦Ë¤p¨à¼Ö2026®L©u­µ¼Ö·| | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1618260
+[culture_rss] Parsed: 2026Äf±æ¤§Án¡uÅ¥¨£~®ç¼@§{¡v¦X°Û®a±ÚÁp¦X­µ¼Ö·| | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623793
+[culture_rss] Parsed: ÃÀ¥»¹DÂÄ§J´µ­·­««µ¹Î«Ç¤º¼Ö¨t¦C¡X¡i±q¤Ú¾¤¨ì¤é¥» From P | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621008
+[culture_rss] Parsed: ®ç¶é«Ç¤º¦X°Û¹Î2026®L©u­µ¼Ö·| | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620732
+[culture_rss] Parsed: ­µ¬°ª¾­µ¡A¼Ö¥H·|¤Í ¥jºå­µ¼Ö·| | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1620124
+[culture_rss] Parsed: 2026¡iÁnÁnº©¡jSSR³ß¼@ª±©@ | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1619577
+[culture_rss] Parsed: ¤@¤é¤T¿ô ¤T¬Ù§^¨­/½ð½ñ¥´À»¨q | L:True | AI:True
+[culture_rss] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1627037
+[culture_rss] Parsed: ®ü¤ý¤l | L:True | AI:True
+\n[hakka_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/OpenData.aspx?SN=BCA8635B3DCF0C4F
+[hakka_rss] Processing 28 detail URLs.
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1634494
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1600026
+[hakka_rss] Parsed: ®ç¶é¥«¬F©²115¦~«×¶}³]«È®a¬ã²ß½Òµ{¹ê¬I­pµe | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1596656
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1588159
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1383305
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1316740
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1636885
+[hakka_rss] Parsed: ¡u2026¥_»OÆW«È»yÁ¿¬G¨Æ¤ñÁÉ¡v±o¼ú¦W³æ | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1633166
+[hakka_rss] Parsed: ¡i¤½§i¡j115¦~®ç¶é¥««È»yÁ~¶Ç®v°ö°V½Òµ{²Ä¤K³õ¦¸¤Î²Ä¤E³õ¦¸¥¿ | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1633165
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1628135
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1386978
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1622204
+[hakka_rss] Parsed: ¡i¤½§i¡j¡u2026¥_»OÆW«È»yÁ¿¬G¨Æ¤ñÁÉ¡v°ÑÁÉ²Õ§O»P¥X³õ¶¶§Ç§ó | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1621529
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1474252
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1618844
+[hakka_rss] Parsed: «È®a©e­û·|¡u115¾Ç¦~«È»y¨I®û¦¡±Ð¾Ç­pµe¡v§Y¤é°_¶}©ñ¥Ó½Ð¦Ü5 | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1618888
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1449770
+[hakka_rss] Parsed: ¡i¤½§i¡j¡u2026¥_»OÆW«È»yÁ¿¬G¨Æ¤ñÁÉ¡v³ø¦W©µªø¦Ü4¤ë30¤é | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1614818
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1614096
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1611051
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1611013
+[hakka_rss] Parsed: 2026¥_»OÆW«È»yÁ¿¬G¨Æ¤ñÁÉ¡A¶}©ñ³ø¦WÅo! | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1598489
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1599996
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/https://ws.tycg.gov.tw
+[hakka_rss] Detail fetch failed for https://www.hakka.tycg.gov.tw/https://ws.tycg.gov.tw: 500 Server Error: Internal Server Error for url: https://www.hakka.tycg.gov.tw/https://ws.tycg.gov.tw
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1595704
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1590080
+[hakka_rss] Parsed: ¡i¬¡°Ê°T®§¡j®ç¶é¥_°Ï«È®a·|À]¡U«È®a®v¥ÍÁp¦X·s®Ñµoªíº[®y½Í·| | L:False | AI:False
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1586732
+[hakka_rss] Fetching: https://www.hakka.tycg.gov.tw/News_Content.aspx?n=11372&s=1581117
+[hakka_rss] Parsed: 114¦~®ç¶é¥««È»y®a®x2.0-«Î¤U¨ÓÁ¿«È¦³¼v³á ²Ä¤@©u¼v¤ùÄv | L:False | AI:False
+\n[hakka_json] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[hakka_json] Fetching: https://www.hakka.tycg.gov.tw/OpenData.aspx?SN=864B3ED39B4FC3A5
+[hakka_json] Processing 0 detail URLs.
+\n[youth_hot_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[youth_hot_rss] Fetching: https://youth.tycg.gov.tw/OpenData.aspx?SN=C8AF4939B9174635
+[youth_hot_rss] Processing 1 detail URLs.
+[youth_hot_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=11582&s=1614293
+[youth_hot_rss] Parsed: ®ç¶é«C¦~¸`¨t¦C¬¡°Ê¶}¶] ¦t©z¤H¤Î¤½À]«C¤Ö¦~3¤ë28¤éÃÀ¤å¼s³õ | L:False | AI:False
+\n[youth_news_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/OpenData.aspx?SN=C70B732F9E006ED5
+[youth_news_rss] Processing 50 detail URLs.
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1636307
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621570
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1634764
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1634875
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1634484
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1635512
+[youth_news_rss] Parsed: ¡i½Òµ{¡j«C³Ð¸ê·½¤¤¤ß ?¡u¼v¡v°_ª`·N¡Gµu¼v­µ°Å¿è¤u§@§{ | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1635510
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1631170
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1631166
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1630634
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1629707
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1628746
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1628776
+[youth_news_rss] Parsed: ¡i·s»D¡j®ç¶é·s³Ð¶i­xInnoVEX 2026 Äâ¤â°ê»Ú³»¦y¥[ | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1626887
+[youth_news_rss] Parsed: ¡i·s»D¡j¥þ¥x­º³ÐÂ¾·~²y¹Î´C¦X¡I¡uTAOYUAN Cheer  | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1625667
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1625301
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621900
+[youth_news_rss] Parsed: ¡i·s»D¡j®ç«C¦~§½Äâ¤â·~¬É«e¶i®Õ¶é °ö¤O«C¦~AI®É¥N¼Æ¦ìÄvª§¤O | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621861
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621672
+[youth_news_rss] Parsed: ?2026¥xÆW³]­p®i¡U2026®ç¶é«C¦~³]­p«°¥«®i¼x¥ó¶}¶]? | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621496
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1621113
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1619283
+[youth_news_rss] Parsed: ?¡i¤½§i¡j2026®ç¶éªÀ·|¥ø·~³Ð·~ÄvÁÉº[²Ä11©¡¤×§V´µ¼ú ¶} | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1619510
+[youth_news_rss] Parsed: YOUNG®ç¤U¤@¨B¡U´£¦W®ç¥ø©âÂ§ª«¬¡°Ê¶}¶] | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1619432
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1619343
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1618862
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1618316
+[youth_news_rss] Parsed: #®çÃÀ¤u§{¡U®çÃÀ¬L©MËm®i°â¬¡°Ê | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1617472
+[youth_news_rss] Parsed: ¡i½Òµ{¡j®ç¶é«C¦~¼Æ¦ì¤O¥¿¦¡±Ò°Ê¡U115¦~«C¦~¼Æ¦ì¤u¨ã¤H¤~°ö¨| | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1617440
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1617147
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1616392
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1606131
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1614049
+[youth_news_rss] Parsed: ?®çÃÀ¤u§{¡U2026¥xÆW³]­p®i´Ó·P®ç¶éµêÀÀ¶i¾n¹Î¶¤¤½§i? | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1614095
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1614077
+[youth_news_rss] Parsed: ¡i·s»D¡j¦a¤è³Ð¥Í°ê»Ú?°Ê¡I®ç¥«©²¦êÁp¦b¦a«~µPÄâ¤â¤éÁú°¨¹Î¶¤¶i | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1613317
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1612208
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1611795
+[youth_news_rss] Parsed: ¡i·s»D¡j®ç¶é«C³Ð¸ê·½¤¤¤ß¥´³y³Ð·~¹ê¾Ô½Òµ{ §U«C¦~ºë·Ç´x´¤Z¥@ | L:False | AI:False
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1611550
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1611048
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/https://ws.tycg.gov.tw
+[youth_news_rss] Detail fetch failed for https://youth.tycg.gov.tw/https://ws.tycg.gov.tw: 500 Server Error: Internal Server Error for url: https://youth.tycg.gov.tw/https://ws.tycg.gov.tw
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1609414
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1609192
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1609138
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1607313
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1606602
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1604954
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1604220
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1601253
+[youth_news_rss] Fetching: https://youth.tycg.gov.tw/News_Content.aspx?n=5622&s=1599808
+[youth_news_rss] Parsed: ®ç¥ø¤Í¦n¥««P¦¨¸ó¬É¤½¯q¦X§@ ¥ø·~»PªÀ¥øÄâ¤â¨«¤J¨|¥®°|¥´³y¥ÃÄò | L:False | AI:False
+\n[sports_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/OpenData.aspx?SN=93E06BC9B20C2B59
+[sports_rss] Processing 50 detail URLs.
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619889
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1617120
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1616791
+[sports_rss] Parsed: Âàª¾®ç¶é¥«¬F©²®a®x¼É¤Oº[©Ê«I®`¨¾ªv¤¤¤ß¿ì²z115¦~«×©ÊÄÌÂZ¨¾ | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1614996
+[sports_rss] Parsed: ¦³Ãö¥»¥«°Ñ¥[¡u¤¤µØ¥Á°ê115¦~¥þ°ê¨­¤ß»ÙÃª°ê¥Á¹B°Ê·|¡v ©ó¥» | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1609456
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/https://ws.tycg.gov.tw
+[sports_rss] Detail fetch failed for https://www.dst.tycg.gov.tw/https://ws.tycg.gov.tw: 500 Server Error: Internal Server Error for url: https://www.dst.tycg.gov.tw/https://ws.tycg.gov.tw
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1578537
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1634486
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1633511
+[sports_rss] Parsed: Âàª¾¥»¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z115¦~6¤ë¥÷§ÓÄ@ªA°È±Ð¨|°V½m½Ò | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1630991
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1630246
+[sports_rss] Parsed: Âàª¾®ç¶é¥«Åé¨|Á`·|¦E²î©e­û·|¿ì²z115¦~¹B°Êi»OÆW-¦a¤è¬F©² | L:True | AI:True
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1629694
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1629706
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1628393
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1628236
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1628233
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1628231
+[sports_rss] Parsed: ¡i¤½§i¡j¤¤¸ô¹B°Ê¤½¶éºô²y³õ°t¦X¬¡°Ê¼È°±¹ï¥~¶}©ñ®É¶¡ | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1628230
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1623878
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1622149
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1621882
+[sports_rss] Parsed: Âàª¾¹B°Ê³¡¥þ¥Á¹B°Ê¸p¿ì²z¡u115¦~«×¨àµ£¤Î¤Ö¦~¹B°Ê±Ð½m¦w¥þ«O | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1621864
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1621614
+[sports_rss] Parsed: Âàª¾¥»©²¿ì²z¡u®ç¶é¥«§ÓÄ@ªA°È¾ã¦X¸ê°T¥­¥x(¥H¤UÂ²ºÙ®ç¶é§Ó¤uºô | L:True | AI:True
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1621134
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1620834
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1620536
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1620534
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1620533
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1620530
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1620051
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619906
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619765
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619720
+[sports_rss] Parsed: Âàª¾¹B°Ê³¡¥þ¥Á¹B°Ê¸p­×¥¿¡u±Ð¨|³¡Åé¨|¸p¨àµ£¤Î¤Ö¦~¹B°Ê±Ð½mª¾¯à | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619468
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619392
+[sports_rss] Parsed: Âàª¾¹B°Ê³¡¥þ¥Á¹B°Ê¸p­×¥¿µo¥¬¡uºj¤f°Ê¯à¤GµJ¦Õ¥H¤U§C°Ê¯à¹CÀ¸¥Î | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619388
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619371
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619301
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1619191
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1618268
+[sports_rss] Parsed: Âàª¾¥»¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z115¦~5¤ë¥÷§ÓÄ@ªA°È±Ð¨|°V½m½Ò | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1617631
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1617594
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1617542
+[sports_rss] Parsed: ¡u2026°ê»Ú¦Û¥Ñ¨®Àô¥xÁÉ¡X®ç¶é¥«¯¸Äá¼v¤ñÁÉ¡v±o¼ú¦W³æ¤½§i | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1617185
+[sports_rss] Parsed: Âàª¾¡u115¦~¤s°ìÂQ¾É¼W¯à½u¤W¨t¦CÁ¿®y¡v¬¡°Ê¸ê°T¡A½Ð¨ó§U¤½§i | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1616207
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1616105
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1615180
+[sports_rss] Parsed: Âàª¾¥»¥«¿ì²z115¦~¹B°Êi»OÆW2.0­pµe¡u2026®ç¶é¥«¬Ã¯] | L:False | AI:False
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1614925
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1614837
+[sports_rss] Fetching: https://www.dst.tycg.gov.tw/News_Content.aspx?n=11693&s=1613847
+\n[animal_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[animal_rss] Fetching: https://animal.tycg.gov.tw/OpenData.aspx?SN=5348010A49E08CEA
+[animal_rss] Processing 50 detail URLs.
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1629749
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1633824
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1633272
+[animal_rss] Parsed: Âàª¾®ç¶é¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z115¦~6¤ë§ÓÄ@ªA°È±Ð¨|°V½m¤§ | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1629751
+[animal_rss] Parsed: ®ç¶é¥«°Ê«O³B«n©÷°Ê«O¶é°Ï±Ð¨|Á¿®y115¦~6¤ë¥÷½Òµ{¬¡°Ê ¡]Åw | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1629748
+[animal_rss] Parsed: ª¢ª¢®L¤é¤ò«Ä®ø´»­º¿ï¡I®ç¶é«n©÷Ãdª«À¸¤ô¦À6¤ë¶}©ñ¹w¬ù³ø¦W | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1619830
+[animal_rss] Parsed: 115¦~6¤ë¥÷©e°UªÀ¹Îªk¤H¤¤µØ°Êª«ºÖ¬ç°ê»Ú¥æ¬y¨ó·|¿ì²z°¾­¥°Ï | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1623007
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1621035
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1620441
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1620434
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1619173
+[animal_rss] Parsed: Âàª¾®ç¶é¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z115¦~5¤ë§ÓÄ@ªA°È±Ð¨|°V½m°ò | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/https://ws.tycg.gov.tw
+[animal_rss] Detail fetch failed for https://animal.tycg.gov.tw/https://ws.tycg.gov.tw: 500 Server Error: Internal Server Error for url: https://animal.tycg.gov.tw/https://ws.tycg.gov.tw
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1616239
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1615806
+[animal_rss] Parsed: Âàª¾¡u2026¦a´ºÃÀ³N¸`¡v§Ó¤u¥l¶Ò | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1614449
+[animal_rss] Parsed: Âàª¾®ç¶é¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z115¦~4¤ë¥÷§ÓÄ@ªA°È±Ð¨|°V½m | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1614179
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1613376
+[animal_rss] Parsed: ®ç¶é¥«°Ê«O³B«n©÷°Ê«O¶é°Ï±Ð¨|Á¿®y115¦~4¤ë¥÷½Òµ{¬¡°Ê ¡]Åw | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1611695
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1608857
+[animal_rss] Parsed: Âàª¾®ç¶é¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z115¦~3¤ë¥÷§ÓÄ@ªA°È±Ð¨|°V½m | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1608466
+[animal_rss] Parsed: 115¦~3¤ë¥÷©e°UªÀ¹Îªk¤H¤¤µØ°Êª«ºÖ¬ç°ê»Ú¥æ¬y¨ó·|¿ì²z°¾­¥°Ï | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1608447
+[animal_rss] Parsed: 115¦~®ç¶é¥«¯S©wÃdª«¬ü®e¤Î¦í±J·~ªÌ¬K¸`Àç·~®É¶¡ | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1608035
+[animal_rss] Parsed: ®ç¶é¥«°Êª«ÂåÀø¬K¸`¤£¥´¯L | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1607318
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1603737
+[animal_rss] Parsed: 115¦~1¤ë¥÷©e°UªÀ¹Îªk¤H¤¤µØ°Êª«ºÖ¬ç°ê»Ú¥æ¬y¨ó·|¿ì²z°¾­¥°Ï | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1602550
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1602523
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1602294
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1601915
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1601054
+[animal_rss] Parsed: ®ç¶é°Ê«O³B«n©÷°Ê«O±Ð¨|¶é°Ï¿ì²z¦~²×´Á¥½´úÅçº[½Òµ{º¡·N«×¤ÀªR  | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1599936
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1598693
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1595555
+[animal_rss] Parsed: 114¦~12¤ë¥÷©e°UªÀ¹Îªk¤H¤¤µØ°Êª«ºÖ¬ç°ê»Ú¥æ¬y¨ó·|¿ì²z°¾­¥ | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1594709
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1593254
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1592486
+[animal_rss] Parsed: 114¦~11¤ë¥÷©e°UªÀ¹Îªk¤H¤¤µØ°Êª«ºÖ¬ç°ê»Ú¥æ¬y¨ó·|¿ì²z°¾­¥ | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1591204
+[animal_rss] Parsed: Âàª¾®ç¶é¥«¬F©²Á|¿ì¡u®ç¶é¥«114¦~§ÓÄ@ªA°È¹Å¦~µØº[NPO¦¨ªG | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1590714
+[animal_rss] Parsed: Âàª¾®ç¶é¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z114¦~11¤ë¥÷§ÓÄ@ªA°È±Ð¨|°V | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1586435
+[animal_rss] Parsed: ®ç¶é¥«114¦~«×10¤ë§K¶O°Êª«¨g¤ü¯f¬Ì­]¹w¨¾ª`®gº[«Å¾É¨µ°j¬¡ | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1585999
+[animal_rss] Parsed: ®ç¶é¥«114¦~®ç¼Ö°Êª«¤Íµ½«°¥«§Ó¤u¦bÂ¾°V½mÅwªï³ø¦W | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1584946
+[animal_rss] Parsed: 114¦~10¤ë¥÷©e°UªÀ¹Îªk¤H¤¤µØ°Êª«ºÖ¬ç°ê»Ú¥æ¬y¨ó·|¿ì²z°¾­¥ | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1584893
+[animal_rss] Parsed: 114¦~«×®ç¶é¥«Ãdª«¹Å¦~µØ¬¡°Ê¡A¡uPET§A¤C®ç½ì¡v¡AÁÜ½Ð¥Á²³ | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1584859
+[animal_rss] Parsed: ¤ò«Ä®L¤é·s¼Ö¶é¡I®ç¶é«n©÷Ãdª«À¸¤ô¦À±Ò¥Î320°¦ª¯ª¯§Ö¼Ö¶}ªa | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1584206
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1581107
+[animal_rss] Parsed: ®ç¶é¥«114¦~«×9¤ë§K¶O°Êª«¨g¤ü¯f¬Ì­]¹w¨¾ª`®gº[«Å¾É¨µ°j¬¡°Ê | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1577795
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1577550
+[animal_rss] Parsed: 114¦~9¤ë¥÷©e°UªÀ¹Îªk¤H¤¤µØ°Êª«ºÖ¬ç°ê»Ú¥æ¬y¨ó·|¿ì²z°¾­¥°Ï | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1573425
+[animal_rss] Parsed: ®ç¶é¥«114¦~«×9¤ë§K¶O°Êª«¨g¤ü¯f¬Ì­]¹w¨¾ª`®gº[«Å¾É¨µ°j¬¡°Ê | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1573265
+[animal_rss] Parsed: Âàª¾°]¹Îªk¤H¹A·~¬ì§Þ¬ã¨s©Ò¿ì²z¥»(114)¦~«×¡u¨g¤ü¯f¨¾±±±Ð | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1572958
+[animal_rss] Parsed: Âàª¾®ç¶é¥«§ÓÄ@ªA°È±À¼s¤¤¤ß¿ì²z114¦~9¤ë¥÷§ÓÄ@ªA°È±Ð¨|°V½m | L:False | AI:False
+[animal_rss] Fetching: https://animal.tycg.gov.tw/News_Content.aspx?n=8542&s=1572100
+[animal_rss] Parsed: ®ç¶é¥«114¦~®ç¼Ö°Êª«¤Íµ½«°¥«§Ó¤u¯S®í°V½mÅwªï³ø¦W | L:False | AI:False
+\n[library_activity_rss] Starting scrape with RssOpenDataFetcher (limit: 100)...
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/RSS/Activity
+[library_activity_rss] Processing 18 detail URLs.
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9720
+[library_activity_rss] Parsed: [¤j·Ë°Ï»¡¬G¨Æ] ¤j·Ë°Ï¹Ï®ÑÀ]7¤ë¥÷»¡¬G¨Æ¬¡°Ê | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9726
+[library_activity_rss] Parsed: ¡iÁ`À]¬¡°Ê¡j±¡ºü®®Åª¤O¨t¦C¬¡°Ê | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9710
+[library_activity_rss] Parsed: [¥­Âí¬¡°Ê]7/26(¤é) Ã¸¥X¾\Åªªº¦â±m¨t¦C¬¡°Ê-¦~¦~¦³³½ | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9709
+[library_activity_rss] Parsed: [¥­Âí¬¡°Ê]7/25(¤») Ã¸¥X¾\Åªªº¦â±m¨t¦C¬¡°Ê-¥Û»I¥ßÅé | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9707
+[library_activity_rss] Parsed: [¥­Âí¬¡°Ê]7/11(¤») Ã¸¥X¾\Åªªº¦â±m¨t¦C¬¡°Ê-À£§J¤O¦ü | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9706
+[library_activity_rss] Parsed: [¥­Âí¬¡°Ê]7/5(¤é) Ã¸¥X¾\Åªªº¦â±m¨t¦C¬¡°Ê-¥Û­^¬â¦Ù²z | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9705
+[library_activity_rss] Parsed: [¥­Âí¬¡°Ê]7/4(¤») Ã¸¥X¾\Åªªº¦â±m¨t¦C¬¡°Ê-?«n¥Ê¨®¨® | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9719
+[library_activity_rss] Parsed: ¡i2026«GÂIº©Åª¡j¡mÁnªiº©Åª®L¥OÀç¡n¨t¦C¬¡°Ê | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9715
+[library_activity_rss] Parsed: [¥­Âí¬¡°Ê]Ã¸¥X¾\Åªªº¦â±m¨t¦C¬¡°Ê | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9717
+[library_activity_rss] Parsed: ¡i¤é»yÅª®Ñ·|¡j®ç³¶«äÅª®Ñ·|07¡U¤é¥»¤å¤ÆÇMÇ§Ç­¡Ð®LÆÒ­·ª«¸Ö? | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/8974
+[library_activity_rss] Parsed: [¥­Âí®iÄý]¥­Âí¤ÀÀ]115¦~7-12¤ë®iÄý¬¡°Ê | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/6659
+[library_activity_rss] Parsed: 115¦~Á`À]¥ÃÄòµo®i±Ð¨|±À¼s¬¡°Ê | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9611
+[library_activity_rss] Parsed: [Àt¤s¥DÃD¹q¼v]Àt¤s¤ÀÀ]6¤ë¥DÃD¹q¼v-°»±´»P¸ÑÁ¼ ÅÞ¿è«äºû»P | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9675
+[library_activity_rss] Parsed: [Àt¤s¬¡°Ê]115¦~6¤ëÀt¤s¬G¨Æ«Î | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9656
+[library_activity_rss] Parsed: [¥­Âí¹q¼vªY½à]¸q¥Á¤ÀÀ]115¦~6¤ë¼v¤ùªY½à | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9655
+[library_activity_rss] Parsed: [¥­Âí¹q¼vªY½à]¥­Âí¤ÀÀ]115¦~6¤ë¼v¤ùªY½à | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9654
+[library_activity_rss] Parsed: [¥­Âí¹q¼vªY½à]¤s¥J³»¤ÀÀ]115¦~6¤ë¼v¤ùªY½à | L:False | AI:False
+[library_activity_rss] Fetching: https://www.typl.gov.tw/zh-tw/Activity/Content/9695
+[library_activity_rss] Parsed: »¡¬G¨Æ [¥­Âí»¡¬G¨Æ]115¦~6¤ëµ£¸Ü99¬G¨Æ¯Z | L:False | AI:False
+\n[wem_news_photo] Starting scrape with HtmlListFetcher (limit: 100)...
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/News_Photo.aspx?n=9676&sms=13653
+[wem_news_photo] Processing 14 detail URLs.
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/News_Photo_Content.aspx?n=5710&s=1175243
+[wem_news_photo] Parsed: Àô¹Ò±Ð¨| | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/News_Photo_Content.aspx?n=5710&s=1175247
+[wem_news_photo] Parsed: ¹ÎÅé¹w¬ù¨î¤ìÃÀ½Òµ{ | L:True | AI:True
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/News_Photo_Content.aspx?n=5710&s=1175246
+[wem_news_photo] Parsed: ¨C¤ë¤ìÃÀ¤â§@½Ò | L:True | AI:True
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1615560
+[wem_news_photo] Parsed: ½è¦a±Ä¶°¡G¤j·Ë«Ø¿v°ò¦]¯Á¤Þ 115/04/10~115/09 | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1615552
+[wem_news_photo] Parsed: °O¾Ð¡D¦A¥Í¡G¤j·ËªZ¼w·µ®iºt 115/03/31~115/08 | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1463881
+[wem_news_photo] Parsed: ¤p«Ä¯D³õ¡X¤ì¨|¹CÀ¸³õ 114/05/17~119/12/31 | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1463879
+[wem_news_photo] Parsed: ¤j·ËÃÀ¯à¨Æ°È©Ò Woodcraft Wonders 114/ | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1377361
+[wem_news_photo] Parsed: ¡u­å¤ì¦¨§÷¡v  ¤j·Ë»s§÷¯S®i 113/11/06~1 | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1346484
+[wem_news_photo] Parsed: ¡u´M§ä°l¹Ú¤H¡v»ñ­¸­¸¬G¨ÆÀ]±`³]®i 113/08/18~115 | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1180805
+[wem_news_photo] Parsed: ¶}½c¤j·Ë±`³]®i 112/10/20~118/12/01 ¤j·Ë | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1180804
+[wem_news_photo] Parsed: ¡u¤j·Ë¦³½t«È¡Ð«È®a¤å¤Æ²{ÂÜ¡v¥DÃD¯S®i 112/08/11~1 | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1180802
+[wem_news_photo] Parsed: §õª÷¿³®a±ÚÂ²¤¶º[¥Í¬¡±¡¹Ò±`³]®i 111/12/09~114/ | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1180800
+[wem_news_photo] Parsed: ¡u¤j·Ë¦Ñ­íÃä¡vÄµ¹î±JªÙ¸s¥Í¬¡¬G¨Æ±`³]®i 110/11/20~ | L:False | AI:False
+[wem_news_photo] Fetching: https://wem.tycg.gov.tw/Photo_News_Content_Museums.aspx?n=9676&s=1180799
+[wem_news_photo] Parsed: ¤»¤Ü¥|¬G¨ÆÀ]¶}À]±`³]®i 110/10/06~115/12/0 | L:False | AI:False
+\n[tmofa_events] Starting scrape with HtmlListFetcher (limit: 100)...
+[tmofa_events] Fetching: https://tmofa.tycg.gov.tw/ch/events/current-events
+[tmofa_events] Processing 0 detail URLs.
+\n[tmofa_exhibitions] Starting scrape with HtmlListFetcher (limit: 100)...
+[tmofa_exhibitions] Fetching: https://tmofa.tycg.gov.tw/ch/exhibitions/current-exhibitions
+[tmofa_exhibitions] Processing 2 detail URLs.
+[tmofa_exhibitions] Fetching: https://tmofa.tycg.gov.tw/ch/exhibitions/current-exhibitions/154
+[tmofa_exhibitions] Parsed: ¸ú¿ß¿ß¡G¤ý·N²E®Ñªk³Ð§@®i | L:True | AI:True
+[tmofa_exhibitions] Fetching: https://tmofa.tycg.gov.tw/ch/exhibitions/current-exhibitions/152
+[tmofa_exhibitions] Parsed: ¤p®È¤H ¡P ¤j®Èµ{ | L:False | AI:False
+\nTotal raw events: 264, After dedupe: 209
+\nRun completed successfully! Generating report...
+\n==================================================
+## V3 °õ¦æµ²ªG\n
+- °õ¦æ®É¶¡: 1003 ¬í
+- ¦¨¥\¨Ó·½: 17
+- ¥¢±Ñ¨Ó·½: 0
+- Á`«Ø¥ß¸ê®Æ: 209
+- usable: 177
+- line_card_ready: 50
+- search_ready: 50
+- ai_ready: 46
+- rejected: 0
+- ¤U¸üªþ¥ó: 447
+- ¦X®æ®ü³ø: 88\n
+## ¦U¨Ó·½«~½èªí\n
+| source | priority | total | usable | line_ready | ai_ready | rejected | avg_score | MVP (Metrics) |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| tycg_events | primary | 0 | 0 | 0 | 0 | 0 | 0 | Fail |
+| culture | primary | 20 | 20 | 19 | 18 | 0 | 99.0 | Pass |
+| youth | filtered | 5 | 5 | 0 | 0 | 0 | 87.0 | Fail |
+| hakka | filtered | 6 | 6 | 0 | 0 | 0 | 83.33 | Fail |
+| agriculture | primary | 16 | 16 | 1 | 1 | 0 | 99.06 | Fail |
+| economic | filtered | 8 | 8 | 0 | 0 | 0 | 91.25 | Fail |
+| travel_openapi | primary_candidate | 31 | 22 | 3 | 0 | 0 | 86.94 | Fail |
+| tycg_events_rss | primary_candidate | 0 | 0 | 0 | 0 | 0 | 0 | Fail |
+| economic_rss | filtered | 15 | 15 | 0 | 0 | 0 | 90.67 | Fail |
+| agriculture_rss | filtered | 16 | 16 | 1 | 1 | 0 | 99.06 | Fail |
+| culture_rss | primary_candidate | 48 | 48 | 41 | 40 | 0 | 99.58 | Fail |
+| hakka_rss | filtered | 9 | 9 | 0 | 0 | 0 | 83.89 | Fail |
+| hakka_json | filtered | 0 | 0 | 0 | 0 | 0 | 0 | Fail |
+| youth_hot_rss | primary_candidate | 1 | 1 | 0 | 0 | 0 | 95.0 | Fail |
+| youth_news_rss | filtered | 13 | 13 | 0 | 0 | 0 | 86.15 | Fail |
+| sports_rss | filtered | 13 | 13 | 2 | 2 | 0 | 85.38 | Fail |
+| animal_rss | filtered | 29 | 29 | 0 | 0 | 0 | 86.55 | Fail |
+| library_activity_rss | primary_candidate | 18 | 3 | 0 | 0 | 0 | 65.83 | Fail |
+| wem_news_photo | filtered | 14 | 6 | 2 | 2 | 0 | 78.57 | Fail |
+| tmofa_events | primary_candidate | 0 | 0 | 0 | 0 | 0 | 0 | Fail |
+| tmofa_exhibitions | primary_candidate | 2 | 2 | 1 | 1 | 0 | 92.5 | Fail |
+==================================================\n
+Importing crawler output: C:\Users\k9404\Desktop\TaoyuanTime\scraping\data\output\activities_all.json
+IMPORTED: total=209, created=1, updated=208, skipped=0
+Crawler pipeline finished and imported.

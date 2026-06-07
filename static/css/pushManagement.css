@@ -1,0 +1,42 @@
+/* 推播列表表格 */
+.push-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.push-table thead tr {
+  background: #F5F5F5;
+}
+
+.push-table th {
+  padding: 10px 14px;
+  text-align: left;
+  color: #666;
+  font-weight: 500;
+}
+
+.push-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #F5F5F5;
+  color: #444;
+}
+
+.push-title {
+  font-weight: 500;
+  color: #222;
+}
+
+.muted {
+  color: #999;
+  text-align: center;
+}
+
+/* 綠色統計卡片 */
+.stat-card.green {
+  border-left-color: #28a745;
+}
+
+.stat-card.green .number {
+  color: #28a745;
+}

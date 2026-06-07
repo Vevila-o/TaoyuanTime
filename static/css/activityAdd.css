@@ -1,0 +1,107 @@
+/* 返回按鈕 */
+.btn-back {
+  color: #666;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.btn-back:hover {
+  color: var(--taoyuan-blue);
+}
+
+/* 表單卡片 */
+.form-card {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+/* 一列兩欄的排列 */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* 單一欄位群組 */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 佔滿整列 */
+.form-group.full-width {
+  margin-bottom: 16px;
+}
+
+/* label 樣式 */
+.form-group label {
+  font-size: 13px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* 必填紅色星號 */
+.required {
+  color: #dc3545;
+}
+
+/* 所有輸入框統一樣式 */
+.form-input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Microsoft JhengHei', sans-serif;
+}
+
+.form-input:focus {
+  border-color: var(--taoyuan-light-blue);
+}
+
+textarea.form-input {
+  resize: vertical;
+}
+
+/* 底部操作按鈕 */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.btn-cancel {
+  background: #F5F5F5;
+  color: #666;
+  border: 1px solid #ddd;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-cancel:hover {
+  background: #eee;
+  color: #444;
+}
+
+.btn-save {
+  background: var(--taoyuan-blue);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background: var(--taoyuan-light-blue);
+}

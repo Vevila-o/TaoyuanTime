@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>推播管理</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pushManagement.css' %}">
+</head>
+<body>
+  {% include "adminSidebar.html" with active_page="push" %}
+  <div class="main-content">
+    <div class="topbar"><h5><i class="bi bi-megaphone"></i> 推播管理</h5></div>
+    {% if messages %}
+      {% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}
+    {% endif %}
+    <div class="alert alert-warning small">預定時間目前只做紀錄；若沒有外部排程器，scheduled 推播不會自動發送。按「建立發送任務」後可到任務進度頁查看成功、失敗與略過數。</div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-4"><div class="stat-card"><div class="label">成功推播</div><div class="number">{{ sent_count }}</div></div></div>
+      <div class="col-4"><div class="stat-card green"><div class="label">失敗推播</div><div class="number">{{ failed_count }}</div></div></div>
+      <div class="col-4"><div class="stat-card blue"><div class="label">待發送任務</div><div class="number">{{ pending_count }}</div></div></div>
+    </div>
+
+    <form method="get" class="table-card mb-3 p-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-8">
+          <label class="form-label small">搜尋可推播活動</label>
+          <input name="activity_q" class="form-control form-control-sm" value="{{ activity_q }}" placeholder="輸入標題、地點或行政區">
+          <div class="form-text">先搜尋活動，再建立推播。未搜尋時只顯示近期 {{ activity_limit }} 筆，避免清單過長。</div>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-sm btn-outline-primary" type="submit">更新活動清單</button>
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'pushManagement' %}">清除</a>
+        </div>
+      </div>
+    </form>
+
+    <form method="post" class="table-card mb-4 p-3">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create_campaign">
+      <h6 class="mb-3">建立手動推播任務</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small">推播標題</label>
+          <input name="title" class="form-control form-control-sm" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">關聯活動</label>
+          <select name="activity_id" class="form-select form-select-sm">
+            <option value="">不指定活動</option>
+            {% for activity in activities %}
+              <option value="{{ activity.id }}">#{{ activity.id }} {{ activity.start_date|date:"m/d"|default:"無日期" }} {{ activity.district|default:"" }}｜{{ activity.title }}｜{{ activity.push_option_note }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">搜尋結果最多顯示 {{ activity_limit }} 筆；近期已推播的活動請先 dry-run。</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">受眾</label>
+          <select name="audience" class="form-select form-select-sm">
+            <option value="all_push_enabled">所有開啟推播使用者</option>
+            <option value="preferred_tags">偏好 Tag 命中使用者</option>
+            <option value="subscribers">既有訂閱使用者</option>
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label small">訊息</label>
+          <input name="message" class="form-control form-control-sm" placeholder="留空時使用活動卡片">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">預定時間</label>
+          <input name="scheduled_at" type="datetime-local" class="form-control form-control-sm">
+        </div>
+      </div>
+      <button class="btn btn-sm btn-primary mt-3" type="submit">建立推播任務</button>
+    </form>
+
+    <div class="table-card">
+      <table class="push-table">
+        <thead>
+          <tr>
+            <th>推播標題</th>
+            <th>活動</th>
+            <th>預定發送時間</th>
+            <th>狀態</th>
+            <th>成功 / 失敗</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for campaign in campaigns %}
+          <tr>
+            <td class="push-title">{{ campaign.title }}</td>
+            <td>{{ campaign.activity.title|default:"-" }}</td>
+            <td>{{ campaign.scheduled_at|date:"Y/m/d H:i"|default:"立即或未指定" }}</td>
+            <td><span class="badge {{ campaign.status }}">{{ campaign.status }}</span></td>
+            <td>{{ campaign.delivery_logs.all|length }}</td>
+            <td>
+              {% if campaign.same_activity_sent_count %}
+                <div class="small text-danger mb-1">同活動已成功推播 {{ campaign.same_activity_sent_count }} 次</div>
+              {% endif %}
+              <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+                <input type="hidden" name="action" value="preview_campaign">
+                <button class="btn btn-sm btn-outline-secondary" type="submit">預覽受眾</button>
+              </form>
+              <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+                <input type="hidden" name="action" value="dry_run_campaign">
+                <button class="btn btn-sm btn-outline-primary" type="submit">dry-run</button>
+              </form>
+              <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+                <input type="hidden" name="action" value="send_campaign_now">
+                <button class="btn btn-sm btn-danger" type="submit" {% if not campaign.can_send %}disabled{% endif %}>建立正式發送任務</button>
+              </form>
+              {% if campaign.can_cancel %}
+              <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+                <input type="hidden" name="action" value="cancel_campaign">
+                <button class="btn btn-sm btn-outline-danger" type="submit">取消</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6">目前沒有推播任務</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

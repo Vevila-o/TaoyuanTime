@@ -1,0 +1,41 @@
+/* 使用者列表表格 */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.user-table thead tr {
+  background: #F5F5F5;
+}
+
+.user-table th {
+  padding: 10px 14px;
+  text-align: left;
+  color: #666;
+  font-weight: 500;
+}
+
+.user-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #F5F5F5;
+  color: #444;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #222;
+}
+
+/* 推播狀態 */
+.push-on {
+  color: #28a745;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.push-off {
+  color: #dc3545;
+  font-size: 16px;
+  font-weight: 500;
+}

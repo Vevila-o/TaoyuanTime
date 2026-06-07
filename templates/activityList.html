@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活動管理</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/activityList.css' %}">
+</head>
+<body>
+  {% include "adminSidebar.html" with active_page="activities" %}
+
+  <!--主要內容 -->
+  <div class="main-content">
+
+    <!--頂部標題 -->
+    <div class="topbar">
+      <h5><i class='bi bi-calendar-event'></i> 活動管理</h5>
+      <a href='{% url 'activityAdd' %}' class="btn-add">+ 新增活動</a>
+    </div>
+    {% if messages %}
+      {% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}
+    {% endif %}
+
+    <!--搜尋 -->
+      <!-- 文字篩選 -->
+    <form class="filter-bar" method="get">
+      <input name="q" type="text" class='filter-input' placeholder='搜尋活動名稱...' value="{{ filters.q }}">
+      
+      <!-- 狀態篩選 -->
+      <select name="status" class="filter-select">
+        <option value="">全部狀態</option>
+        <option value="active" {% if filters.status == "active" %}selected{% endif %}>上架中</option>
+        <option value="inactive" {% if filters.status == "inactive" %}selected{% endif %}>已下架</option>
+        <option value="draft" {% if filters.status == "draft" %}selected{% endif %}>草稿</option>
+      </select>
+
+      <!-- 地區篩選 -->
+      <select name="district" class="filter-select">
+        <option value="">全部地區</option>
+        {% for district in districts %}
+          <option value="{{ district }}" {% if filters.district == district %}selected{% endif %}>{{ district }}區</option>
+        {% endfor %}
+      </select>
+      <select name="readiness" class="filter-select">
+        <option value="">全部 readiness</option>
+        <option value="line_ready" {% if filters.readiness == "line_ready" %}selected{% endif %}>LINE ready</option>
+        <option value="needs_review" {% if filters.readiness == "needs_review" %}selected{% endif %}>待審核</option>
+        <option value="expired_active" {% if filters.readiness == "expired_active" %}selected{% endif %}>過期仍上架</option>
+        <option value="missing_detail" {% if filters.readiness == "missing_detail" %}selected{% endif %}>缺官方詳細頁</option>
+        <option value="fallback_image" {% if filters.readiness == "fallback_image" %}selected{% endif %}>圖片需 fallback</option>
+        <option value="seed_sample" {% if filters.readiness == "seed_sample" %}selected{% endif %}>疑似假資料</option>
+        <option value="line_blocked" {% if filters.readiness == "line_blocked" %}selected{% endif %}>LINE 不可見</option>
+        <option value="recommendation_blocked" {% if filters.readiness == "recommendation_blocked" %}selected{% endif %}>推薦被排除</option>
+        <option value="ai_summary_blocked" {% if filters.readiness == "ai_summary_blocked" %}selected{% endif %}>AI 摘要不處理</option>
+        <option value="ocr_blocked" {% if filters.readiness == "ocr_blocked" %}selected{% endif %}>OCR 未成功</option>
+        <option value="quality_warning" {% if filters.readiness == "quality_warning" %}selected{% endif %}>品質警告</option>
+        <option value="missing_search_profile" {% if filters.readiness == "missing_search_profile" %}selected{% endif %}>缺搜尋語意</option>
+        <option value="search_profile_failed" {% if filters.readiness == "search_profile_failed" %}selected{% endif %}>搜尋語意失敗</option>
+        <option value="link_dead" {% if filters.readiness == "link_dead" %}selected{% endif %}>官方連結疑似失效</option>
+      </select>
+      <button class="btn btn-sm btn-primary" type="submit">篩選</button>
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'tagReview' %}">Tag 待審 {{ pending_tag_suggestions }}</a>
+    </form>
+
+    <!--活動列表 -->
+    <div class="table-card">
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>活動名稱</th>
+            <th>地區</th>
+            <th>開始時間</th>
+            <th>結束時間</th>
+            <th>狀態</th>
+            <th>Ready</th>
+            <th>圖片</th>
+            <th>篩選診斷</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for activity in activities %}
+          <tr>
+            <td class="activity-title">
+              {{ activity.title }}
+              <div class="small">
+                {% if activity.official_detail_url %}<a href="{{ activity.official_detail_url }}" target="_blank" rel="noopener">官方頁</a>{% else %}<span class="text-danger">無官方頁</span>{% endif %}
+              </div>
+            </td>
+            <td>{{ activity.district|default:"-" }}</td>
+            <td>{{ activity.start_date|date:"Y/m/d H:i"|default:"-" }}</td>
+            <td>{{ activity.end_date|date:"Y/m/d H:i"|default:"-" }}</td>
+            <td><span class="badge {{ activity.status }}">{{ activity.get_status_display }}</span></td>
+            <td>
+              {% if activity.line_ready %}<span class="badge active">LINE</span>{% endif %}
+              {% if activity.recommendation_ready %}<span class="badge active">推薦</span>{% endif %}
+              {% if not activity.line_ready and not activity.recommendation_ready %}<span class="badge draft">待審</span>{% endif %}
+            </td>
+            <td class="small">
+              {% if activity.image_url and "placehold.co" not in activity.image_url %}
+                <span class="text-success">有圖</span>
+              {% else %}
+                <span class="text-danger">fallback</span>
+              {% endif %}
+              <div>OCR {{ activity.ocr_status|default:"未執行" }}</div>
+            </td>
+            <td class="small">
+              <div>LINE：{% if activity.exposure_diagnostic.line.ok %}<span class="text-success">可見</span>{% else %}<span class="text-danger">{{ activity.exposure_diagnostic.line.reasons|join:"、" }}</span>{% endif %}</div>
+              <div>推薦：{% if activity.exposure_diagnostic.recommendation.ok %}<span class="text-success">可用</span>{% else %}<span class="text-danger">{{ activity.exposure_diagnostic.recommendation.reasons|join:"、" }}</span>{% endif %}</div>
+              {% if activity.exposure_diagnostic.quality_warnings %}
+                <div class="text-muted">品質：{{ activity.exposure_diagnostic.quality_warnings|join:"、" }}</div>
+              {% endif %}
+              <div>搜尋：{% if activity.search_profile.status == "success" %}<span class="text-success">已補</span>{% elif activity.search_profile %}<span class="text-danger">{{ activity.search_profile.status }}</span>{% else %}<span class="text-danger">缺</span>{% endif %}</div>
+              {% if activity.official_link_status == "dead" %}
+                <div class="text-danger">官方連結失效</div>
+              {% elif activity.official_link_status == "error" %}
+                <div class="text-warning">官方連結待確認</div>
+              {% endif %}
+            </td>
+            <td class="action-btns">
+            <a href="{% url 'activityEdit' id=activity.id %}" class="btn-edit">編輯</a>
+            <form method="post" action="{% url 'activitySetStatus' id=activity.id %}" style="display:inline">
+              {% csrf_token %}
+              {% if activity.status == "active" %}
+                <input type="hidden" name="status" value="inactive">
+                <button class="btn-inactive" type="submit">下架</button>
+              {% else %}
+                <input type="hidden" name="status" value="active">
+                <button class="btn-edit" type="submit">上架</button>
+              {% endif %}
+            </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9">目前沒有活動資料</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+</body>
+</html>

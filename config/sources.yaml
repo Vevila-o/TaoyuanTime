@@ -1,0 +1,132 @@
+sources:
+  - key: tycg_events
+    name: "桃園市政府活動月曆"
+    start_url: "https://www.tycg.gov.tw/ActiveMonthList.aspx?n=8&sms=7883"
+    fetcher_type: Fetcher
+    source_priority: "primary"
+
+  - key: culture
+    name: "桃園市政府文化局"
+    start_url: "https://culture.tycg.gov.tw/News.aspx?n=11099&sms=14558"
+    fetcher_type: Fetcher
+    source_priority: "primary"
+
+  - key: youth
+    name: "桃園市政府青年事務局"
+    start_url: "https://youth.tycg.gov.tw/News.aspx?n=5622&sms=11012"
+    fetcher_type: Fetcher
+    source_priority: "filtered"
+
+  - key: hakka
+    name: "桃園市政府客家事務局"
+    start_url: "https://www.hakka.tycg.gov.tw/News.aspx?n=11372&sms=14705"
+    fetcher_type: Fetcher
+    source_priority: "filtered"
+
+  - key: agriculture
+    name: "桃園市政府農業局"
+    start_url: "https://agriculture.tycg.gov.tw/News.aspx?n=10591&sms=14301"
+    fetcher_type: Fetcher
+    source_priority: "primary"
+
+  - key: economic
+    name: "桃園市政府經濟發展局"
+    start_url: "https://edb.tycg.gov.tw/News.aspx?n=3749&sms=9954"
+    fetcher_type: Fetcher
+    source_priority: "filtered"
+
+  - key: travel_openapi
+    name: "桃園觀光導覽網 OpenAPI｜節慶與活動"
+    start_url: "https://travel.tycg.gov.tw/open-api"
+    fetcher_type: TravelOpenApiFetcher
+    source_priority: "primary_candidate"
+
+  - key: travel_news
+    name: "桃園觀光導覽網｜最新消息"
+    start_url: "https://travel.tycg.gov.tw/zh-tw/event"
+    fetcher_type: DynamicFetcher
+    source_priority: "filtered"
+
+  - key: tycg_events_rss
+    name: "桃園市政府活動月曆 RSS"
+    start_url: "https://www.tycg.gov.tw/OpenData.aspx?SN=6EE17DD61E44335F"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "primary_candidate"
+
+  - key: economic_rss
+    name: "桃園市政府經濟發展局 RSS"
+    start_url: "https://edb.tycg.gov.tw/OpenData.aspx?SN=F1B1153D28102C6F"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "filtered"
+
+  - key: agriculture_rss
+    name: "桃園市政府農業局 RSS"
+    start_url: "https://agriculture.tycg.gov.tw/OpenData.aspx?SN=90130BAB3EBBCA03"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "filtered"
+
+  - key: culture_rss
+    name: "桃園市政府文化局 RSS"
+    start_url: "https://culture.tycg.gov.tw/OpenData.aspx?SN=F78550DFC41C052C"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "primary_candidate"
+
+  - key: hakka_rss
+    name: "桃園市政府客家事務局 RSS"
+    start_url: "https://www.hakka.tycg.gov.tw/OpenData.aspx?SN=BCA8635B3DCF0C4F"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "filtered"
+
+  - key: hakka_json
+    name: "桃園市政府客家事務局 JSON OpenData"
+    start_url: "https://www.hakka.tycg.gov.tw/OpenData.aspx?SN=864B3ED39B4FC3A5"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "filtered"
+
+  - key: youth_hot_rss
+    name: "桃園市政府青年事務局熱門活動 RSS"
+    start_url: "https://youth.tycg.gov.tw/OpenData.aspx?SN=C8AF4939B9174635"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "primary_candidate"
+
+  - key: youth_news_rss
+    name: "桃園市政府青年事務局最新消息 RSS"
+    start_url: "https://youth.tycg.gov.tw/OpenData.aspx?SN=C70B732F9E006ED5"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "filtered"
+
+  - key: sports_rss
+    name: "桃園市政府體育局 RSS"
+    start_url: "https://www.dst.tycg.gov.tw/OpenData.aspx?SN=93E06BC9B20C2B59"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "filtered"
+
+  - key: animal_rss
+    name: "桃園市政府動物保護處 RSS"
+    start_url: "https://animal.tycg.gov.tw/OpenData.aspx?SN=5348010A49E08CEA"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "filtered"
+
+  - key: library_activity_rss
+    name: "桃園市立圖書館活動 RSS"
+    start_url: "https://www.typl.gov.tw/zh-tw/RSS/Activity"
+    fetcher_type: RssOpenDataFetcher
+    source_priority: "primary_candidate"
+
+  - key: wem_news_photo
+    name: "桃園市立博物館 News Photo"
+    start_url: "https://wem.tycg.gov.tw/News_Photo.aspx?n=9676&sms=13653"
+    fetcher_type: HtmlListFetcher
+    source_priority: "filtered"
+
+  - key: tmofa_events
+    name: "桃園市立美術館活動"
+    start_url: "https://tmofa.tycg.gov.tw/ch/events/current-events"
+    fetcher_type: HtmlListFetcher
+    source_priority: "primary_candidate"
+
+  - key: tmofa_exhibitions
+    name: "桃園市立美術館展覽"
+    start_url: "https://tmofa.tycg.gov.tw/ch/exhibitions/current-exhibitions"
+    fetcher_type: HtmlListFetcher
+    source_priority: "primary_candidate"

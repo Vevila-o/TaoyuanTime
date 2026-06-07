@@ -1,0 +1,106 @@
+<div class="form-row">
+  <div class="form-group">
+    <label>活動名稱 <span class="required">*</span></label>
+    <input name="title" type="text" class="form-input" value="{{ activity.title|default:'' }}" required>
+  </div>
+  <div class="form-group">
+    <label>地區</label>
+    <select name="district" class="form-input">
+      <option value="">未指定</option>
+      {% for district in districts %}
+        <option value="{{ district }}" {% if activity.district == district %}selected{% endif %}>{{ district }}區</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+<div class="form-group full-width">
+  <label>活動說明</label>
+  <textarea name="description" class="form-input" rows="4">{{ activity.description|default:'' }}</textarea>
+</div>
+<div class="form-row">
+  <div class="form-group">
+    <label>開始時間</label>
+    <input name="start_date" type="datetime-local" class="form-input" value="{{ activity.start_date|date:'Y-m-d\\TH:i' }}">
+  </div>
+  <div class="form-group">
+    <label>結束時間</label>
+    <input name="end_date" type="datetime-local" class="form-input" value="{{ activity.end_date|date:'Y-m-d\\TH:i' }}">
+  </div>
+</div>
+<div class="form-row">
+  <div class="form-group">
+    <label>地點</label>
+    <input name="location" type="text" class="form-input" value="{{ activity.location|default:'' }}">
+  </div>
+  <div class="form-group">
+    <label>狀態</label>
+    <select name="status" class="form-input">
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if activity.status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+<div class="form-row">
+  <div class="form-group">
+    <label>來源機關</label>
+    <input name="source_agency" type="text" class="form-input" value="{{ activity.source_agency|default:'' }}">
+  </div>
+  <div class="form-group">
+    <label>費用類型</label>
+    <select name="fee_type" class="form-input">
+      {% for value, label in fee_choices %}
+        <option value="{{ value }}" {% if activity.fee_type == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+<div class="form-group full-width">
+  <label>官方詳情 URL</label>
+  <input name="official_detail_url" type="url" class="form-input" value="{{ activity.official_detail_url|default:'' }}">
+</div>
+<div class="form-group full-width">
+  <label>來源 URL</label>
+  <input name="source_url" type="url" class="form-input" value="{{ activity.source_url|default:'' }}">
+</div>
+<div class="form-row">
+  <div class="form-group">
+    <label>主辦單位</label>
+    <input name="organizer" type="text" class="form-input" value="{{ activity.organizer|default:'' }}">
+  </div>
+  <div class="form-group">
+    <label>報名 URL</label>
+    <input name="registration_url" type="url" class="form-input" value="{{ activity.registration_url|default:'' }}">
+  </div>
+</div>
+<div class="form-group full-width">
+  <label>圖片 URL</label>
+  <input name="image_url" type="url" class="form-input" value="{{ activity.image_url|default:'' }}">
+</div>
+<div class="form-group full-width">
+  <label>人工修正保護</label>
+  <div class="row small">
+    <label class="col-12 col-md-3"><input type="checkbox" name="manual_verified" {% if activity.manual_verified %}checked{% endif %}> 已人工確認</label>
+    <label class="col-12 col-md-9">保護欄位（逗號分隔，例如 title,start_date,location）<input name="manual_overrides" type="text" class="form-input" value="{{ activity.manual_overrides|join:',' }}"></label>
+  </div>
+  <textarea name="manual_note" class="form-input mt-2" rows="2" placeholder="人工修正備註">{{ activity.manual_note|default:'' }}</textarea>
+</div>
+<div class="form-group full-width">
+  <label>Tag</label>
+  <div class="row">
+    {% for tag in tags %}
+      <label class="col-6 col-md-3 small mb-2">
+        <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id in selected_tag_ids %}checked{% endif %}>
+        {{ tag.name }} <span class="text-muted">({{ tag.tag_type }})</span>
+      </label>
+    {% endfor %}
+  </div>
+</div>
+<div class="form-group full-width">
+  <label>上架旗標</label>
+  <div class="row small">
+    <label class="col-6 col-md-3"><input type="checkbox" name="is_free" {% if activity.is_free %}checked{% endif %}> 免費</label>
+    <label class="col-6 col-md-3"><input type="checkbox" name="requires_registration" {% if activity.requires_registration %}checked{% endif %}> 需報名</label>
+    <span class="col-12 text-muted">LINE / AI / 推薦 ready 請在「活動曝光診斷」區塊用專用按鈕設定，避免繞過品質檢查。</span>
+  </div>
+</div>

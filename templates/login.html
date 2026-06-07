@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登入 — 桃園市政府後台</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+
+  <div class="login-page">
+    <div class="login-card">
+
+      <!-- Logo 區域 -->
+      <div class="login-logo">
+        <div class="login-icon"></div>
+        <h5>桃園市政府</h5>
+        <p>活動資訊管理後台</p>
+      </div>
+
+      <!-- 錯誤訊息（登入失敗時顯示） -->
+      {% if error %}
+      <div class="login-error">
+        帳號或密碼錯誤，請重新輸入
+      </div>
+      {% endif %}
+
+      <!-- 登入表單 -->
+      <form action="{% url 'dashboard' %}">
+        <div class="form-group">
+          <label>帳號</label>
+          <input type="text" class="form-input" placeholder="請輸入帳號">
+        </div>
+        <div class="form-group">
+          <label>密碼</label>
+          <input type="password" class="form-input" placeholder="請輸入密碼">
+        </div>
+        <button type="submit" class="btn-login">登入</button>
+      </form>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

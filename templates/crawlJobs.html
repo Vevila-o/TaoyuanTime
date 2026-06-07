@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if auto_refresh %}<meta http-equiv="refresh" content="8">{% endif %}
+  <title>爬蟲任務</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+  {% include "adminSidebar.html" with active_page="crawl" %}
+  <div class="main-content">
+    <div class="topbar"><h5><i class="bi bi-cloud-download"></i> 爬蟲任務</h5><small>queued {{ queued_count }} / running {{ running_count }}</small></div>
+    {% if messages %}{% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}{% endif %}
+
+    <form method="post" class="chart-card mb-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create_job">
+      <input type="hidden" name="preset" value="one_click_update">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <h6>開始完整更新</h6>
+          <p class="small text-muted mb-0">立即啟動背景任務：爬蟲、匯入上架、AI Tag、搜尋語意、摘要與可處理圖片的 OCR。無圖活動會使用 fallback，不會浪費 OCR 名額。</p>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">抓取上限</label>
+          <select class="form-select form-select-sm" name="primary_limit">
+            <option value="100" selected>100 筆</option>
+            <option value="50">50 筆</option>
+            <option value="300">300 筆</option>
+          </select>
+          <input type="hidden" name="max_runtime" value="30">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">來源</label>
+          <select class="form-select form-select-sm" name="source">
+            <option value="">全部來源</option>
+            {% for source in source_options %}
+              <option value="{{ source.key }}">{{ source.key }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100" type="submit">開始完整更新</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="chart-card mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">任務進度</h6>
+        <span class="small text-muted">執行中頁面會自動刷新</span>
+      </div>
+      <table class="table table-sm">
+        <thead><tr><th>ID</th><th>任務</th><th>來源</th><th>目前階段</th><th>匯入結果</th><th>建立</th><th>完成</th><th></th></tr></thead>
+        <tbody>
+          {% for job in jobs %}
+            <tr>
+              <td>{{ job.id }}</td>
+              <td>{{ job.title }}</td>
+              <td>{{ job.source|default:"all" }}</td>
+              <td style="min-width:260px">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ job.progress_label }}</span>
+                  <span>{{ job.progress_percent }}%</span>
+                </div>
+                <div class="progress" style="height:8px">
+                  <div class="progress-bar {{ job.progress_class }}" role="progressbar" style="width: {{ job.progress_percent }}%"></div>
+                </div>
+                <div class="small text-muted mt-1">{{ job.progress_note|truncatechars:80 }}</div>
+                {% if job.status == "running" %}
+                  <form method="post" class="mt-1">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="mark_interrupted">
+                    <input type="hidden" name="job_id" value="{{ job.id }}">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">標記中斷</button>
+                  </form>
+                {% endif %}
+              </td>
+              <td class="small">
+                {% if job.import_run %}
+                  新增 {{ job.import_run.created_count }}<br>
+                  更新 {{ job.import_run.updated_count }}<br>
+                  略過 {{ job.import_run.skipped_count }} / 失敗 {{ job.import_run.failed_count }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ job.created_at|date:"Y/m/d H:i" }}</td>
+              <td>{{ job.finished_at|date:"Y/m/d H:i"|default:"-" }}</td>
+              <td><a href="{% url 'crawlJobDetail' job.id %}">詳情</a></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="8">尚無任務</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <details class="mb-4">
+      <summary class="small text-muted">維護工具</summary>
+      <div class="row g-3 mt-2">
+        <div class="col-md-3">
+          <form method="post" class="chart-card h-100">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="run_next">
+            <h6>啟動等待任務</h6>
+            <p class="small text-muted">只在任務已 queued 但沒有啟動時使用。</p>
+            <button class="btn btn-outline-primary btn-sm" type="submit">啟動下一筆</button>
+          </form>
+        </div>
+        <div class="col-md-3">
+          <form method="post" class="chart-card h-100">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="clear_queued_jobs">
+            <h6>清除等待任務</h6>
+            <p class="small text-muted">任務卡住或排錯時取消所有 queued 任務。</p>
+            <button class="btn btn-outline-danger btn-sm" type="submit">清除 queued</button>
+          </form>
+        </div>
+        <div class="col-md-3">
+          <form method="post" class="chart-card h-100">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="mark_stale_running_failed">
+            <h6>標記中斷</h6>
+            <p class="small text-muted">把超過預估時間的 running 任務標為失敗。</p>
+            <button class="btn btn-outline-warning btn-sm" type="submit">標記可能中斷</button>
+          </form>
+        </div>
+        <div class="col-md-3">
+          <form method="post" class="chart-card h-100">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_job">
+            <input type="hidden" name="preset" value="small_test">
+            <input type="hidden" name="source" value="travel_openapi">
+            <h6>小批測試</h6>
+            <p class="small text-muted">抓 1 筆、不匯入、不下載圖片。</p>
+            <button class="btn btn-outline-secondary btn-sm" type="submit">建立測試任務</button>
+          </form>
+        </div>
+      </div>
+    </details>
+  </div>
+</body>
+</html>

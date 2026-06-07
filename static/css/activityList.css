@@ -1,0 +1,142 @@
+/* 搜尋篩選列 */
+.filter-bar {
+  background: white;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.filter-input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 13px;
+  flex: 1;
+  outline: none;
+}
+
+.filter-input:focus {
+  border-color: var(--taoyuan-light-blue);
+}
+
+.filter-select {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: #666;
+  outline: none;
+  cursor: pointer;
+}
+
+/* 活動表格 */
+.table-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.activity-table thead tr {
+  background: #F5F5F5;
+}
+
+.activity-table th {
+  padding: 10px 14px;
+  text-align: left;
+  color: #666;
+  font-weight: 500;
+}
+
+.activity-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #F5F5F5;
+  color: #444;
+}
+
+.activity-title {
+  font-weight: 500;
+  color: #222;
+}
+
+/* 狀態標籤 */
+.badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge.active {
+  background: #d4edda;
+  color: #28a745;
+}
+
+.badge.inactive {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.badge.draft {
+  background: #fff3cd;
+  color: #ffc107;
+}
+
+/* 操作按鈕 */
+.action-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-edit {
+  background: var(--taoyuan-light-blue);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-active {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-inactive {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* 新增活動按鈕 */
+.btn-add {
+  background: var(--taoyuan-blue);
+  color: white;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  background: var(--taoyuan-light-blue);
+}

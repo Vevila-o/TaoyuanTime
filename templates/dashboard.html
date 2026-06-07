@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>桃園市政府 — 活動管理後台</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+  {% include "adminSidebar.html" with active_page="dashboard" %}
+  <div class="main-content">
+    <div class="topbar">
+      <h5><i class="bi bi-speedometer2"></i> 儀表板總覽</h5>
+      <small>最後更新：{% now "Y/m/d H:i" %}</small>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-3"><div class="stat-card blue"><div class="label">可服務活動</div><div class="number">{{ serviceable_active_count }}</div><div class="trend muted">上架 {{ active_count }} / 總數 {{ total_count }}</div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="label">資料狀態</div><div class="number" style="font-size:1.5rem">{{ database_status }}</div><div class="trend muted">缺口請到營運工具</div></div></div>
+      <div class="col-md-3"><div class="stat-card orange"><div class="label">LINE 使用者</div><div class="number">{{ user_count }}</div><div class="trend muted">訂閱 {{ subscription_count }}</div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="label">推播成功率</div><div class="number">{{ push_success_rate }}%</div><div class="trend muted">總筆數 {{ push_total }}</div></div></div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="chart-card h-100">
+          <h6>主要入口</h6>
+          <p class="small text-muted">更新活動請從爬蟲任務開始；補摘要、搜尋語意或 OCR 缺口再到營運工具。</p>
+          <a class="btn btn-primary btn-sm" href="{% url 'crawlJobs' %}">開始更新活動</a>
+          <a class="btn btn-outline-secondary btn-sm" href="{% url 'operations' %}">營運工具</a>
+          <a class="btn btn-outline-secondary btn-sm" href="{% url 'activityList' %}">活動列表</a>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="chart-card h-100">
+          <h6>資料缺口</h6>
+          <table class="table table-sm mb-0">
+            <tr><td>LINE 不可見</td><td class="text-end"><a href="{% url 'activityList' %}?readiness=line_blocked">{{ filter_summary.line_blocked }}</a></td></tr>
+            <tr><td>推薦被排除</td><td class="text-end"><a href="{% url 'activityList' %}?readiness=recommendation_blocked">{{ filter_summary.recommendation_blocked }}</a></td></tr>
+            <tr><td>缺搜尋語意</td><td class="text-end"><a href="{% url 'activityList' %}?readiness=missing_search_profile">{{ missing_search_profile_count }}</a></td></tr>
+            <tr><td>圖片需 fallback</td><td class="text-end">{{ placeholder_image_count }}</td></tr>
+            <tr><td>過期仍上架</td><td class="text-end">{{ expired_active_count }}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h6>最近爬蟲任務</h6>
+          <table class="table table-sm">
+            <thead><tr><th>任務</th><th>狀態</th><th>建立時間</th><th></th></tr></thead>
+            <tbody>
+              {% for job in recent_crawl_jobs %}
+                <tr><td>{{ job.title|default:job.id }}</td><td>{{ job.status }}</td><td>{{ job.created_at|date:"Y/m/d H:i" }}</td><td><a href="{% url 'crawlJobDetail' job.id %}">詳情</a></td></tr>
+              {% empty %}
+                <tr><td colspan="4">尚無爬蟲任務</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h6>最近匯入紀錄</h6>
+          <table class="table table-sm">
+            <thead><tr><th>狀態</th><th>新增</th><th>更新</th><th>完成時間</th></tr></thead>
+            <tbody>
+              {% for run in recent_imports %}
+                <tr><td>{{ run.status }}</td><td>{{ run.created_count }}</td><td>{{ run.updated_count }}</td><td>{{ run.finished_at|date:"Y/m/d H:i"|default:"-" }}</td></tr>
+              {% empty %}
+                <tr><td colspan="4">尚無匯入紀錄</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <details>
+      <summary class="small text-muted">細部診斷</summary>
+      <div class="row g-3 mt-2">
+        <div class="col-md-6">
+          <div class="chart-card">
+            <h6>主要篩選原因</h6>
+            <table class="table table-sm">
+              <tbody>
+                {% for reason, count in top_filter_reasons %}
+                  <tr><td>{{ reason }}</td><td class="text-end">{{ count }}</td></tr>
+                {% empty %}
+                  <tr><td>目前沒有明顯篩選原因</td><td></td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="chart-card">
+            <h6>最近爬蟲輸出報告</h6>
+            <table class="table table-sm">
+              <tr><td>整體狀態</td><td class="text-end">{{ health_report.overall_status }}</td></tr>
+              <tr><td>產生時間</td><td class="text-end">{{ health_report.generated_at|default:"-" }}</td></tr>
+              <tr><td>本次輸出筆數</td><td class="text-end">{{ health_report.totals.events|default:"0" }}</td></tr>
+              <tr><td>推薦池</td><td class="text-end">{{ health_report.totals.recommendation_items|default:"0" }}</td></tr>
+              <tr><td>AI ready</td><td class="text-end">{{ health_report.totals.ai_ready_activity_items|default:"0" }}</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+</body>
+</html>

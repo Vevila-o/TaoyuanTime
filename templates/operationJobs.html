@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>任務進度</title>
+  {% if auto_refresh %}<meta http-equiv="refresh" content="5">{% endif %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+  {% include "adminSidebar.html" with active_page="operation_jobs" %}
+  <div class="main-content">
+    <div class="topbar"><h5><i class="bi bi-list-task"></i> 任務進度</h5><small>queued {{ queued_count }} / running {{ running_count }}</small></div>
+    {% if messages %}{% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}{% endif %}
+
+    <div class="table-card">
+      <table class="table table-sm align-middle">
+        <thead><tr><th>ID</th><th>任務</th><th>類型</th><th>狀態</th><th>進度</th><th>成功 / 失敗 / 略過</th><th>目前項目</th><th>更新</th></tr></thead>
+        <tbody>
+          {% for job in jobs %}
+          <tr>
+            <td><a href="{% url 'operationJobDetail' job.id %}">#{{ job.id }}</a></td>
+            <td>{{ job.title|default:"-" }}</td>
+            <td>{{ job.job_type }}</td>
+            <td>
+              <span class="badge bg-secondary">{{ job.progress_label }}</span>
+              {% if job.maybe_stale %}<div class="small text-warning">可能中斷</div>{% endif %}
+            </td>
+            <td style="min-width:180px">
+              {% if job.empty_result_message %}
+                <div class="small text-muted">{{ job.empty_result_message }}</div>
+              {% else %}
+                <div class="d-flex justify-content-between small"><span>{{ job.processed_count }}/{{ job.total_count }}</span><span>{{ job.progress_percent }}%</span></div>
+                <div class="progress" style="height:8px"><div class="progress-bar {{ job.progress_class }}" style="width: {{ job.progress_percent }}%"></div></div>
+              {% endif %}
+            </td>
+            <td>{{ job.success_count }} / {{ job.failed_count }} / {{ job.skipped_count }}</td>
+            <td>{{ job.current_label|default:job.progress_message|truncatechars:48 }}</td>
+            <td>{{ job.updated_at|date:"m/d H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8">尚未建立任務</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

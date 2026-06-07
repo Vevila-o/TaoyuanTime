@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LINE 查詢模擬</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+  {% include "adminSidebar.html" with active_page="line_simulator" %}
+  <div class="main-content">
+    <div class="topbar">
+      <h5><i class="bi bi-chat-dots"></i> LINE 查詢模擬</h5>
+      <small>不呼叫 LINE API，只測後台資料庫查詢與回覆邏輯</small>
+    </div>
+    {% if messages %}{% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}{% endif %}
+
+    <div class="chart-card mb-4">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="simulate">
+        <label class="form-label small">輸入口語查詢</label>
+        <div class="row g-2">
+          <div class="col-md-9">
+            <input class="form-control" name="query" value="{{ result.query }}" placeholder="例如：不然騎腳踏車、有沒有桃園免費的最好運動的活動、火星免費潛水活動">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary w-100" type="submit">模擬查詢</button>
+          </div>
+        </div>
+      </form>
+      <form method="post" class="mt-2">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reset_context">
+        <button class="btn btn-sm btn-outline-secondary" type="submit">清除模擬器上下文</button>
+        <span class="small text-muted ms-2">測試 user：{{ simulator_user.line_user_id }}</span>
+      </form>
+    </div>
+
+    {% if result %}
+      <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="stat-card"><div class="label">Intent</div><div class="number" style="font-size:1.1rem">{{ result.intent }}</div></div></div>
+        <div class="col-md-3"><div class="stat-card blue"><div class="label">回覆類型</div><div class="number" style="font-size:1.1rem">{{ result.message_types|join:", " }}</div></div></div>
+        <div class="col-md-3"><div class="stat-card {% if result.has_flex %}green{% else %}orange{% endif %}"><div class="label">是否送卡片</div><div class="number" style="font-size:1.1rem">{% if result.has_flex %}是{% else %}否{% endif %}</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><div class="label">命中活動</div><div class="number">{{ result.activities|length }}</div></div></div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-5">
+          <div class="chart-card h-100">
+            <h6>搜尋條件 / 計畫</h6>
+            <pre class="small mb-0">{{ result.conditions_json }}</pre>
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="chart-card h-100">
+            <h6>回覆文字</h6>
+            {% for text in result.texts %}
+              <div class="alert alert-light border py-2 small">{{ text }}</div>
+            {% empty %}
+              <div class="small text-muted">沒有文字回覆。</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card mt-4">
+        <h6>命中活動</h6>
+        <table class="table table-sm align-middle">
+          <thead><tr><th>活動</th><th>日期</th><th>地區</th><th>狀態</th><th>搜尋語意</th><th>官方連結</th></tr></thead>
+          <tbody>
+            {% for activity in result.activities %}
+              <tr>
+                <td><a href="{% url 'activityEdit' activity.id %}">{{ activity.title|truncatechars:42 }}</a></td>
+                <td>{{ activity.start_date|date:"Y/m/d"|default:"-" }}</td>
+                <td>{{ activity.district|default:"-" }}</td>
+                <td>{{ activity.status }}</td>
+                <td>{{ activity.search_profile.status|default:"缺" }}</td>
+                <td>{{ activity.official_link_status|default:"unknown" }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6">沒有命中活動；正式 LINE 回覆不應硬塞卡片。</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

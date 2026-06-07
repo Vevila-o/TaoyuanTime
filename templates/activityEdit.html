@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活動編輯</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/activityAdd.css' %}">
+</head>
+<body>
+  {% include "adminSidebar.html" with active_page="activities" %}
+  <div class="main-content">
+    <div class="topbar">
+      <h5><i class="bi bi-pencil-square"></i> 活動編輯</h5>
+      <a href="{% url 'activityList' %}" class="btn-back">返回活動列表</a>
+    </div>
+    {% if messages %}
+      {% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}
+    {% endif %}
+    <form method="post" class="form-card">
+      {% csrf_token %}
+      {% include "activityFormFields.html" %}
+      <div class="form-actions">
+        <a href="{% url 'activityList' %}" class="btn-cancel">取消</a>
+        <button class="btn-save" type="submit">儲存活動</button>
+      </div>
+    </form>
+    <div class="form-card mt-3">
+      <h6>活動曝光診斷</h6>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="small text-muted">LINE 可見</div>
+          {% if exposure_diagnostic.line.ok %}<span class="badge active">可見</span>{% else %}<span class="badge draft">不可見</span><div class="small">{{ exposure_diagnostic.line.reasons|join:"、" }}</div>{% endif %}
+        </div>
+        <div class="col-md-3">
+          <div class="small text-muted">推薦可用</div>
+          {% if exposure_diagnostic.recommendation.ok %}<span class="badge active">可用</span>{% else %}<span class="badge draft">排除</span><div class="small">{{ exposure_diagnostic.recommendation.reasons|join:"、" }}</div>{% endif %}
+        </div>
+        <div class="col-md-3">
+          <div class="small text-muted">AI 摘要候選</div>
+          {% if exposure_diagnostic.ai_summary.ok %}<span class="badge active">候選</span>{% else %}<span class="badge draft">不處理</span><div class="small">{{ exposure_diagnostic.ai_summary.reasons|join:"、" }}</div>{% endif %}
+        </div>
+        <div class="col-md-3">
+          <div class="small text-muted">OCR 狀態</div>
+          {% if exposure_diagnostic.ocr.ok %}<span class="badge active">成功</span>{% else %}<span class="badge draft">未成功</span><div class="small">{{ exposure_diagnostic.ocr.reasons|join:"、" }}</div>{% endif %}
+        </div>
+      </div>
+      {% if exposure_diagnostic.quality_warnings %}
+        <div class="alert alert-warning mt-3 mb-0 py-2">品質警告：{{ exposure_diagnostic.quality_warnings|join:"、" }}</div>
+      {% endif %}
+      <div class="mt-3 small">
+        <div><strong>官方連結狀態：</strong>{{ activity.official_link_status|default:"unknown" }}{% if activity.official_link_checked_at %}（{{ activity.official_link_checked_at|date:"m/d H:i" }}）{% endif %}</div>
+        {% if activity.official_link_error %}
+          <div class="text-muted"><strong>連結檢查備註：</strong>{{ activity.official_link_error|truncatechars:180 }}</div>
+        {% endif %}
+        <div><strong>OCR 狀態：</strong>{{ activity.ocr_status|default:"未執行" }}</div>
+        <div><strong>OCR 圖檔：</strong>{{ activity.ocr_image_path|default:"-" }}</div>
+        {% if activity.ocr_summary %}
+          <div class="mt-2"><strong>OCR 摘要：</strong>{{ activity.ocr_summary }}</div>
+        {% endif %}
+        {% if activity.ocr_text %}
+          <details class="mt-2">
+            <summary>查看 OCR 全文</summary>
+            <pre class="small bg-light p-2 mt-2" style="white-space:pre-wrap; max-height:260px; overflow:auto">{{ activity.ocr_text }}</pre>
+          </details>
+        {% endif %}
+        {% if activity.ocr_warnings %}
+          <div class="text-muted mt-2"><strong>OCR 備註：</strong>{{ activity.ocr_warnings|truncatechars:180 }}</div>
+        {% endif %}
+      </div>
+      <div class="mt-3 d-flex gap-2 flex-wrap">
+        <form method="post" action="{% url 'activitySetReadiness' id=activity.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="target" value="line_ready">
+          <input type="hidden" name="value" value="{% if activity.line_ready %}false{% else %}true{% endif %}">
+          <button class="btn btn-sm btn-outline-primary" type="submit">{% if activity.line_ready %}關閉 LINE ready{% else %}標記 LINE ready{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'activitySetReadiness' id=activity.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="target" value="recommendation_ready">
+          <input type="hidden" name="value" value="{% if activity.recommendation_ready %}false{% else %}true{% endif %}">
+          <button class="btn btn-sm btn-outline-primary" type="submit">{% if activity.recommendation_ready %}關閉推薦 ready{% else %}標記推薦 ready{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'activitySetReadiness' id=activity.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="target" value="ai_ready">
+          <input type="hidden" name="value" value="{% if activity.ai_ready %}false{% else %}true{% endif %}">
+          <button class="btn btn-sm btn-outline-primary" type="submit">{% if activity.ai_ready %}關閉 AI ready{% else %}標記 AI ready{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'activityApplyAiTags' id=activity.id %}">
+          {% csrf_token %}
+          <button class="btn btn-sm btn-outline-danger" type="submit">AI Tag 直接套用此活動</button>
+        </form>
+      </div>
+    </div>
+    <div class="form-card mt-3">
+      <h6>AI 搜尋語意</h6>
+      {% if search_profile %}
+        <div class="small text-muted mb-2">狀態：{{ search_profile.status }}｜模型：{{ search_profile.provider_model|default:"-" }}｜更新：{{ search_profile.updated_at|date:"m/d H:i" }}</div>
+        {% if search_profile.error %}<div class="alert alert-warning py-2">{{ search_profile.error|truncatechars:220 }}</div>{% endif %}
+        <div class="mb-2"><strong>Keywords：</strong>{% if search_profile.keywords %}{{ search_profile.keywords|join:"、" }}{% else %}-{% endif %}</div>
+        <div class="mb-2"><strong>Topics：</strong>{% if search_profile.topics %}{{ search_profile.topics|join:"、" }}{% else %}-{% endif %}</div>
+        <div class="mb-2"><strong>Synonyms：</strong>{% if search_profile.synonyms %}{{ search_profile.synonyms|join:"、" }}{% else %}-{% endif %}</div>
+        <details class="mt-2">
+          <summary>查看搜尋文字</summary>
+          <pre class="small bg-light p-2 mt-2" style="white-space:pre-wrap; max-height:220px; overflow:auto">{{ search_profile.search_text }}</pre>
+        </details>
+      {% else %}
+        <div class="text-danger small">尚未建立搜尋語意。可到「營運工具」按一鍵補 AI Tag 與搜尋語意。</div>
+      {% endif %}
+    </div>
+    <div class="row g-3 mt-3">
+      <div class="col-md-4">
+        <div class="form-card">
+          <h6>活動異動紀錄</h6>
+          <table class="table table-sm">
+            {% for log in change_logs %}
+              <tr><td>{{ log.field_name }}</td><td>{{ log.created_at|date:"m/d H:i" }}</td></tr>
+            {% empty %}
+              <tr><td>尚無異動紀錄</td></tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-card">
+          <h6>AI 處理紀錄</h6>
+          <table class="table table-sm">
+            {% for log in ai_logs %}
+              <tr>
+                <td>{{ log.created_at|date:"m/d H:i" }}</td>
+                <td>{{ log.task_type }}</td>
+                <td>{{ log.model|default:"-" }}</td>
+                <td>{{ log.status }}{% if log.error %}<div class="small text-muted">{{ log.error|truncatechars:80 }}</div>{% endif %}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4">尚無 AI 紀錄</td></tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-card">
+          <h6>後台操作紀錄</h6>
+          <table class="table table-sm">
+            {% for log in admin_logs %}
+              <tr><td>{{ log.action }}</td><td>{{ log.created_at|date:"m/d H:i" }}</td></tr>
+            {% empty %}
+              <tr><td>尚無操作紀錄</td></tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
