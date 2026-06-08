@@ -141,6 +141,10 @@ class UserProfile(models.Model):
     push_enabled = models.BooleanField(default=True)
     default_remind_before_days = models.PositiveIntegerField(default=1)
     has_citizen_card = models.BooleanField(default=False)
+    citizen_card_number = models.CharField(max_length=50, blank=True, null=True) # 儲存卡號
+    citizen_name = models.CharField(max_length=100, blank=True, null=True)       # 綁定姓名
+    citizen_phone = models.CharField(max_length=20, blank=True, null=True)       # 綁定電話
+    citizen_birthdate = models.DateField(blank=True, null=True)                  # 綁定生日
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -189,3 +193,23 @@ class ActionLog(models.Model):
 
     def __str__(self):
         return f"{self.user} {self.action_type} {self.activity or ''}"
+    
+class CitizenCardData(models.Model):
+    # 這是「官方驗證」的資料庫，預先匯入
+    card_number = models.CharField(max_length=14, unique=True) # 14碼數位碼
+    name = models.CharField(max_length=50)
+    phone = models.CharField(max_length=20)
+    birthdate = models.DateField()
+
+    def __str__(self):
+        return f"{self.name} ({self.card_number})"
+    
+class Store(models.Model):
+    name = models.CharField(max_length=100)      # 商店名稱
+    district = models.CharField(max_length=20)    # 地區（如：中壢區）
+    address = models.CharField(max_length=255)    # 詳細地址
+    latitude = models.FloatField()               # 緯度
+    longitude = models.FloatField()              # 經度
+    discount_info = models.TextField()           # 優惠內容
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)

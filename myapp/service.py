@@ -122,3 +122,13 @@ def get_line_card_payload(activity: Activity) -> dict:
         'is_free': activity.is_free,
         'requires_registration': activity.requires_registration,
     }
+
+from math import radians, cos, sin, asin, sqrt
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    R = 6371  # 地球半徑
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
+    return 2 * R * asin(sqrt(a))
+

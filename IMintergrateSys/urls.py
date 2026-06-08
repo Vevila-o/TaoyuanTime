@@ -30,3 +30,6 @@ urlpatterns = [
     path('callback', callback, name='line_callback'), #LINE Bot
 
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

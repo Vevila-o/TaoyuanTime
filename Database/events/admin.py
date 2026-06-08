@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SourceWebsite, Activity, Tag, UserProfile, Subscription, ActionLog
+from .models import SourceWebsite, Activity, Tag, UserProfile, Subscription, ActionLog ,Store,CitizenCardData
 
 # Register your models here.
 @admin.register(Activity)
@@ -47,3 +47,11 @@ class ActionLogAdmin(admin.ModelAdmin):
     list_filter = ('action_type',)
     readonly_fields = ('metadata','created_at')
  
+
+@admin.register(Store)
+class StoreAdmin(admin.ModelAdmin):
+    list_display = ('name', 'district', 'address','discount_info','start_date','end_date')
+    
+@admin.register(CitizenCardData)
+class CitizenCardDataAdmin(admin.ModelAdmin):
+    list_display = ('card_number', 'name', 'phone','birthdate')
