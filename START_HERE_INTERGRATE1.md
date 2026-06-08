@@ -155,6 +155,61 @@ python manage.py run_crawler_pipeline --no-import --no-assets --skip-dynamic --s
 python manage.py run_crawler_pipeline --activate --skip-dynamic --primary-limit 20 --secondary-limit 20 --max-runtime 10
 ```
 
+完整更新建議優先走後台：
+
+1. 開 `http://127.0.0.1:8000/crawlJobs/`
+2. 使用「一鍵完整更新」或建立爬蟲任務
+3. 若任務只進 queued、沒有自動開始，執行：
+
+```powershell
+python manage.py run_queued_crawl_jobs --limit 1
+```
+
+完整更新流程會做：爬蟲、匯入、過期活動自動下架、AI Tag、搜尋語意、AI 摘要與 OCR。這不是 Windows 自動排程；需要你手動按後台或手動執行 command。
+
+只建立/處理 queued job 的情況：
+
+```powershell
+python manage.py run_queued_crawl_jobs --limit 1
+```
+
+如果知道特定 job id：
+
+```powershell
+python manage.py run_queued_crawl_jobs --job-id <job_id>
+```
+
+只想清掉 dashboard 的「過期仍上架」：
+
+```powershell
+python manage.py archive_expired_activities
+```
+
+先確認 dry-run 列表沒問題，再執行：
+
+```powershell
+python manage.py archive_expired_activities --apply
+```
+
+低成本更新，只跑爬蟲匯入、不跑圖片資產：
+
+```powershell
+python manage.py run_crawler_pipeline --activate --skip-dynamic --no-assets --primary-limit 50 --secondary-limit 50 --max-runtime 15
+```
+
+資料已經有 JSON，只重新匯入：
+
+```powershell
+python manage.py import_crawler_json --input scraping\data\output\activities_all.json --activate
+```
+
+任務卡住處理：
+
+- 先看 `/crawlJobs/` 是否有 running 很久的任務。
+- 如果電腦關機、Django server 被停止、網路斷線或 SQLite locked，running 任務不會自己恢復。
+- 在 `/crawlJobs/` 把該任務標記中斷/失敗後，再重新建立任務或執行 `python manage.py run_queued_crawl_jobs --limit 1`。
+- 若是在終端機手動跑爬蟲，按 `Ctrl + C` 可停止目前程序。
+
 AI 摘要：
 
 ```powershell

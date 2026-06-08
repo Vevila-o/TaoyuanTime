@@ -100,6 +100,33 @@ python manage.py migrate
 python manage.py import_crawler_json --input scraping\data\output\activities_all.json --activate
 ```
 
+小批次爬蟲測試，不匯入：
+
+```powershell
+python manage.py run_crawler_pipeline --no-import --no-assets --skip-dynamic --source travel_openapi --primary-limit 1 --secondary-limit 1 --max-runtime 1
+```
+
+正式爬蟲並匯入：
+
+```powershell
+python manage.py run_crawler_pipeline --activate --skip-dynamic --primary-limit 20 --secondary-limit 20 --max-runtime 10
+```
+
+完整更新建議走後台 `/crawlJobs/` 的「一鍵完整更新」。這條流程會建立 `CrawlJob`，並由既有 queued job 執行：爬蟲、匯入、過期下架、AI Tag、搜尋語意、AI 摘要與 OCR。若後台只建立 queued job、沒有自動背景程序，可手動跑：
+
+```powershell
+python manage.py run_queued_crawl_jobs --limit 1
+```
+
+只清掉 dashboard 的「過期仍上架」：
+
+```powershell
+python manage.py archive_expired_activities
+python manage.py archive_expired_activities --apply
+```
+
+任務卡住時，到 `/crawlJobs/` 把 running 任務標記中斷/失敗，再重新建立或重跑 queued job。停止目前終端機中的 Django 或爬蟲可按 `Ctrl + C`。
+
 AI 摘要：
 
 ```powershell
