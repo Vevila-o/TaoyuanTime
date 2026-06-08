@@ -129,7 +129,25 @@ https://你的-ngrok-domain.ngrok-free.app/callback
 
 提醒：用瀏覽器或假 POST 打 `/callback` 回 400 或 403 是正常的，真 LINE webhook 需要 LINE signature。
 
-## 7. 常用資料與 AI 指令
+## 7. 管理員日常更新活動
+
+如果你是管理員、不會任何指令，日常更新活動只需要：
+
+1. 確認 Django server 已啟動。
+2. 打開 `http://127.0.0.1:8000/crawlJobs/`。
+3. 按「一鍵完整更新」或建立完整更新任務。
+4. 進任務詳情看進度與結果。
+
+完整更新會做：爬蟲、匯入、過期活動自動下架、AI Tag、搜尋語意、AI 摘要與 OCR。它不會定時自己跑；要更新時手動按後台即可。
+
+資料保存原則：
+
+- 過期活動只會從 `active` 改成 `inactive`，不會刪掉活動資料。
+- 訂閱、互動、異動紀錄會保留，方便查歷史與追蹤。
+- `scraping\data\assets\`、`scraping\data\raw_html\`、`scraping\data\debug_cases\` 目前沒有自動過期刪除機制，除非手動刪，否則會保留。
+- `scraping\data\output\activities_all.json`、`health_report.json` 等最新輸出檔會被下一次爬蟲覆寫；這是更新最新狀態，不是清歷史。若要保存每一次爬蟲快照，需另外備份。
+
+## 8. 常用資料與 AI 指令
 
 匯入既有 JSON dry-run：
 
@@ -165,7 +183,7 @@ python manage.py run_crawler_pipeline --activate --skip-dynamic --primary-limit 
 python manage.py run_queued_crawl_jobs --limit 1
 ```
 
-完整更新流程會做：爬蟲、匯入、過期活動自動下架、AI Tag、搜尋語意、AI 摘要與 OCR。這不是 Windows 自動排程；需要你手動按後台或手動執行 command。
+完整更新流程會做：爬蟲、匯入、過期活動自動下架、AI Tag、搜尋語意、AI 摘要與 OCR。它不會定時自己跑；需要你手動按後台或手動執行 command。
 
 只建立/處理 queued job 的情況：
 
@@ -230,7 +248,7 @@ OCR：
 python manage.py process_activity_ocr --limit 20
 ```
 
-## 8. 推播與提醒
+## 9. 推播與提醒
 
 推薦推播 dry-run：
 
@@ -262,7 +280,7 @@ python manage.py push_activity_change_notifications --dry-run
 python manage.py push_activity_change_notifications
 ```
 
-## 9. 驗收 smoke
+## 10. 驗收 smoke
 
 LINE 自然語言與 tracking 回歸：
 
@@ -276,7 +294,7 @@ python manage.py smoke_extreme_line_flow
 python manage.py shell -c "from django.test import Client; c=Client(); urls=['/dashboard/','/operations/','/operations/jobs/','/activityList/','/tagReview/','/push','/User','/crawlJobs/','/activityChanges/','/lineQuerySimulator/']; [print(u, c.get(u).status_code) for u in urls]"
 ```
 
-## 10. 注意事項
+## 11. 注意事項
 
 - `.env` 不提交。
 - `Database\db.sqlite3` 是本資料夾獨立 DB。
@@ -284,6 +302,4 @@ python manage.py shell -c "from django.test import Client; c=Client(); urls=['/d
 - LINE 沒反應時，先看 Django server 是否收到 `/callback`，再看 ngrok 與 LINE Developers webhook URL。
 - 改 ngrok domain 後，要同步更新 `.env` 的 `PUBLIC_BASE_URL` 與 LINE Developers webhook URL。
 - AI 服務選擇規則：`LOCAL=not/false/0/no/off` 或 `AI_BASE_URL` 空白/`not` 時，直接使用 OpenAI cloud；`LOCAL=true` 且 `AI_BASE_URL` 有值時，才會先試本地端再 fallback。AI 對話、AI Tag、AI 摘要與 OCR 都共用這套規則。
-
-
 

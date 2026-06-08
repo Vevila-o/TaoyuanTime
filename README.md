@@ -15,6 +15,8 @@
 - `.env` 只放本機，不提交 Git。
 - `.env.example` 是預設雲端 OpenAI API 模式，不預設連本地模型。
 - 爬蟲輸出與活動資料保留在 `scraping/data/`，方便換電腦後不用重新爬。
+- 活動過期只會從 `active` 下架成 `inactive`，不會刪資料庫活動、訂閱、互動、異動紀錄，也不會刪 `scraping/data/assets/`、`scraping/data/raw_html/`、`scraping/data/debug_cases/` 等爬蟲保存檔案。
+- `scraping/data/output/activities_all.json`、`health_report.json` 這類「最新輸出檔」可能會被下一次爬蟲覆寫；如果要保留每次快照，需要另外手動備份。
 
 ## 快速啟動
 
@@ -83,6 +85,17 @@ AI_PROVIDER_ORDER=local,openai
 - AI tag / AI summary / OCR，可用本地 OpenAI-compatible API 或 OpenAI fallback。
 - 爬蟲 pipeline 與既有活動 JSON 匯入。
 - 活動異動通知、訂閱提醒、推薦推播。
+
+## 管理員日常更新
+
+如果你是管理員、完全不想記指令，日常更新只要做這件事：
+
+1. 啟動 Django server。
+2. 打開 `http://127.0.0.1:8000/crawlJobs/`。
+3. 按「一鍵完整更新」。
+4. 到任務詳情確認狀態是 success 或 partial。
+
+「一鍵完整更新」會處理爬蟲、匯入、過期下架、AI Tag、搜尋語意、AI 摘要與 OCR。過期活動只會下架，不會刪除歷史資料或爬蟲保存檔案。
 
 ## 常用指令
 
@@ -213,3 +226,4 @@ LINE 實機至少測：
 - `Database/db.sqlite3` 會提交，讓這份快完成品換電腦後仍有活動資料可用。
 - `scraping/data/` 會提交，避免組員重新爬資料。
 - 目前建議分支：`codex/near-complete-build`。
+
