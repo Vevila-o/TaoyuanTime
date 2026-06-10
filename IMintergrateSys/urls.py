@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from admin_app import views
 from myapp import views as line_views
 
@@ -51,3 +53,7 @@ urlpatterns = [
     path('track/maps/<int:activity_id>/', line_views.track_maps, name='track_maps'), # LINE maps tracking
 
 ]
+
+# 配置媒體文件服務（開發環境）
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

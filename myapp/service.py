@@ -2,6 +2,7 @@ from django.utils import timezone
 from django.db.models import Count, Q
 from events.models import Activity, UserProfile, Subscription, ActionLog, Tag
 from datetime import timedelta
+from math import radians, sin, cos, sqrt, asin
 
 
 def recommend_activities_for_user(user: UserProfile, limit: int = 3):
@@ -122,3 +123,11 @@ def get_line_card_payload(activity: Activity) -> dict:
         'is_free': activity.is_free,
         'requires_registration': activity.requires_registration,
     }
+
+#  距離計算
+def calculate_distance(lat1, lon1, lat2, lon2):
+    R = 6371
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
+    return 2 * R * asin(sqrt(a))

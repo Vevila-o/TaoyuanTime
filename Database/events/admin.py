@@ -7,6 +7,7 @@ from .models import (
     ActivityChangeLog,
     ActivityTagSuggestion,
     AdminAuditLog,
+    CitizenCardData,
     CrawlJob,
     CrawlTask,
     ImportRun,
@@ -15,6 +16,7 @@ from .models import (
     PushCampaign,
     PushDeliveryLog,
     SourceWebsite,
+    Store,
     Subscription,
     Tag,
     UserProfile,
@@ -159,3 +161,19 @@ class AdminAuditLogAdmin(admin.ModelAdmin):
     search_fields = ('actor','action','activity__title')
     list_filter = ('action',)
     readonly_fields = ('metadata','created_at')
+
+
+@admin.register(CitizenCardData)
+class CitizenCardDataAdmin(admin.ModelAdmin):
+    list_display = ('card_number','name','phone','birthdate')
+    search_fields = ('card_number','name','phone')
+    readonly_fields = ()
+
+
+@admin.register(Store)
+class StoreAdmin(admin.ModelAdmin):
+    list_display = ('name','district','address','discount_info','start_date','end_date')
+    search_fields = ('name','district','address','discount_info')
+    list_filter = ('district','start_date','end_date')
+    readonly_fields = ()
+

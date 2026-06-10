@@ -1,7 +1,5 @@
 from datetime import timedelta
 
-from datetime import timedelta
-
 from django.db import models
 from django.utils import timezone
 
@@ -170,6 +168,10 @@ class UserProfile(models.Model):
     last_recommend_pushed_at = models.DateTimeField(null=True, blank=True)
     default_remind_before_days = models.PositiveIntegerField(default=1)
     has_citizen_card = models.BooleanField(default=False)
+    citizen_card_number = models.CharField(max_length=50, blank=True, null=True)
+    citizen_name = models.CharField(max_length=100, blank=True, null=True)
+    citizen_phone = models.CharField(max_length=20, blank=True, null=True)
+    citizen_birthdate = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -214,6 +216,7 @@ class ActionLog(models.Model):
         ('add_calendar','add_calendar'),
         ('view_more','view_more'),
         ('citizen_card_click','citizen_card_click'),
+        ('citizen_card_bind','citizen_card_bind'),
     ]
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='action_logs')
     activity = models.ForeignKey(Activity, null=True, blank=True, on_delete=models.SET_NULL, related_name='action_logs')
@@ -665,3 +668,24 @@ class AdminAuditLog(models.Model):
 
     def __str__(self):
         return f'{self.actor} {self.action}'
+
+# 市民卡
+class CitizenCardData(models.Model):
+    card_number = models.CharField(max_length=14, unique=True)
+    name = models.CharField(max_length=50)
+    phone = models.CharField(max_length=20)
+    birthdate = models.DateField()
+
+    def __str__(self):
+        return f"{self.name} ({self.card_number})"
+
+# 商店
+class Store(models.Model):
+    name = models.CharField(max_length=100)
+    district = models.CharField(max_length=20)
+    address = models.CharField(max_length=255)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    discount_info = models.TextField()
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
