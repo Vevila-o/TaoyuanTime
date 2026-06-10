@@ -93,5 +93,111 @@ admin 註冊是為了資料庫的註冊因為大家都是令建專案導致有3�
 4. 提醒通知修改
    目前提醒推播不論幾天都是「前一天」，要根據使用者的選擇做改動
 
+---
+
+#### 6/10 活動資料重建教學
+
+這版已改成以本機 AI 為主，預設不走 OpenAI fallback。
+
+重建活動資料建議順序：
+
+1. 確認 `.env`
+
+   ```env
+   AI_PROVIDER_ORDER=local
+   AI_BASE_URL=http://localhost:11434/v1
+   AI_MODEL=qwen
+   ```
+
+   重點是 `AI_PROVIDER_ORDER=local`，如果本機 AI 沒開，AI tag / search profile 會直接失敗，不會偷偷改用 OpenAI。
+
+2. 確認本機 AI 連線
+
+   ```powershell
+   python manage.py shell --skip-checks
+   ```
+
+   進入 shell 後可以測：
+
+   ```python
+   from events.ai_providers import provider_order
+   provider_order()
+   ```
+
+   正常應該看到：
+
+   ```python
+   ['local']
+   ```
+
+3. 清空活動資料，但保留使用者、標籤、特約商店
+
+   先 dry-run 看會刪什麼：
+
+   ```powershell
+   python manage.py reset_activity_data --dry-run --skip-checks
+   ```
+
+   確認後再真的刪：
+
+   ```powershell
+   python manage.py reset_activity_data --confirm --skip-checks
+   ```
+
+   這個指令會刪活動、活動訂閱、活動推播紀錄、活動搜尋語意、AI 處理紀錄；不會刪 `UserProfile`、`Tag`、`Store`。
+
+4. 重新爬活動並匯入
+
+   現在後台與命令列的預設爬取上限已改成 1，方便先小量測試。
+
+   小量測試：
+
+   ```powershell
+   python manage.py run_crawler_pipeline --primary-limit 1 --secondary-limit 1 --max-runtime 10 --skip-dynamic --no-assets --activate --skip-checks
+   ```
+
+   想加大數量時，自己把 `--primary-limit` / `--secondary-limit` 改大即可，例如：
+
+   ```powershell
+   python manage.py run_crawler_pipeline --primary-limit 30 --secondary-limit 30 --max-runtime 30 --skip-dynamic --no-assets --activate --skip-checks
+   ```
+
+5. 補 AI tag 與搜尋語意
+
+   匯入後要再跑一次 AI tag，因為 LINE 的資料庫型聊天搜尋會吃 `ActivitySearchProfile`。
+
+   小量測試：
+
+   ```powershell
+   python manage.py ai_tag_activities --limit 5 --apply --skip-checks
+   ```
+
+   大量處理：
+
+   ```powershell
+   python manage.py ai_tag_activities --limit 50 --apply --skip-checks
+   ```
+
+   如果中途停止，已完成的活動會留下 tag / search profile；之後可以再跑一次接著補。
+
+6. 驗證資料量
+
+   ```powershell
+   python manage.py reset_activity_data --dry-run --skip-checks
+   ```
+
+   或用 Django shell 看活動數：
+
+   ```python
+   from events.models import Activity, ActivitySearchProfile
+   Activity.objects.count()
+   ActivitySearchProfile.objects.count()
+   ```
+
+7. 注意目前本機環境
+
+   `smoke_extreme_line_flow` 目前會被 `barcode` 套件擋住，因為 `myapp/views.py` 會 import `barcode`。
+   `requirements.txt` 裡已經有 `python-barcode>=0.15`，但目前本機 Python 環境看起來尚未安裝。
+
 
 
