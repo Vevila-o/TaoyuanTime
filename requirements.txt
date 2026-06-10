@@ -9,4 +9,5 @@ python-dotenv>=1.0
 setuptools>=65.0
 lxml>=4.9
 scrapling>=0.2
+curl_cffi>=0.15.0
 playwright>=1.44

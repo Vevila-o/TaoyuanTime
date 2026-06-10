@@ -5,6 +5,7 @@ from datetime import timedelta
 from math import radians, sin, cos, sqrt, asin
 
 
+# 依使用者偏好標籤推薦活動，以符合標籤數與開始時間排序
 def recommend_activities_for_user(user: UserProfile, limit: int = 3):
     """
     根據使用者 preferred_tags 推薦活動（最多 limit 筆）。
@@ -23,6 +24,7 @@ def recommend_activities_for_user(user: UserProfile, limit: int = 3):
     return list(qs)
 
 
+# 多條件搜尋活動（地區、標籤、費用、時間），只回傳上架且未過期的活動
 def search_activities_by_conditions(district=None, tag_names=None, is_free=None, start_date=None, end_date=None, limit=3, ai_mode: bool = False):
     """
     搜尋活動條件：district(字串包含)、tag_names (list of tag names)、is_free (bool)、start_date/end_date (datetime/date)
@@ -47,6 +49,7 @@ def search_activities_by_conditions(district=None, tag_names=None, is_free=None,
     return list(qs.distinct().order_by('start_date')[:limit])
 
 
+# 取得公開且有官方詳情頁的上架活動
 def get_public_items():
     """Items that are public and have official detail page"""
     now = timezone.now()
@@ -56,6 +59,7 @@ def get_public_items():
     return qs
 
 
+# 取得適合 AI 處理（ai_ready=True, is_activity=True）的上架活動
 def get_ai_ready_activities():
     """Activities suitable for AI processing"""
     now = timezone.now()
@@ -65,6 +69,7 @@ def get_ai_ready_activities():
     return qs
 
 
+# 取得可進入推薦池（recommendation_ready=True）的上架活動
 def get_recommendation_ready_activities():
     """Activities allowed into recommendation pool"""
     now = timezone.now()
@@ -74,6 +79,7 @@ def get_recommendation_ready_activities():
     return qs
 
 
+# 記錄使用者互動行為至 ActionLog
 def log_user_action(user: UserProfile, action_type: str, activity: Activity = None, metadata: dict = None):
     """記錄使用者互動至 ActionLog"""
     ActionLog.objects.create(
@@ -84,6 +90,7 @@ def log_user_action(user: UserProfile, action_type: str, activity: Activity = No
     )
 
 
+# 取得在 window_hours 小時內需要發送提醒的訂閱列表
 def get_due_subscriptions(window_hours: int = 24):
     """
     回傳需要在接下來 window_hours 小時內發送提醒的 Subscription 列表。
@@ -103,6 +110,7 @@ def get_due_subscriptions(window_hours: int = 24):
     return due
 
 
+# 取得 LINE 卡片格式的活動資料（需 line_ready=True）
 def get_line_card_payload(activity: Activity) -> dict:
     """Return a clean payload dict for LINE card usage.
 
@@ -125,6 +133,7 @@ def get_line_card_payload(activity: Activity) -> dict:
     }
 
 #  距離計算
+# 用 Haversine 公式計算兩地理座標之間的距離（公里）
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371
     dlat = radians(lat2 - lat1)

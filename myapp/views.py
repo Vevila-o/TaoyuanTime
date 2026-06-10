@@ -35,6 +35,7 @@ parser = WebhookParser(settings.LINE_CHANNEL_SECRET) if settings.LINE_CHANNEL_SE
 
 
 @csrf_exempt
+# LINE Webhook 入口，接收並驗證所有 LINE 事件
 def callback(request):
     if request.method != 'POST':
         return HttpResponseBadRequest('Only POST is allowed')
@@ -60,6 +61,7 @@ def callback(request):
     return HttpResponse('OK')
 
 
+# 事件分派器，依事件類型（追蹤/Postback/文字/位置）決定處理方式
 def dispatch_line_event(event):
     if isinstance(event, FollowEvent):
         user = get_or_create_line_user(getattr(event.source, 'user_id', ''), fetch_display_name(event.source.user_id))
@@ -78,6 +80,7 @@ def dispatch_line_event(event):
     return None
 
 
+# 處理 LINE Postback 事件，分流市民卡與活動操作
 def handle_postback_event(event):
     user = get_or_create_line_user(getattr(event.source, 'user_id', ''))
     params = dict(urllib.parse.parse_qsl(event.postback.data or ''))
@@ -90,6 +93,7 @@ def handle_postback_event(event):
     return handle_activity_postback(user, action, params)
 
 
+# 處理 LINE 文字訊息事件，分流市民卡指令與一般查詢
 def handle_text_message(event):
     text = event.message.text.strip()
     user = get_or_create_line_user(getattr(event.source, 'user_id', ''))
@@ -100,6 +104,7 @@ def handle_text_message(event):
     return handle_line_text_message(user, text)
 
 
+# 處理市民卡相關 Postback（顯示條碼、綁定確認、請求位置）
 def handle_citizen_card_postback(event, action, params):
     line_user_id = event.source.user_id
     try:
@@ -161,6 +166,7 @@ def handle_citizen_card_postback(event, action, params):
 CITIZEN_CARD_COMMANDS = {'我的桃園市民卡', '市民卡', '數位市民卡', '查詢市民卡', '市民卡查詢'}
 
 
+# 處理市民卡相關文字指令（查詢顯示條碼、輸入卡號綁定）
 def handle_citizen_card_text(event, text):
     line_user_id = event.source.user_id
 
@@ -230,6 +236,7 @@ def handle_citizen_card_text(event, text):
     return False
 
 
+# 取得 LINE 使用者顯示名稱，失敗時回傳預設值
 def fetch_display_name(line_user_id):
     if not line_user_id or line_bot_api is None:
         return '桃園市民'
@@ -239,6 +246,7 @@ def fetch_display_name(line_user_id):
         return '桃園市民'
 
 
+# 處理位置訊息，搜尋 5 公里內有效特約商店並回覆 Flex 卡片
 def handle_location(event):
     lat = event.message.latitude
     lon = event.message.longitude
@@ -303,29 +311,22 @@ def handle_location(event):
     )
 
 
-def get_preference_flex_message(user_profile, show_only=None):
+# 產生偏好設定 Flex Message（全版標籤選擇面板）>>在line_service.py
+# def get_preference_flex_message(user_profile, show_only=None):
     current_tags = list(user_profile.preferred_tags.values_list('name', flat=True))
 
     all_sections = [
-        {"title": "🎨 藝文與知識", "tags": [
-            {"name": "藝文", "label": "🎨 藝文"}, {"name": "表演", "label": "🎭 表演"},
-            {"name": "展覽", "label": "🖼️ 展覽"}, {"name": "電影", "label": "🎬 電影"},
-            {"name": "閱讀", "label": "📖 閱讀"}, {"name": "講座", "label": "🎤 講座"}
-        ]},
-        {"title": "🌲 休閒與戶外", "tags": [
-            {"name": "戶外", "label": "🌲 戶外"}, {"name": "市集", "label": "🛍️ 市集"},
-            {"name": "農遊", "label": "🚜 農遊"}, {"name": "運動", "label": "⚽ 運動"},
-            {"name": "手作", "label": "🔨 手作"}
-        ]},
-        {"title": "🎵 其他類型", "tags": [
-            {"name": "動漫", "label": "✨ 動漫"}, {"name": "音樂", "label": "🎸 音樂"},
-            {"name": "節慶", "label": "🎉 節慶"}
-        ]},
-        {"title": "👥 專屬目標對象", "tags": [
-            {"name": "親子", "label": "👨‍👩‍👧 親子"}, {"name": "學生", "label": "🎒 學生"},
-            {"name": "情侶", "label": "👩‍❤️‍👨 情侶"}, {"name": "毛孩", "label": "🐾 寵物"},
-            {"name": "長輩", "label": "👵 長輩"}, {"name": "青年", "label": "🚀 青年"}
-        ]},
+        {"title": "🎨 藝文與知識", "tags": [{"name": "藝文", "label": "🎨 藝文"}, {"name": "表演", "label": "🎭 表演"},
+                {"name": "展覽", "label": "🖼️ 展覽"}, {"name": "電影", "label": "🎬 電影"},
+                {"name": "閱讀", "label": "📖 閱讀"}, {"name": "講座", "label": "🎤 講座"}]}, # 放入你的標籤資料
+        {"title": "🌲 休閒與戶外", "tags": [{"name": "戶外", "label": "🌲 戶外"}, {"name": "市集", "label": "🛍️ 市集"},
+                {"name": "農遊", "label": "🚜 農遊"}, {"name": "運動", "label": "⚽ 運動"},
+                {"name": "手作", "label": "🔨 手作"}]},
+        {"title": "🎵 其他類型", "tags": [{"name": "動漫", "label": "✨ 動漫"}, {"name": "音樂", "label": "🎸 音樂"},
+                {"name": "節慶", "label": "🎉 節慶"}]},
+        {"title": "👥 專屬目標對象", "tags": [{"name": "親子", "label": "👨‍👩‍👧 親子"}, {"name": "學生", "label": "🎒 學生"},
+                {"name": "情侶", "label": "👩‍❤️‍👨 情侶"}, {"name": "毛孩", "label": "🐾 寵物"},
+                {"name": "長輩", "label": "👵 長輩"}, {"name": "青年", "label": "🚀 青年"}]},
         {"title": "💳 優惠與費用", "tags": [
             {"name": "免費", "label": "🆓 免費"}, {"name": "免預約", "label": "📝 免預約"},
             {"name": "市民卡", "label": "💳 市民卡"}, {"name": "特約優惠", "label": "🏷️ 特約優惠"}
@@ -388,6 +389,7 @@ def get_preference_flex_message(user_profile, show_only=None):
     return FlexSendMessage(alt_text="請設定活動偏好(可多選)", contents=flex_contents)
 
 
+# 產生活動卡片輪播 Flex 訊息（舊版，供後台推播使用）
 def generate_activity_carousel(activities, focus_tag=None):
     bubbles = []
     for act in activities:
@@ -455,6 +457,7 @@ def generate_activity_carousel(activities, focus_tag=None):
     return {"type": "carousel", "contents": bubbles}
 
 
+# 產生訂閱活動輪播 Flex 訊息（含取消訂閱按鈕）
 def generate_subscription_carousel(activities):
     bubbles = []
     for act in activities:
@@ -495,6 +498,7 @@ def generate_subscription_carousel(activities):
     return {"type": "carousel", "contents": bubbles}
 
 
+# 產生市民卡 Code128 條碼圖片並回傳可公開存取的完整 URL
 def generate_barcode_image(card_number):
     save_dir = os.path.join(settings.MEDIA_ROOT, 'barcodes')
     if not os.path.exists(save_dir):
@@ -515,6 +519,7 @@ def generate_barcode_image(card_number):
     return f"{base_url}{settings.MEDIA_URL}barcodes/{filename}"
 
 
+# 推播新活動給符合推薦條件且已開啟推播的用戶
 def push_activity_to_interested_users(activity):
     all_users = UserProfile.objects.filter(line_user_id__isnull=False, push_enabled=True)
     carousel_payload = generate_activity_carousel([activity])
@@ -542,6 +547,7 @@ def push_activity_to_interested_users(activity):
     return push_count
 
 
+# 追蹤活動詳情點擊行為並重導向至官方頁
 def track_activity(request, activity_id):
     activity = Activity.objects.filter(id=activity_id).first()
     if not activity:
@@ -557,6 +563,7 @@ def track_activity(request, activity_id):
     return HttpResponseRedirect(safe_detail_url(activity))
 
 
+# 追蹤加入行事曆動作並重導向至 Google Calendar
 def track_calendar(request, activity_id):
     activity = Activity.objects.filter(id=activity_id).first()
     if not activity:
@@ -567,6 +574,7 @@ def track_calendar(request, activity_id):
     return HttpResponseRedirect(google_calendar_url(activity))
 
 
+# 追蹤導航動作並重導向至 Google Maps
 def track_maps(request, activity_id):
     activity = Activity.objects.filter(id=activity_id).first()
     if not activity:
@@ -577,6 +585,7 @@ def track_maps(request, activity_id):
     return HttpResponseRedirect(google_maps_url(activity.district, activity.location))
 
 
+# 從追蹤請求的查詢參數取得使用者物件
 def user_from_tracking_request(request):
     line_user_id = request.GET.get('line_user_id') or ''
     if not line_user_id:

@@ -130,53 +130,35 @@ FALLBACK_IMAGE_KEYWORDS = (
 )
 
 PREFERENCE_SECTIONS = [
-  {
-    'title': '🎵 想找什麼類型的活動？',
-    'tags': [
-      {'name': '藝文', 'label': '🎨 藝文展覽'},
-      {'name': '市集', 'label': '🛍️ 踩點市集'},
-      {'name': '戶外', 'label': '🌲 戶外休閒'},
-      {'name': '美食', 'label': '🍕 美食饗宴'},
-      {'name': '音樂', 'label': '🎸 流行音樂'},
-    ],
-  },
-  {
-    'title': '👥 專屬合適對象',
-    'tags': [
-      {'name': '親子', 'label': '👨‍👩‍👧 親子同樂'},
-      {'name': '學生', 'label': '🎒 學生專屬'},
-      {'name': '情侶', 'label': '👩‍❤️‍👨 約會勝地'},
-      {'name': '毛孩', 'label': '🐾 寵物友善'},
-    ],
-  },
-  {
-    'title': '🎁 好康與小資專區',
-    'tags': [
-      {'name': '免費', 'label': '💰 免費入場'},
-      {'name': '市民卡', 'label': '💳 市民卡優惠'},
-    ],
-  },
-  {
-    'title': '📍 想看哪些地區？',
-    'tags': [
-      {'name': '桃園', 'label': '桃園'},
-      {'name': '中壢', 'label': '中壢'},
-      {'name': '平鎮', 'label': '平鎮'},
-      {'name': '八德', 'label': '八德'},
-      {'name': '楊梅', 'label': '楊梅'},
-      {'name': '蘆竹', 'label': '蘆竹'},
-      {'name': '大溪', 'label': '大溪'},
-      {'name': '龍潭', 'label': '龍潭'},
-      {'name': '龜山', 'label': '龜山'},
-      {'name': '大園', 'label': '大園'},
-      {'name': '觀音', 'label': '觀音'},
-      {'name': '新屋', 'label': '新屋'},
-      {'name': '復興', 'label': '復興'},
-    ],
-  },
-]
+  {"title": "🎨 藝文與知識", "tags": [{"name": "藝文", "label": "🎨 藝文"}, {"name": "表演", "label": "🎭 表演"},
+                {"name": "展覽", "label": "🖼️ 展覽"}, {"name": "電影", "label": "🎬 電影"},
+                {"name": "閱讀", "label": "📖 閱讀"}, {"name": "講座", "label": "🎤 講座"}]}, # 放入你的標籤資料
+        {"title": "🌲 休閒與戶外", "tags": [{"name": "戶外", "label": "🌲 戶外"}, {"name": "市集", "label": "🛍️ 市集"},
+                {"name": "農遊", "label": "🚜 農遊"}, {"name": "運動", "label": "⚽ 運動"},
+                {"name": "手作", "label": "🔨 手作"}]},
+        {"title": "🎵 其他類型", "tags": [{"name": "動漫", "label": "✨ 動漫"}, {"name": "音樂", "label": "🎸 音樂"},
+                {"name": "節慶", "label": "🎉 節慶"}]},
+        {"title": "👥 專屬目標對象", "tags": [{"name": "親子", "label": "👨‍👩‍👧 親子"}, {"name": "學生", "label": "🎒 學生"},
+                {"name": "情侶", "label": "👩‍❤️‍👨 情侶"}, {"name": "毛孩", "label": "🐾 寵物"},
+                {"name": "長輩", "label": "👵 長輩"}, {"name": "青年", "label": "🚀 青年"}]},
+        {"title": "💳 優惠與費用", "tags": [
+            {"name": "免費", "label": "🆓 免費"}, {"name": "免預約", "label": "📝 免預約"},
+            {"name": "市民卡", "label": "💳 市民卡"}, {"name": "特約優惠", "label": "🏷️ 特約優惠"}
+        ]},
+        {"title": "📍 地區選擇", "tags": [
+            {"name": "中壢", "label": "📍 中壢"}, {"name": "桃園", "label": "📍 桃園"},
+            {"name": "八德", "label": "📍 八德"}, {"name": "平鎮", "label": "📍 平鎮"},
+            {"name": "大園", "label": "📍 大園"}, {"name": "楊梅", "label": "📍 楊梅"},
+            {"name": "蘆竹", "label": "📍 蘆竹"}, {"name": "龜山", "label": "📍 龜山"},
+            {"name": "大溪", "label": "📍 大溪"}, {"name": "龍潭", "label": "📍 龍潭"},
+            {"name": "觀音", "label": "📍 觀音"}, {"name": "新屋", "label": "📍 新屋"},
+            {"name": "復興", "label": "📍 復興"}
+        ]}
+    ]
 
 
+
+# 取得或建立 LINE 使用者的 UserProfile
 def get_or_create_line_user(line_user_id, display_name='桃園市民'):
   user_id = line_user_id or settings.LINE_USER_ID or 'line-test-user'
   user, _ = UserProfile.objects.get_or_create(
@@ -193,6 +175,7 @@ def get_or_create_line_user(line_user_id, display_name='桃園市民'):
   return user
 
 
+# 建立偏好設定 Flex Message（標籤選擇＋推播頻率設定）
 def build_preference_message(user):
   current_tags = set(user.preferred_tags.values_list('name', flat=True))
   body_contents = [{
@@ -281,6 +264,7 @@ def build_preference_message(user):
   return FlexSendMessage(alt_text='請設定活動偏好(可多選)', contents=contents)
 
 
+# 建立推播頻率設定按鈕元件（已選取時顯示為綠色）
 def push_interval_button(user, days, label):
   selected = (days == 0 and not user.recommend_push_enabled) or (
     days > 0 and user.recommend_push_enabled and user.recommend_push_interval_days == days
@@ -300,6 +284,7 @@ def push_interval_button(user, days, label):
   }
 
 
+# 查找有效的 Tag 資料（含「區」後綴容錯與市民卡特例處理）
 def find_active_tag(tag_name):
   tag_name = (tag_name or '').strip()
   if not tag_name:
@@ -316,6 +301,7 @@ def find_active_tag(tag_name):
   return None
 
 
+# 新增或移除使用者偏好標籤（切換）
 def toggle_preference_tag(user, tag_name):
   tag = find_active_tag(tag_name)
   if not tag:
@@ -327,6 +313,7 @@ def toggle_preference_tag(user, tag_name):
   return True
 
 
+# 取得推薦活動（含去重、輪替已看活動、AI 重排序）
 def get_recommended_activities(user, limit=3, use_ai=True, offset=0, exclude_subscribed=False, exclude_recently_pushed=False):
   pool_size = max(50, limit + offset + 20)
   candidates = recommend_activities_for_user(user, limit=pool_size)
@@ -347,6 +334,7 @@ def get_recommended_activities(user, limit=3, use_ai=True, offset=0, exclude_sub
   return ranked[offset:offset + limit]
 
 
+# 取得使用者有效且尚未結束的訂閱活動
 def get_active_subscribed_activities(user, limit=10):
   now = timezone.now()
   subscriptions = (Subscription.objects
@@ -357,6 +345,7 @@ def get_active_subscribed_activities(user, limit=10):
   return dedupe_activities_by_business_key([subscription.activity for subscription in subscriptions if subscription.activity], limit=limit)
 
 
+# 查找使用者對業務上相同活動的訂閱（支援相似活動去重）
 def equivalent_subscription_for_activity(user, activity, include_cancelled=False):
   if not user or not activity:
     return None
@@ -378,6 +367,7 @@ def equivalent_subscription_for_activity(user, activity, include_cancelled=False
   return active_match or cancelled_match
 
 
+# 取得使用者已訂閱活動的業務鍵集合
 def subscribed_business_keys(user, include_cancelled=False):
   qs = Subscription.objects.select_related('activity').filter(user=user)
   if not include_cancelled:
@@ -389,6 +379,7 @@ def subscribed_business_keys(user, include_cancelled=False):
   return keys
 
 
+# 排除使用者已訂閱的相同業務活動
 def exclude_subscribed_equivalent_activities(user, activities):
   keys = subscribed_business_keys(user)
   if not keys:
@@ -396,6 +387,7 @@ def exclude_subscribed_equivalent_activities(user, activities):
   return [activity for activity in activities if not keys.intersection(activity_business_keys(activity))]
 
 
+# 取得使用者最近 12 小時內看過的活動業務鍵
 def recent_seen_business_keys(user, hours=12):
   since = timezone.now() - timedelta(hours=hours)
   keys = set()
@@ -409,6 +401,7 @@ def recent_seen_business_keys(user, hours=12):
   return keys
 
 
+# 將近期已看過的活動排到推薦清單後面，讓新活動優先顯示
 def rotate_recently_seen_activities(user, activities):
   seen_keys = recent_seen_business_keys(user)
   if not seen_keys or len(activities) <= 3:
@@ -423,6 +416,7 @@ def rotate_recently_seen_activities(user, activities):
   return fresh + seen
 
 
+# 取得最近 14 天內已推播過的活動業務鍵
 def recent_pushed_business_keys(user, days=14):
   since = timezone.now() - timedelta(days=days)
   keys = set()
@@ -436,6 +430,7 @@ def recent_pushed_business_keys(user, days=14):
   return keys
 
 
+# 排除近期已推播過的活動，確保推播內容多樣
 def exclude_recently_pushed_activities(user, activities):
   keys = recent_pushed_business_keys(user)
   if not keys:
@@ -444,6 +439,7 @@ def exclude_recently_pushed_activities(user, activities):
   return fresh or activities
 
 
+# 取得使用者偏好標籤依類型（地區/活動類型/受眾/費用/優惠）分組的集合
 def preferred_tag_sets(user):
   tags = list(user.preferred_tags.filter(is_active=True))
   return {
@@ -456,6 +452,7 @@ def preferred_tag_sets(user):
   }
 
 
+# 判斷活動是否符合使用者的偏好地區
 def activity_region_match(activity, preferred_regions):
   if not preferred_regions:
     return False
@@ -465,14 +462,17 @@ def activity_region_match(activity, preferred_regions):
   return any(tag.tag_type == 'region' and tag.name in preferred_regions for tag in activity.tags.all())
 
 
+# 計算已訂閱活動的分數懲罰（避免重複推薦已訂閱活動）
 def subscribed_activity_score(user, activity):
   return -25 if equivalent_subscription_for_activity(user, activity) else 0
 
 
+# 計算近期已看活動的分數懲罰（-18）
 def recent_seen_penalty(user, activity):
   return -18 if recent_seen_business_keys(user).intersection(activity_business_keys(activity)) else 0
 
 
+# 取得使用者未見過且未訂閱的探索候選活動
 def exploration_candidates(user, activities):
   seen = recent_seen_business_keys(user)
   subscribed = subscribed_business_keys(user)
@@ -483,6 +483,7 @@ def exploration_candidates(user, activities):
   ]
 
 
+# 在推薦清單末尾注入一個使用者未見過的探索活動
 def blend_exploration_activity(user, ranked, limit=3):
   if len(ranked) <= 1 or limit < 3:
     return ranked
@@ -499,6 +500,7 @@ def blend_exploration_activity(user, ranked, limit=3):
   return ranked
 
 
+# 判斷訊息是否為活動查詢（含生活情境、地區、關鍵字）
 def is_activity_query(text):
   text = (text or '').strip()
   if not text:
@@ -514,6 +516,7 @@ def is_activity_query(text):
   return False
 
 
+# 判斷是否為高確信度活動查詢（不需 AI 確認可直接搜尋）
 def high_confidence_activity_query(text):
   text = text or ''
   if is_lifestyle_activity_query(text):
@@ -525,6 +528,7 @@ def high_confidence_activity_query(text):
   return False
 
 
+# 判斷是否為生活情境活動查詢（帶小孩/雨天/約會）
 def is_lifestyle_activity_query(text):
   compact = re.sub(r'\s+', '', text or '')
   if not compact:
@@ -538,6 +542,7 @@ def is_lifestyle_activity_query(text):
   return False
 
 
+# 判斷訊息是否有帶小孩出門的活動意圖
 def has_child_lifestyle_intent(compact):
   return (
     any(term in (compact or '') for term in CHILD_AUDIENCE_TERMS)
@@ -545,6 +550,7 @@ def has_child_lifestyle_intent(compact):
   )
 
 
+# 判斷訊息是否有雨天找室內活動的意圖
 def has_rainy_lifestyle_intent(compact):
   return (
     any(term in (compact or '') for term in RAINY_ACTIVITY_TERMS)
@@ -552,6 +558,7 @@ def has_rainy_lifestyle_intent(compact):
   )
 
 
+# 判斷訊息是否有約會找活動的意圖
 def has_date_lifestyle_intent(compact):
   return (
     any(term in (compact or '') for term in DATE_ACTIVITY_TERMS)
@@ -559,6 +566,7 @@ def has_date_lifestyle_intent(compact):
   )
 
 
+# 建立查詢說明訊息，告訴使用者如何查詢活動
 def build_query_help_message():
   return TextSendMessage(
     text='我可以幫你找桃園活動。你可以試試：\n'
@@ -569,6 +577,7 @@ def build_query_help_message():
   )
 
 
+# 處理 LINE 文字訊息主流程（含指令偵測、意圖分類、活動搜尋）
 def handle_line_text_message(user, text):
   text = (text or '').strip()
   if text in PREFERENCE_COMMANDS:
@@ -629,6 +638,7 @@ def handle_line_text_message(user, text):
   )
 
 
+# 處理使用者要求「查看更多」的文字指令，延續上一輪查詢
 def handle_more_results_text(user, text, state):
   if not state:
     activities = get_recommended_activities(user, limit=3, exclude_subscribed=True)
@@ -659,6 +669,7 @@ def handle_more_results_text(user, text, state):
   return build_activity_carousel_message(activities, alt_text='更多桃園活動', user=user, query_context=query, offset=offset, include_intro=True)
 
 
+# 處理搜尋精煉文字（在上一輪查詢基礎上加入新條件）
 def handle_refined_search_text(user, text, state):
   base_conditions = deserialize_conditions(state.conditions or {}) if state else {}
   if base_conditions.get('mode'):
@@ -678,6 +689,7 @@ def handle_refined_search_text(user, text, state):
   return build_activity_carousel_message(activities, alt_text='桃園活動查詢結果', user=user, query_context=query, include_intro=True)
 
 
+# 用 AI 分類使用者訊息意圖（規則型為備援）
 def classify_line_intent(user, text, state=None):
   fallback = rule_classify_line_intent(text, state=state)
   # Deterministic control phrases should not be overridden by the model.
@@ -736,12 +748,14 @@ def classify_line_intent(user, text, state=None):
     return fallback
 
 
+# 驗證意圖字串是否合法，不合法時回傳 fallback
 def normalize_line_intent(value, fallback):
   intent = str(value or '').strip()
   allowed = {'activity_search', 'more_results', 'refine_search', 'preference_help', 'subscription_help', 'unsupported_chat'}
   return intent if intent in allowed else fallback
 
 
+# 用規則快速分類使用者意圖（不呼叫 AI）
 def rule_classify_line_intent(text, state=None):
   normalized = re.sub(r'\s+', '', (text or '').strip().lower())
   if not normalized:
@@ -759,6 +773,7 @@ def rule_classify_line_intent(text, state=None):
   return 'unsupported_chat'
 
 
+# 判斷短文字是否為針對上一輪結果的搜尋精煉（如「免費的呢」）
 def looks_like_refinement(text):
   compact = re.sub(r'\s+', '', text or '')
   if not compact:
@@ -774,12 +789,14 @@ def looks_like_refinement(text):
   return False
 
 
+# 判斷文字是否包含資料庫中已知的有效標籤
 def contains_known_tag(text):
   if not text:
     return False
   return Tag.objects.filter(is_active=True, name__in=[tag for tag in Tag.objects.filter(is_active=True).values_list('name', flat=True) if tag and tag in text]).exists()
 
 
+# 合併上一輪與本輪查詢字串為完整查詢
 def combine_context_query(previous, current):
   previous = (previous or '').strip()
   current = (current or '').strip()
@@ -790,6 +807,7 @@ def combine_context_query(previous, current):
   return f'{previous}，{current}'
 
 
+# 合併基底查詢條件與新的精煉條件（patch 優先覆蓋）
 def merge_search_conditions(base, patch):
   merged = dict(base or {})
   patch = dict(patch or {})
@@ -817,6 +835,7 @@ def merge_search_conditions(base, patch):
   return apply_nearby_preference(None, merged)
 
 
+# 儲存使用者對話狀態（查詢意圖、條件、活動 ID），TTL 30 分鐘
 def save_conversation_state(user, intent, query, conditions, activities, offset=0):
   if not user:
     return None
@@ -835,6 +854,7 @@ def save_conversation_state(user, intent, query, conditions, activities, offset=
   return state
 
 
+# 取得尚未過期的使用者對話狀態
 def get_valid_conversation_state(user):
   if not user:
     return None
@@ -847,6 +867,7 @@ def get_valid_conversation_state(user):
   return state
 
 
+# 序列化查詢條件為可儲存的 JSON（日期物件轉字串）
 def serialize_conditions(conditions):
   result = {}
   for key, value in (conditions or {}).items():
@@ -857,6 +878,7 @@ def serialize_conditions(conditions):
   return result
 
 
+# 反序列化查詢條件（ISO 字串轉回日期物件）
 def deserialize_conditions(conditions):
   result = dict(conditions or {})
   for key in ('start_date', 'end_date'):
@@ -869,6 +891,7 @@ def deserialize_conditions(conditions):
   return result
 
 
+# LINE 活動搜尋主流程（AI 條件提取→資料庫查詢→放寬策略→排序）
 def search_activities_for_line(user, query, limit=3, offset=0, conditions=None, return_conditions=False):
   query = (query or '').strip()
   if not query:
@@ -905,6 +928,7 @@ def search_activities_for_line(user, query, limit=3, offset=0, conditions=None, 
   return (result, conditions) if return_conditions else result
 
 
+# 建立活動輪播 LINE 訊息（可選含引言文字）
 def build_activity_carousel_message(
   activities,
   alt_text='桃園活動推薦',
@@ -931,11 +955,13 @@ def build_activity_carousel_message(
   return carousel
 
 
+# 建立無查詢結果的提示訊息
 def build_no_result_message(query=''):
   suffix = f'「{query}」' if query else '目前條件'
   return TextSendMessage(text=f'目前沒有找到符合{suffix}的活動，可以改查地區、活動類型或免費活動。')
 
 
+# 建立活動介紹引言文字（優先用 AI，失敗時用規則型備援）
 def build_activity_intro_text(activities, query_context='推薦活動', user=None):
   count = len(activities)
   notice = next((getattr(activity, '_line_notice', '') for activity in activities if getattr(activity, '_line_notice', '')), '')
@@ -954,6 +980,7 @@ def build_activity_intro_text(activities, query_context='推薦活動', user=Non
   return f'我找到 {count} 個符合「{query_context}」的活動，先給你卡片參考。'
 
 
+# 用 AI 產生活動介紹引言文字（1-2 句，最多 70 字）
 def build_activity_intro_text_with_ai(activities, query_context='推薦活動', user=None):
   if not activities or query_context == '已訂閱活動':
     return ''
@@ -1021,6 +1048,7 @@ def build_activity_intro_text_with_ai(activities, query_context='推薦活動', 
     return ''
 
 
+# 標準化並截斷 AI 產生的引言文字（最多 90 字）
 def normalize_line_intro(text):
   text = re.sub(r'\s+', ' ', (text or '').strip())
   text = text.replace('沒有完全符合', '先整理')
@@ -1029,6 +1057,7 @@ def normalize_line_intro(text):
   return text
 
 
+# 建立活動輪播 Flex 結構（最多 10 張卡片）
 def build_activity_carousel(activities, focus_tag=None, user=None, query_context='推薦活動', offset=0):
   next_offset = offset + len(activities)
   for activity in activities:
@@ -1048,6 +1077,7 @@ def build_activity_carousel(activities, focus_tag=None, user=None, query_context
   }
 
 
+# 建立單一活動 Flex Bubble 卡片（含圖片、標籤、時間、按鈕）
 def build_activity_bubble(activity, focus_tag=None, user=None, query_context='推薦活動', next_offset=3):
   summary = compact_activity_summary(activity)
   district = activity.district or '桃園'
@@ -1108,6 +1138,7 @@ def build_activity_bubble(activity, focus_tag=None, user=None, query_context='�
   }
 
 
+# 建立活動注意事項內容（搜尋放寬提示，有才顯示）
 def activity_notice_contents(activity):
   notice = getattr(activity, '_line_notice', '')
   if not notice:
@@ -1122,6 +1153,7 @@ def activity_notice_contents(activity):
   }]
 
 
+# 壓縮活動摘要文字至指定長度，超出則加省略號
 def compact_activity_summary(activity, limit=SUMMARY_MAX_LENGTH):
   text = activity.ai_summary or activity.description or '暫無活動摘要介紹。'
   text = re.sub(r'\s+', ' ', text).strip()
@@ -1130,6 +1162,7 @@ def compact_activity_summary(activity, limit=SUMMARY_MAX_LENGTH):
   return text[:limit].rstrip() + '...'
 
 
+# 取得活動安全圖片 URL，無效時依標籤或標題自動選備用圖
 def get_activity_image_url(activity):
   if is_line_safe_image_url(activity.image_url) and not is_placeholder_image_url(activity.image_url):
     return activity.image_url
@@ -1143,6 +1176,7 @@ def get_activity_image_url(activity):
   return default_remote_image_url(activity)
 
 
+# 判斷圖片 URL 是否符合 LINE API 要求（需 HTTPS 且純 ASCII）
 def is_line_safe_image_url(url):
   if not url or not str(url).startswith('https://'):
     return False
@@ -1152,11 +1186,13 @@ def is_line_safe_image_url(url):
   return bool(parsed.scheme == 'https' and parsed.netloc)
 
 
+# 判斷是否為占位圖片 URL（placehold.co 等）
 def is_placeholder_image_url(url):
   parsed = urllib.parse.urlparse(str(url))
   return parsed.netloc.lower() in PLACEHOLDER_IMAGE_HOSTS
 
 
+# 依活動 id 輪流選取預設遠端圖片 URL
 def default_remote_image_url(activity):
   if activity is None:
     return REMOTE_DEFAULT_IMAGES[0]
@@ -1164,11 +1200,13 @@ def default_remote_image_url(activity):
   return REMOTE_DEFAULT_IMAGES[seed % len(REMOTE_DEFAULT_IMAGES)]
 
 
+# 依活動 id 從備用圖片清單中循環選取一張
 def choose_fallback_image(activity, image_urls):
   seed = getattr(activity, 'id', None) or sum(ord(char) for char in (activity.title or ''))
   return image_urls[seed % len(image_urls)]
 
 
+# 依活動標題與描述推斷備用圖片類別（親子/美食/市集等）
 def infer_fallback_image_key(activity):
   text = f'{activity.title or ""} {activity.description or ""}'
   for keyword, image_key in FALLBACK_IMAGE_KEYWORDS:
@@ -1177,12 +1215,14 @@ def infer_fallback_image_key(activity):
   return ''
 
 
+# 取得本地靜態 LINE 圖片的公開 URL（需 PUBLIC_BASE_URL）
 def static_line_image_url(file_name):
   if settings.PUBLIC_BASE_URL:
     return f'{settings.PUBLIC_BASE_URL}/static/img/line/{file_name}'
   return default_remote_image_url(None)
 
 
+# 建立活動標籤徽章清單（含已訂閱標記與使用者偏好高亮）
 def build_tag_badges(activity, focus_tag=None, subscribed=False):
   badges = []
   if subscribed:
@@ -1207,6 +1247,7 @@ def build_tag_badges(activity, focus_tag=None, subscribed=False):
   return badges or [{'type': 'filler'}]
 
 
+# 取得活動用於卡片顯示的 activity_type 公開標籤
 def get_public_card_tags(activity, focus_tag=None):
   tags = []
   for tag in activity.tags.all():
@@ -1220,6 +1261,7 @@ def get_public_card_tags(activity, focus_tag=None):
   return tags
 
 
+# 建立單一標籤徽章 Flex 元件
 def tag_badge(name, background, color):
   return {
     'type': 'box',
@@ -1232,6 +1274,7 @@ def tag_badge(name, background, color):
   }
 
 
+# 處理活動相關 Postback 事件（標籤切換、訂閱、取消、導航、行事曆、查看更多）
 def handle_activity_postback(user, action, params):
   if action == 'toggle_tag':
     toggle_preference_tag(user, params.get('tag', ''))
@@ -1291,6 +1334,7 @@ def handle_activity_postback(user, action, params):
   return TextSendMessage(text='這個操作目前還不能處理。')
 
 
+# 設定訂閱活動的提醒天數（1/3/5 天前）
 def set_subscription_reminder_days(user, activity_id, days_value):
   days = parse_positive_int(days_value, default=1)
   if days not in {1, 3, 5}:
@@ -1305,6 +1349,7 @@ def set_subscription_reminder_days(user, activity_id, days_value):
   return TextSendMessage(text=f'已設定為活動開始前 {days} 天提醒。')
 
 
+# 建立或重新啟用活動訂閱
 def subscribe_activity(user, activity_id, source_action='subscribe_activity'):
   activity = Activity.objects.filter(id=activity_id).first()
   if not activity:
@@ -1340,6 +1385,7 @@ def subscribe_activity(user, activity_id, source_action='subscribe_activity'):
   return build_subscription_success_message(activity, subscription, created)
 
 
+# 取消活動訂閱（狀態改為 cancelled）
 def cancel_subscription(user, activity_id):
   activity = Activity.objects.filter(id=activity_id).first()
   subscription = equivalent_subscription_for_activity(user, activity, include_cancelled=True) if activity else None
@@ -1355,8 +1401,9 @@ def cancel_subscription(user, activity_id):
   return TextSendMessage(text=f'已取消訂閱：{subscription.activity.title}')
 
 
+# 建立訂閱成功 Flex Message（含提醒天數設定與 Google Calendar 按鈕）
 def build_subscription_success_message(activity, subscription, created):
-  title = f'訂閱成功！將於前 {subscription.remind_before_days} 天通知' if created else '您先前已訂閱過此活動'
+  title = f'訂閱成功！將於前 {subscription.remind_before_days + 1} 天通知' if created else '您先前已訂閱過此活動'
   color = '#1DB446' if created else '#4A4A4A'
   contents = {
     'type': 'bubble',
@@ -1400,6 +1447,7 @@ def build_subscription_success_message(activity, subscription, created):
   return FlexSendMessage(alt_text=f'活動訂閱：{activity.title}', contents=contents)
 
 
+# 建立提醒天數選擇按鈕（活動前 N 天提醒）
 def reminder_button(activity, days):
   return {
     'type': 'button',
@@ -1413,6 +1461,7 @@ def reminder_button(activity, days):
   }
 
 
+# 建立取消訂閱按鈕
 def cancel_subscription_button(activity, label='取消訂閱'):
   return {
     'type': 'button',
@@ -1426,6 +1475,7 @@ def cancel_subscription_button(activity, label='取消訂閱'):
   }
 
 
+# 建立查看更多活動按鈕（帶查詢與 offset 參數）
 def view_more_button(query_context, next_offset):
   query = urllib.parse.quote(query_context or '推薦活動')
   return {

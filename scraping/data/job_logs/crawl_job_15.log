@@ -1,0 +1,28 @@
+Queued jobs=1
+Running crawler pipeline...
+\n[tycg_events] Starting scrape with Fetcher (limit: 50)...
+[tycg_events] Fetching: https://www.tycg.gov.tw/ActiveMonthList.aspx?n=8&sms=7883
+[tycg_events] Processing 0 detail URLs.
+\nTotal raw events: 0, After dedupe: 0
+\nRun completed successfully! Generating report...
+\n==================================================
+## V3 執行結果\n
+- 執行時間: 1 秒
+- 成功來源: 0
+- 失敗來源: 0
+- 總建立資料: 0
+- usable: 0
+- line_card_ready: 0
+- search_ready: 0
+- ai_ready: 0
+- rejected: 0
+- 下載附件: 0
+- 合格海報: 0\n
+## 各來源品質表\n
+| source | priority | total | usable | line_ready | ai_ready | rejected | avg_score | MVP (Metrics) |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| tycg_events | primary | 0 | 0 | 0 | 0 | 0 | 0 | Fail |
+==================================================\n
+Importing crawler output: C:\LineRobot\IMintergrateSys\scraping\data\output\activities_all.json
+IMPORTED: total=0, created=0, updated=0, skipped=0
+Crawler pipeline finished and imported.

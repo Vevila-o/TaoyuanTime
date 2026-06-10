@@ -1,0 +1,68 @@
+Queued jobs=1
+Running crawler pipeline...
+\n[culture] Starting scrape with Fetcher (limit: 100)...
+[culture] Fetching: https://culture.tycg.gov.tw/News.aspx?n=11099&sms=14558
+[culture] Processing 20 detail URLs.
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1638877
+[culture] Parsed: 2026桃園閩南文化節–閩南藝術表演《劉全進瓜》，6/28在 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1638875
+[culture] Parsed: 2026桃園閩南文化節–閩南藝術表演《日出．千塘》，6/27 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1638183
+[culture] Parsed: 2026桃園藝術巡演龜山場-如果兒童劇團《咱的棒球囡仔》兒童 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1638175
+[culture] Parsed: 2026桃園藝術巡演復興場-Kiss Me 親一下劇團《壞碳 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1638173
+[culture] Parsed: 2026桃園藝術巡演蘆竹場-風雅頌古箏樂團《愛生氣的火神娘娘 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1638167
+[culture] Parsed: 2026桃園藝術巡演大溪場-新象創作劇團《快樂的馬戲團》兒童 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1636293
+[culture] Parsed: 中原文創園區 《即刻救原3-珍粽再見》 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635647
+[culture] Parsed: 「2026中華紗帽山畫會第28屆年度大展」 桃園文化局精彩呈 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635646
+[culture] Parsed: 油彩記錄親子溫情「藝色自若—馮秀銀創作個展」 桃園文化局溫馨 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1635645
+[culture] Parsed: 「許瑞龍書法與詩韻創作展—集古開薪」 桃園文化局隆重開展 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1634008
+[culture] Parsed: ? 2026桃園閩南文化節系列活動攝影競賽 開始徵件！ | L:False | AI:False
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1633284
+[culture] Parsed: ? 2026桃園閩南文化創意繪畫大賽 開始徵件！ 用你的創意 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1627903
+[culture] Parsed: 2026桃園閩南文化節 6/5-7/25 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623833
+[culture] Parsed: 東方‧光‧希望 ─ 台灣東方美學大展 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623023
+[culture] Parsed: 銀河谷音劇團—〔玩具國的奇幻之旅〕人偶舞台音樂劇 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1623018
+[culture] Parsed: 2026年夏季巧虎大型舞臺劇「銀河怪盜的祕密」 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621727
+[culture] Parsed: 【本節目適用文化幣】尊鵬國際有限公司《西遊記誤闖黑家店》 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621546
+[culture] Parsed: 2026桃園藝術巡演觀音場-九歌兒童劇團《東郭、獵人、狼》兒 | L:True | AI:True
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621448
+[culture] Parsed: 中壢青少年管弦樂團第29次定期音樂會 | L:True | AI:False
+[culture] Fetching: https://culture.tycg.gov.tw/News_Content.aspx?n=11099&s=1621446
+[culture] Parsed: 「搶救受飢兒」2026世界和平會兒童戲劇慈善公演 | L:True | AI:True
+\nTotal raw events: 20, After dedupe: 20
+\nRun completed successfully! Generating report...
+\n==================================================
+## V3 執行結果\n
+- 執行時間: 42 秒
+- 成功來源: 1
+- 失敗來源: 0
+- 總建立資料: 20
+- usable: 20
+- line_card_ready: 19
+- search_ready: 19
+- ai_ready: 18
+- rejected: 0
+- 下載附件: 29
+- 合格海報: 12\n
+## 各來源品質表\n
+| source | priority | total | usable | line_ready | ai_ready | rejected | avg_score | MVP (Metrics) |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| culture | primary | 20 | 20 | 19 | 18 | 0 | 99.0 | Pass |
+==================================================\n
+Importing crawler output: C:\LineRobot\IMintergrateSys\scraping\data\output\activities_all.json
+IMPORTED: total=20, created=6, updated=14, skipped=0
+Crawler pipeline finished and imported.
