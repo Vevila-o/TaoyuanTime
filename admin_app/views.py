@@ -774,10 +774,12 @@ def crawlJobs(request):
       return redirect('crawlJobs')
 
     preset = request.POST.get('preset') or 'custom'
+    primary_limit = positive_int(request.POST.get('primary_limit'), default=1)
+    secondary_limit = positive_int(request.POST.get('secondary_limit'), default=primary_limit)
     options = {
       'source': request.POST.get('source', '').strip(),
-      'primary_limit': int(request.POST.get('primary_limit') or 100),
-      'secondary_limit': int(request.POST.get('secondary_limit') or 100),
+      'primary_limit': primary_limit,
+      'secondary_limit': secondary_limit,
       'max_runtime': int(request.POST.get('max_runtime') or 30),
       'skip_dynamic': request.POST.get('skip_dynamic') == 'on',
       'no_assets': request.POST.get('no_assets') == 'on',
@@ -907,6 +909,14 @@ def parse_manual_overrides(value):
   return fields or None
 
 
+def positive_int(value, default=1):
+  try:
+    parsed = int(value)
+  except (TypeError, ValueError):
+    return default
+  return parsed if parsed > 0 else default
+
+
 def audit_actor(request):
   user = getattr(request, 'user', None)
   if user and getattr(user, 'is_authenticated', False):
@@ -933,7 +943,7 @@ def crawler_source_options():
 
 def crawl_preset_options(preset, current_options):
   if preset == 'one_click_update':
-    limit = current_options.get('primary_limit') or 100
+    limit = current_options.get('primary_limit') or 1
     return {
       'primary_limit': limit,
       'secondary_limit': limit,
@@ -963,8 +973,8 @@ def crawl_preset_options(preset, current_options):
     }
   if preset == 'formal_import':
     return {
-      'primary_limit': current_options.get('primary_limit') or 20,
-      'secondary_limit': current_options.get('secondary_limit') or 20,
+      'primary_limit': current_options.get('primary_limit') or 1,
+      'secondary_limit': current_options.get('secondary_limit') or 1,
       'max_runtime': current_options.get('max_runtime') or 10,
       'skip_dynamic': True,
       'activate': True,
@@ -975,8 +985,8 @@ def crawl_preset_options(preset, current_options):
     }
   if preset == 'formal_import_ocr':
     return {
-      'primary_limit': current_options.get('primary_limit') or 20,
-      'secondary_limit': current_options.get('secondary_limit') or 20,
+      'primary_limit': current_options.get('primary_limit') or 1,
+      'secondary_limit': current_options.get('secondary_limit') or 1,
       'max_runtime': current_options.get('max_runtime') or 10,
       'skip_dynamic': True,
       'no_assets': False,

@@ -13,8 +13,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--mode", default="reliability_v3", choices=["probe_1hour", "reliability_v3", "custom"])
         parser.add_argument("--source", type=str, help="Run a specific source key from config/sources.yaml.")
-        parser.add_argument("--primary-limit", type=int, default=150)
-        parser.add_argument("--secondary-limit", type=int, default=150)
+        parser.add_argument("--primary-limit", type=int, default=1)
+        parser.add_argument("--secondary-limit", type=int, default=1)
         parser.add_argument("--max-runtime", type=int, default=150, help="Max crawler runtime in minutes.")
         parser.add_argument("--resume", action="store_true")
         parser.add_argument("--no-assets", action="store_true")

@@ -43,7 +43,7 @@ AI_MAX_TOKENS = int(os.environ.get('AI_MAX_TOKENS', '800'))
 OPENAI_BASE_URL = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 OPENAI_MODEL = os.environ.get('OPENAI_MODEL', 'gpt-4.1-mini')
-AI_PROVIDER_ORDER = os.environ.get('AI_PROVIDER_ORDER', 'openai')
+AI_PROVIDER_ORDER = os.environ.get('AI_PROVIDER_ORDER', 'local')
 LINE_CHNNEL_ACCESS_TOKEN = LINE_CHANNEL_ACCESS_TOKEN
 
 DEBUG = True

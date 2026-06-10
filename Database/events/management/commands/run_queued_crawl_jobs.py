@@ -51,8 +51,8 @@ def run_job(job, command):
             'run_crawler_pipeline',
             mode=options.get('mode') or 'reliability_v3',
             source=options.get('source') or None,
-            primary_limit=int(options.get('primary_limit') or 20),
-            secondary_limit=int(options.get('secondary_limit') or 20),
+            primary_limit=int(options.get('primary_limit') or 1),
+            secondary_limit=int(options.get('secondary_limit') or 1),
             max_runtime=int(options.get('max_runtime') or 10),
             no_assets=bool(options.get('no_assets', True)),
             ocr=bool(options.get('ocr', False)),
@@ -120,8 +120,8 @@ def run_full_pipeline_job(job, command):
             'run_crawler_pipeline',
             mode=options.get('mode') or 'reliability_v3',
             source=options.get('source') or None,
-            primary_limit=int(options.get('primary_limit') or 100),
-            secondary_limit=int(options.get('secondary_limit') or options.get('primary_limit') or 100),
+            primary_limit=int(options.get('primary_limit') or 1),
+            secondary_limit=int(options.get('secondary_limit') or options.get('primary_limit') or 1),
             max_runtime=int(options.get('max_runtime') or 30),
             no_assets=bool(options.get('no_assets', False)),
             ocr=False,
@@ -163,7 +163,7 @@ def run_full_pipeline_job(job, command):
     finish_stage(expire_task, 'success', expire_result)
 
     priority_ids = imported_activity_ids(output_path)
-    limit = int(options.get('post_process_limit') or options.get('primary_limit') or 100)
+    limit = int(options.get('post_process_limit') or options.get('primary_limit') or 1)
     cooldown_hours = int(options.get('failure_cooldown_hours') or 24)
     for stage_key, label, runner in (
         ('tagging', 'AI Tag', run_ai_tag_stage),

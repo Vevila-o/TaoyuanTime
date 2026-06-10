@@ -51,6 +51,11 @@ SEMANTIC_QUERY_EXPANSIONS = {
   '親子': ['兒童', '家庭', '小朋友', '孩子'],
   '藝文': ['展覽', '表演', '音樂', '藝術', '文化'],
   '美食': ['餐廳', '餐飲', '小吃', '夜市', '料理'],
+  '泥巴': ['黏土', '陶土', '陶藝', '陶瓷', '手作', '親子體驗'],
+  '黏土': ['泥巴', '陶土', '陶藝', '陶瓷', '手作', '親子體驗'],
+  '陶土': ['泥巴', '黏土', '陶藝', '陶瓷', '手作', '親子體驗'],
+  '陶藝': ['泥巴', '黏土', '陶土', '陶瓷', '手作', '親子體驗'],
+  '陶瓷': ['泥巴', '黏土', '陶土', '陶藝', '手作', '親子體驗'],
 }
 CHILD_AUDIENCE_TERMS = ('小孩', '孩子', '小朋友', '兒童', '親子', '家庭')
 CHILD_ACTIVITY_CONTEXT_TERMS = ('玩', '放電', '去哪', '哪裡', '想帶', '帶', '出門', '出去')
@@ -569,12 +574,87 @@ def has_date_lifestyle_intent(compact):
 # 建立查詢說明訊息，告訴使用者如何查詢活動
 def build_query_help_message():
   return TextSendMessage(
-    text='我可以幫你找桃園活動。你可以試試：\n'
-         '- 中壢免費活動\n'
-         '- 週末親子活動\n'
-         '- 桃園藝文展覽\n\n'
-         '也可以點選單的「設定偏好」或「猜你喜歡」。'
+    text='我可以用活動資料庫幫你找桃園行程，也能延續上一輪結果回答費用、地點、報名和時間。\n'
+         '你可以直接說「要去中壢玩」、「泥巴相關活動」或「週末親子活動」。'
   )
+
+
+def is_activity_followup_question(text):
+  compact = re.sub(r'\s+', '', text or '')
+  if not compact:
+    return False
+  followup_terms = (
+    '這個', '這些', '剛剛', '那個', '那些', '要錢', '免費', '費用', '票價',
+    '需要報名', '要報名', '報名', '在哪', '哪裡', '地點', '地址',
+    '什麼時候', '時間', '幾點', '適合小孩', '適合親子', '小孩適合',
+  )
+  return any(term in compact for term in followup_terms)
+
+
+def context_activities(state):
+  ids = [activity_id for activity_id in (state.last_activity_ids or []) if activity_id]
+  if not ids:
+    return []
+  by_id = {activity.id: activity for activity in Activity.objects.filter(id__in=ids).prefetch_related('tags')}
+  return [by_id[activity_id] for activity_id in ids if activity_id in by_id]
+
+
+def choose_context_activity(text, activities):
+  if not activities:
+    return None
+  compact = re.sub(r'\s+', '', text or '')
+  for activity in activities:
+    title = re.sub(r'\s+', '', activity.title or '')
+    if title and (title in compact or any(len(part) >= 4 and part in compact for part in re.split(r'[：:「」（）()\\-－]', title))):
+      return activity
+  return activities[0] if len(activities) == 1 or any(term in compact for term in ('這個', '那個')) else None
+
+
+def answer_activity_followup(user, text, state):
+  activities = context_activities(state) if state else []
+  if not activities:
+    return None
+  compact = re.sub(r'\s+', '', text or '')
+  activity = choose_context_activity(text, activities)
+
+  if any(term in compact for term in ('免費', '要錢', '費用', '票價')):
+    targets = [activity] if activity else activities
+    free_items = [item for item in targets if item.is_free]
+    paid_or_unknown = [item for item in targets if not item.is_free]
+    if '這些' in compact or not activity:
+      if free_items:
+        names = '、'.join(item.title for item in free_items[:3])
+        return TextSendMessage(text=f'上一輪結果裡，這些看起來是免費或未標示收費：{names}。實際費用仍以官方頁為準。')
+      return TextSendMessage(text='上一輪結果裡目前沒有明確標示免費的活動，費用請以官方頁為準。')
+    fee = activity.fee_description or ('免費或未標示收費' if activity.is_free else '費用未明確標示')
+    return TextSendMessage(text=f'{activity.title}：{fee}。實際費用以官方頁為準。')
+
+  if any(term in compact for term in ('需要報名', '要報名', '報名')):
+    target = activity or activities[0]
+    if target.requires_registration:
+      info = target.registration_info or '需要報名'
+      return TextSendMessage(text=f'{target.title}：{info}。')
+    return TextSendMessage(text=f'{target.title}：目前資料沒有顯示必須報名，建議出發前再看官方頁確認。')
+
+  if any(term in compact for term in ('在哪', '哪裡', '地點', '地址')):
+    target = activity or activities[0]
+    location = f'{target.district or "桃園"} {target.location or "地點請見官方頁"}'.strip()
+    return TextSendMessage(text=f'{target.title}：地點是 {location}。')
+
+  if any(term in compact for term in ('什麼時候', '時間', '幾點', '哪天')):
+    target = activity or activities[0]
+    return TextSendMessage(text=f'{target.title}：{format_time_range(target)}。')
+
+  if any(term in compact for term in ('適合小孩', '小孩適合', '適合親子', '親子適合')):
+    target = activity or activities[0]
+    tag_names = {tag.name for tag in target.tags.all()}
+    text_blob = f'{target.title} {target.description} {target.ai_summary}'
+    suitable = bool({'親子', '兒童'}.intersection(tag_names) or any(term in text_blob for term in CHILD_AUDIENCE_TERMS))
+    if suitable:
+      return TextSendMessage(text=f'{target.title}：目前資料看起來適合親子或小孩參加，仍建議看官方頁確認年齡限制。')
+    return TextSendMessage(text=f'{target.title}：目前資料沒有明確標示親子或兒童適合，建議先看官方頁確認。')
+
+  return None
 
 
 # 處理 LINE 文字訊息主流程（含指令偵測、意圖分類、活動搜尋）
@@ -610,6 +690,11 @@ def handle_line_text_message(user, text):
     )
 
   state = get_valid_conversation_state(user)
+  if state and is_activity_followup_question(text):
+    followup_message = answer_activity_followup(user, text, state)
+    if followup_message:
+      return followup_message
+
   intent = classify_line_intent(user, text, state=state)
   if intent == 'more_results':
     return handle_more_results_text(user, text, state)
@@ -693,7 +778,7 @@ def handle_refined_search_text(user, text, state):
 def classify_line_intent(user, text, state=None):
   fallback = rule_classify_line_intent(text, state=state)
   # Deterministic control phrases should not be overridden by the model.
-  if fallback in {'more_results', 'refine_search', 'unsupported_chat'}:
+  if fallback in {'more_results', 'refine_search'}:
     return fallback
   if fallback == 'activity_search' and high_confidence_activity_query(text):
     return fallback
@@ -1338,7 +1423,7 @@ def handle_activity_postback(user, action, params):
 def set_subscription_reminder_days(user, activity_id, days_value):
   days = parse_positive_int(days_value, default=1)
   if days not in {1, 3, 5}:
-    return TextSendMessage(text='提醒天數只能設定為 5 天、3 天或 1 天前。')
+    return TextSendMessage(text='提醒天數只能設定為 5 天、3 天或 1 天。')
   activity = Activity.objects.filter(id=activity_id).first()
   subscription = equivalent_subscription_for_activity(user, activity) if activity else None
   if not subscription:
@@ -1346,7 +1431,7 @@ def set_subscription_reminder_days(user, activity_id, days_value):
   subscription.remind_before_days = days
   subscription.is_notified = False
   subscription.save(update_fields=['remind_before_days', 'is_notified'])
-  return TextSendMessage(text=f'已設定為活動開始前 {days} 天提醒。')
+  return TextSendMessage(text=f'已設定：{days} 天後活動開始，提醒您。')
 
 
 # 建立或重新啟用活動訂閱
@@ -1403,7 +1488,7 @@ def cancel_subscription(user, activity_id):
 
 # 建立訂閱成功 Flex Message（含提醒天數設定與 Google Calendar 按鈕）
 def build_subscription_success_message(activity, subscription, created):
-  title = f'訂閱成功！將於前 {subscription.remind_before_days + 1} 天通知' if created else '您先前已訂閱過此活動'
+  title = f'訂閱成功！{subscription.remind_before_days} 天後活動開始，提醒您' if created else '您先前已訂閱過此活動'
   color = '#1DB446' if created else '#4A4A4A'
   contents = {
     'type': 'bubble',
@@ -1447,7 +1532,7 @@ def build_subscription_success_message(activity, subscription, created):
   return FlexSendMessage(alt_text=f'活動訂閱：{activity.title}', contents=contents)
 
 
-# 建立提醒天數選擇按鈕（活動前 N 天提醒）
+# 建立提醒天數選擇按鈕
 def reminder_button(activity, days):
   return {
     'type': 'button',
@@ -1455,7 +1540,7 @@ def reminder_button(activity, days):
     'height': 'sm',
     'action': {
       'type': 'postback',
-      'label': f'{days} 天前提醒',
+      'label': f'{days} 天後活動開始提醒',
       'data': f'action=set_reminder_days&activity_id={activity.id}&days={days}',
     },
   }

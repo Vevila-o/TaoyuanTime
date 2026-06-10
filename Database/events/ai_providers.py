@@ -63,7 +63,7 @@ def openai_model() -> str:
 
 
 def provider_order() -> list[str]:
-    raw = os.environ.get("AI_PROVIDER_ORDER") or getattr(settings, "AI_PROVIDER_ORDER", "openai")
+    raw = os.environ.get("AI_PROVIDER_ORDER") or getattr(settings, "AI_PROVIDER_ORDER", "local")
     providers = [item.strip().lower() for item in raw.split(",") if item.strip()]
     valid = []
     use_local = local_enabled()
@@ -74,7 +74,7 @@ def provider_order() -> list[str]:
             valid.append(provider)
     if valid:
         return valid
-    return ["local"] if use_local else ["openai"]
+    return ["local"] if use_local else []
 
 def parse_json_object(raw_content: str) -> dict[str, Any]:
     text = (raw_content or "").strip()
@@ -205,7 +205,10 @@ def call_json_with_fallback(messages: list[dict[str, Any]]) -> AIProviderRespons
         "local": lambda: call_local_text(messages, response_format={"type": "json_object"}),
         "openai": lambda: call_openai_text(messages, response_format={"type": "json_object"}),
     }
-    for provider_name in provider_order():
+    providers = provider_order()
+    if not providers:
+        raise RuntimeError("No AI provider is enabled. Configure AI_BASE_URL for local AI.")
+    for provider_name in providers:
         try:
             response = callers[provider_name]()
             return AIProviderResponse(
@@ -225,7 +228,10 @@ def call_text_with_fallback(messages: list[dict[str, Any]]) -> AIProviderRespons
         "local": lambda: call_local_text(messages),
         "openai": lambda: call_openai_text(messages),
     }
-    for provider_name in provider_order():
+    providers = provider_order()
+    if not providers:
+        raise RuntimeError("No AI provider is enabled. Configure AI_BASE_URL for local AI.")
+    for provider_name in providers:
         try:
             return callers[provider_name]()
         except Exception as exc:

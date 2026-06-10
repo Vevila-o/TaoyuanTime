@@ -27,11 +27,7 @@
         </div>
         <div class="col-md-2">
           <label class="form-label small">抓取上限</label>
-          <select class="form-select form-select-sm" name="primary_limit">
-            <option value="100" selected>100 筆</option>
-            <option value="50">50 筆</option>
-            <option value="300">300 筆</option>
-          </select>
+          <input class="form-control form-control-sm" type="number" name="primary_limit" value="1" min="1" step="1">
           <input type="hidden" name="max_runtime" value="30">
         </div>
         <div class="col-md-2">

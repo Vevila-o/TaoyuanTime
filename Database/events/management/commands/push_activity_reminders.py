@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 line_bot_api.push_message(
                     user.line_user_id,
                     FlexSendMessage(
-                        alt_text=f'您訂閱的活動即將開始：{activity.title}',
+                        alt_text=f'{subscription.remind_before_days} 天後活動開始，提醒您：{activity.title}',
                         contents=build_activity_carousel([activity], user=user),
                     ),
                 )

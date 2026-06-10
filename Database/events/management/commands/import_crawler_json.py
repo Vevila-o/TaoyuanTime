@@ -220,12 +220,14 @@ def activity_values(item, source):
     source_url = item.get("source_url") or item.get("official_detail_url")
     official_url = item.get("official_detail_url") or source_url
     description = item.get("clean_description") or item.get("description") or ""
-    raw_content = item.get("raw_content") or description
+    enriched_metadata = item.get("enriched_metadata_text") or ""
+    raw_content = "\n".join(part for part in (enriched_metadata, item.get("raw_content") or description) if part)
     fee_text = item.get("fee_text") or item.get("fee_description") or ""
     registration = normalized_registration(
         item,
         " ".join([
             str(item.get("registration_info") or ""),
+            str(enriched_metadata or ""),
             str(item.get("clean_description") or ""),
             str(item.get("description") or ""),
             str(item.get("raw_content") or ""),
@@ -237,6 +239,7 @@ def activity_values(item, source):
         district = infer_taoyuan_district_from_text(
             item.get("location") or item.get("location_text") or "",
             item.get("title") or "",
+            enriched_metadata,
             item.get("description") or "",
             item.get("clean_description") or "",
             item.get("raw_content") or "",
@@ -251,6 +254,7 @@ def activity_values(item, source):
         inferred_start, inferred_end = infer_roc_datetimes_from_text(
             item.get("title") or "",
             item.get("location") or item.get("location_text") or "",
+            enriched_metadata,
             item.get("description") or "",
             item.get("clean_description") or "",
             item.get("raw_content") or "",

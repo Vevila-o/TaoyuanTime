@@ -23,6 +23,11 @@ SEMANTIC_EXPANSIONS = {
     '免費': ['免門票', '不用錢', '免費入場'],
     '親子': ['兒童', '家庭', '小朋友', '孩子'],
     '藝文': ['展覽', '表演', '音樂', '藝術', '文化'],
+    '泥巴': ['黏土', '陶土', '陶藝', '陶瓷', '手作', '親子體驗'],
+    '黏土': ['泥巴', '陶土', '陶藝', '陶瓷', '手作', '親子體驗'],
+    '陶土': ['泥巴', '黏土', '陶藝', '陶瓷', '手作', '親子體驗'],
+    '陶藝': ['泥巴', '黏土', '陶土', '陶瓷', '手作', '親子體驗'],
+    '陶瓷': ['泥巴', '黏土', '陶土', '陶藝', '手作', '親子體驗'],
 }
 
 RAW_HTML_MAIN_SELECTORS = [
@@ -114,7 +119,7 @@ def fallback_profile_terms(activity: Activity, ai_result: dict[str, Any] | None 
             base_terms.append(key)
             base_terms.extend(expansions)
     keywords = normalize_terms(base_terms, limit=30)
-    topics = normalize_terms([term for term in keywords if term in {'運動', '戶外', '親子', '藝文', '展覽', '音樂', '市集', '美食', '自行車', '單車'}], limit=12)
+    topics = normalize_terms([term for term in keywords if term in {'運動', '戶外', '親子', '藝文', '展覽', '音樂', '市集', '美食', '自行車', '單車', '手作', '陶藝'}], limit=12)
     synonyms = []
     for term in keywords:
         synonyms.extend(SEMANTIC_EXPANSIONS.get(term, []))
