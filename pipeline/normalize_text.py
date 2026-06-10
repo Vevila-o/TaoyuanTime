@@ -22,6 +22,62 @@ def truncate_tail_noise(text):
     return text[:min(cut_points)].strip()
 
 
+def build_enriched_text(event):
+    """
+    將 HTML metadata 合併到 event 中，供後續 pipeline 使用。
+    產生 enriched_text 欄位：包含 title + metadata + clean_description。
+    """
+    metadata = event.get("html_metadata") or {}
+    parts = []
+
+    # Page title
+    if metadata.get("page_title"):
+        parts.append(f"頁面標題：{metadata['page_title']}")
+
+    # Meta description
+    if metadata.get("meta_description"):
+        parts.append(f"頁面描述：{metadata['meta_description']}")
+
+    # OG description（如果和 meta_description 不同）
+    og_desc = metadata.get("og_description") or ""
+    meta_desc = metadata.get("meta_description") or ""
+    if og_desc and og_desc != meta_desc:
+        parts.append(f"社群描述：{og_desc}")
+
+    # Structured data 中的關鍵欄位
+    for sd in metadata.get("structured_data") or []:
+        sd_type = sd.get("@type", "")
+        if sd_type in ("Event", "ExhibitionEvent", "Festival", "MusicEvent"):
+            if sd.get("name"):
+                parts.append(f"結構化資料名稱：{sd['name']}")
+            if sd.get("startDate"):
+                parts.append(f"結構化資料開始日期：{sd['startDate']}")
+            if sd.get("endDate"):
+                parts.append(f"結構化資料結束日期：{sd['endDate']}")
+            if sd.get("location"):
+                loc = sd["location"]
+                if isinstance(loc, dict):
+                    loc_name = loc.get("name") or loc.get("address", "")
+                    parts.append(f"結構化資料地點：{loc_name}")
+                else:
+                    parts.append(f"結構化資料地點：{loc}")
+            if sd.get("offers"):
+                offers = sd["offers"]
+                if isinstance(offers, dict):
+                    price = offers.get("price", "")
+                    if price:
+                        parts.append(f"結構化資料費用：{price}")
+
+    # Meta keywords
+    if metadata.get("meta_keywords"):
+        parts.append(f"關鍵字：{metadata['meta_keywords']}")
+
+    enriched = " ".join(parts)
+    event["enriched_metadata_text"] = enriched
+
+    return event
+
+
 def normalize_text(event):
     """
     Cleans up description and title.
@@ -52,4 +108,5 @@ def normalize_text(event):
     else:
         event["clean_description"] = ""
         
+    event = build_enriched_text(event)
     return event

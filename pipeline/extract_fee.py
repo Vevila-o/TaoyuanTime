@@ -7,8 +7,9 @@ REGISTRATION_HOST_HINTS = ("accupass.com", "forms.gle", "docs.google.com/forms")
 REGISTRATION_TEXT_HINTS = ("網路報名", "報名連結", "Accupass", "Google 表單", "報名網址", "需事先報名")
 COMMON_REGISTRATION_PAGE_HINTS = ("ActiveList.aspx", "sms=20299")
 FREE_EVIDENCE_KEYWORDS = ("免費入場", "自由參加", "免費")
-PAID_EVIDENCE_KEYWORDS = ("票價", "售票", "購票", "報名費", "門票")
+PAID_EVIDENCE_KEYWORDS = ("票價", "售票", "購票", "報名費", "門票", "收費", "材料費", "入場費", "付費")
 PAID_AMOUNT_RE = re.compile(r'費用\s*[:：]?\s*(?:NT\$|新臺幣|新台幣|\$)?\s*\d[\d,]*(?:\s*元)?', re.I)
+PAID_PER_PERSON_RE = re.compile(r'每人\s*(?:NT\$|新臺幣|新台幣|\$)?\s*\d[\d,]*(?:\s*元)?', re.I)
 
 
 def extract_fee(event, debug_log=None):
@@ -19,6 +20,7 @@ def extract_fee(event, debug_log=None):
     
     desc = " ".join([
         str(event.get("fee_raw_text") or ""),
+        str(event.get("enriched_metadata_text") or ""),
         str(event.get("clean_description") or ""),
         str(event.get("raw_content") or ""),
     ])
@@ -36,7 +38,7 @@ def extract_fee(event, debug_log=None):
 
     free_ticket_keywords = ["索票進場", "免費索票", "索票入場"]
     free_evidence = first_keyword(desc, FREE_EVIDENCE_KEYWORDS)
-    paid_evidence = first_keyword(desc, PAID_EVIDENCE_KEYWORDS) or fee_amount_evidence(desc)
+    paid_evidence = first_keyword(desc, PAID_EVIDENCE_KEYWORDS) or fee_amount_evidence(desc) or per_person_evidence(desc)
     is_free_ticket = any(kw in desc for kw in free_ticket_keywords)
     if (free_evidence or is_free_ticket) and paid_evidence:
         event["is_free"] = None
@@ -57,11 +59,12 @@ def extract_fee(event, debug_log=None):
         event["fee_evidence_text"] = paid_evidence
         event["fee_parse_status"] = "success"
     else:
-        event["is_free"] = None
-        event["fee_type"] = "unknown"
-        event["fee_text"] = "未標示"
+        # 沒有明確提到收費 → 推定為免費
+        event["is_free"] = True
+        event["fee_type"] = "assumed_free"
+        event["fee_text"] = "未明確收費（推定免費）"
         event["fee_evidence_text"] = ""
-        event["fee_parse_status"] = "unknown"
+        event["fee_parse_status"] = "assumed"
         if debug_log is not None:
             debug_log.append({
                 "title": event.get("title"),
@@ -70,6 +73,23 @@ def extract_fee(event, debug_log=None):
                 "reason": "no fee keyword found"
             })
             
+    # 判斷是否需要報名
+    exhibition_terms = ("展覽", "展期", "開放參觀", "常設展", "特展", "展出", "展示")
+    registration_positive_terms = (
+        "立即報名", "線上報名", "報名網址", "報名期間", "報名表單",
+        "名額限制", "額滿", "報名連結",
+    )
+    is_exhibition = any(term in desc for term in exhibition_terms)
+    has_registration_action = any(term in desc for term in registration_positive_terms)
+    has_registration_url = bool(event.get("registration_url"))
+
+    if has_registration_action or (has_registration_url and not is_exhibition):
+        event["registration_required"] = True
+    elif is_exhibition and not has_registration_action:
+        event["registration_required"] = False
+    else:
+        event["registration_required"] = None  # unknown
+
     return event
 
 
@@ -110,6 +130,10 @@ def first_keyword(text, keywords):
 
 def fee_amount_evidence(text):
     match = PAID_AMOUNT_RE.search(text or "")
+    return match.group(0).strip() if match else ""
+
+def per_person_evidence(text):
+    match = PAID_PER_PERSON_RE.search(text or "")
     return match.group(0).strip() if match else ""
 
 

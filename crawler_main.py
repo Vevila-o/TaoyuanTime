@@ -29,6 +29,7 @@ from pipeline.asset_validator import validate_assets
 from pipeline.line_card_readiness import check_line_card_readiness
 from pipeline.ai_readiness import check_ai_readiness
 from pipeline.quality_score import calculate_quality_score
+from pipeline.compute_readiness import compute_readiness
 from pipeline.dedupe import deduplicate
 from pipeline.ocr_client import apply_ocr_to_event
 from pipeline.save_json import save_to_json, save_run_summary_json, _normalize_output_contract, _sync_front_facing_flags
@@ -117,7 +118,7 @@ def main():
         priority = item["priority"]
         limit = args.primary_limit if priority in ("primary", "primary_candidate") else args.secondary_limit
         
-        print(f"\\n[{scraper.key}] Starting scrape with {scraper.fetcher_type} (limit: {limit})...")
+        print(f"\n[{scraper.key}] Starting scrape with {scraper.fetcher_type} (limit: {limit})...")
         
         st = {
             "source_key": scraper.key,
@@ -137,6 +138,11 @@ def main():
             "usable_count": 0,
             "line_ready_count": 0,
             "ai_ready_count": 0,
+            "searchable_count": 0,
+            "published_count": 0,
+            "missing_date_count": 0,
+            "missing_location_count": 0,
+            "unpublished_count": 0,
             
             "date_success": 0,
             "location_success": 0,
@@ -206,6 +212,7 @@ def main():
                         event_data = check_line_card_readiness(event_data)
                         event_data = check_ai_readiness(event_data)
                         event_data = calculate_quality_score(event_data)
+                        event_data = compute_readiness(event_data)
 
                         if priority == "filtered" and not event_data.get("is_activity"):
                             st["items_skipped"] += 1
@@ -220,10 +227,10 @@ def main():
                         debug_file = os.path.join(debug_case_dir, f"{scraper.key}_detail_parse_failed.json")
                         with open(debug_file, "a", encoding="utf-8") as f:
                             f.write(json.dumps({
-                                "source_url": url, 
-                                "raw_html_path": event_data.get("raw_html_path"),
+                                "source_url": url,
+                                "raw_html_path": event_data.get("raw_html_path") if event_data else None,
                                 "error": str(e)
-                            }, ensure_ascii=False) + "\\n")
+                            }, ensure_ascii=False) + "\n")
                         continue
                     
                     if event_data.get("content_type") == "activity":
@@ -236,6 +243,11 @@ def main():
                         
                     if event_data.get("line_card_ready"): st["line_ready_count"] += 1
                     if event_data.get("ai_ready"): st["ai_ready_count"] += 1
+                    if event_data.get("is_searchable"): st["searchable_count"] += 1
+                    if event_data.get("published"): st["published_count"] += 1
+                    else: st["unpublished_count"] += 1
+                    if not event_data.get("has_required_date"): st["missing_date_count"] += 1
+                    if not event_data.get("has_location"): st["missing_location_count"] += 1
                     
                     if event_data.get("date_parse_status") == "success": st["date_success"] += 1
                     if event_data.get("location_parse_status") in ["success", "multi_location"]: st["location_success"] += 1
@@ -272,6 +284,8 @@ def main():
             
     # Post-processing
     deduped_events = deduplicate(all_events)
+    for event in deduped_events:
+        compute_readiness(event)
     print(f"\\nTotal raw events: {len(all_events)}, After dedupe: {len(deduped_events)}")
 
     if args.ocr:
@@ -279,6 +293,7 @@ def main():
         for event in deduped_events:
             _normalize_output_contract(event)
             _sync_front_facing_flags(event)
+            compute_readiness(event)
             has_candidate = any(
                 asset.get("ocr_candidate") and asset.get("image_role") in {"poster", "main_visual"}
                 for asset in event.get("extracted_assets") or []
@@ -369,6 +384,11 @@ def main():
         "line_card_ready_items": sum(1 for e in deduped_events if e.get("line_card_ready")),
         "search_ready_items": sum(1 for e in deduped_events if e.get("search_ready")),
         "ai_ready_items": sum(1 for e in deduped_events if e.get("ai_ready")),
+        "searchable_items": sum(1 for e in deduped_events if e.get("is_searchable")),
+        "published_items": sum(1 for e in deduped_events if e.get("published")),
+        "unpublished_items": sum(1 for e in deduped_events if not e.get("published")),
+        "items_missing_date": sum(1 for e in deduped_events if not e.get("has_required_date")),
+        "items_missing_location": sum(1 for e in deduped_events if not e.get("has_location")),
         "rejected_items": sum(1 for e in deduped_events if e.get("quality_level") == "rejected"),
         "manual_review_required_count": sum(1 for e in deduped_events if e.get("manual_review_required")),
         
@@ -413,16 +433,21 @@ def main():
     print(f"- line_card_ready: {run_summary['line_card_ready_items']}")
     print(f"- search_ready: {run_summary['search_ready_items']}")
     print(f"- ai_ready: {run_summary['ai_ready_items']}")
+    print(f"- searchable: {run_summary['searchable_items']}")
+    print(f"- published: {run_summary['published_items']}")
+    print(f"- unpublished: {run_summary['unpublished_items']}")
+    print(f"- missing_date: {run_summary['items_missing_date']}")
+    print(f"- missing_location: {run_summary['items_missing_location']}")
     print(f"- rejected: {run_summary['rejected_items']}")
     print(f"- 下載附件: {run_summary['assets_downloaded']}")
     print(f"- 合格海報: {sum(s['poster_valid_count'] for s in final_source_stats)}\\n")
     
     print("## 各來源品質表\\n")
-    print("| source | priority | total | usable | line_ready | ai_ready | rejected | avg_score | MVP (Metrics) |")
-    print("|---|---|---:|---:|---:|---:|---:|---:|---|")
+    print("| source | priority | total | usable | line_ready | ai_ready | searchable | published | missing_date | missing_location | rejected | avg_score | MVP (Metrics) |")
+    print("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|")
     for s in final_source_stats:
         status = 'Pass' if s.get('recommended_for_mvp_by_metrics') else 'Fail'
-        print(f"| {s['source_key']} | {s['source_priority']} | {s['items_created']} | {s['usable_count']} | {s['line_ready_count']} | {s['ai_ready_count']} | {s['items_rejected']} | {s['average_quality_score']} | {status} |")
+        print(f"| {s['source_key']} | {s['source_priority']} | {s['items_created']} | {s['usable_count']} | {s['line_ready_count']} | {s['ai_ready_count']} | {s['searchable_count']} | {s['published_count']} | {s['missing_date_count']} | {s['missing_location_count']} | {s['items_rejected']} | {s['average_quality_score']} | {status} |")
     print("="*50 + "\\n")
 
 if __name__ == "__main__":

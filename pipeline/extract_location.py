@@ -23,7 +23,7 @@ def extract_location(event, debug_log=None):
     """
     if not event: return event
     
-    desc = event.get("clean_description", "")
+    desc = f"{event.get('clean_description', '')} {event.get('enriched_metadata_text', '')}"
     
     # Common prefixes. Avoid single-character prefixes such as "於" / "在";
     # they produce false locations like "今年3月圓滿結束".

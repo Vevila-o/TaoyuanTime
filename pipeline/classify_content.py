@@ -16,7 +16,8 @@ def classify_content(event):
     
     title = event.get("title", "") or ""
     desc = event.get("clean_description", "") or ""
-    text_to_search = title + " " + desc
+    enriched = event.get("enriched_metadata_text", "") or ""
+    text_to_search = title + " " + enriched + " " + desc
     warnings = event.setdefault("quality_warnings", [])
     
     activity_score = 0

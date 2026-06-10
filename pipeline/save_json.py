@@ -39,11 +39,13 @@ def _sort_events(events):
 
 def _normalize_output_contract(event):
     apply_stable_ids(event)
-    for key in ("manual_review_required", "line_card_ready", "line_ready", "search_ready", "ai_ready", "recommendation_ready", "is_public_item", "front_ready", "ocr_ready"):
+    for key in ("manual_review_required", "line_card_ready", "line_ready", "search_ready", "ai_ready", "recommendation_ready", "is_public_item", "is_searchable", "published", "front_ready", "ocr_ready"):
         event[key] = bool(event.get(key))
     event.setdefault("quality_warnings", [])
     event.setdefault("parse_warnings", [])
     event.setdefault("ocr_warnings", [])
+    event.setdefault("missing_fields", [])
+    event.setdefault("status_reason", "")
     return event
 
 
@@ -68,22 +70,12 @@ def _front_exclusion_reason(event):
 
 
 def _sync_front_facing_flags(event):
+    """檢查 front_ready 狀態，但不再覆寫 readiness 欄位（由 compute_readiness 負責）。"""
     reason = _front_exclusion_reason(event)
     front_ready = reason is None
     event["front_ready"] = front_ready
-    if front_ready:
-        event["is_public_item"] = True
-        event["recommendation_ready"] = True
-        event["ai_ready"] = True
-        event.pop("front_exclusion_reason", None)
-    else:
-        had_front_flag = bool(event.get("is_public_item") or event.get("recommendation_ready") or event.get("ai_ready"))
-        event["is_public_item"] = False
-        event["recommendation_ready"] = False
-        event["ai_ready"] = False
+    if not front_ready:
         event["front_exclusion_reason"] = reason
-        if had_front_flag and "front_pool_mismatch" not in event["quality_warnings"]:
-            event["quality_warnings"].append("front_pool_mismatch")
     return front_ready
 
 def save_to_json(events, output_dir="scraping/data/output"):
@@ -161,6 +153,8 @@ def save_to_json(events, output_dir="scraping/data/output"):
                 "district": event.get("district"),
                 "line_card_ready": event.get("line_card_ready"),
                 "line_not_ready_reason": event.get("line_not_ready_reason"),
+                "status_reason": event.get("status_reason"),
+                "missing_fields": event.get("missing_fields", []),
             })
         
     # Write files

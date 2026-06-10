@@ -43,7 +43,16 @@ def check_ai_readiness(event):
         ai_reject_reason = "Missing official source URL"
         
     if ai_ready:
-        ai_input_text = f"Title: {event.get('title', '')}\\nDate: {event.get('date_start') or event.get('date_text', '')}\\nLocation: {event.get('location', '')}\\nSource: {event.get('official_detail_url') or event.get('source_url', '')}\\nDescription: {clean_desc}"
+        enriched = event.get("enriched_metadata_text", "") or ""
+        ai_input_text = (
+            f"Title: {event.get('title', '')}\\n"
+            f"Date: {event.get('date_start') or event.get('date_text', '')}\\n"
+            f"Location: {event.get('location', '')}\\n"
+            f"Fee: {event.get('fee_text', '')}\\n"
+            f"Source: {event.get('official_detail_url') or event.get('source_url', '')}\\n"
+            f"Metadata: {enriched}\\n"
+            f"Description: {clean_desc}"
+        )
         
     event["ai_ready"] = ai_ready
     event["ai_reject_reason"] = ai_reject_reason

@@ -38,11 +38,6 @@ def calculate_quality_score(event):
         event["quality_level"] = "rejected"
 
     event["quality_warnings"] = sorted(set(warnings))
-    event["is_public_item"] = bool(
-        event.get("line_card_ready")
-        and event.get("status", "active") == "active"
-        and event["quality_level"] == "usable"
-        and not event.get("manual_review_required")
-    )
+    # is_public_item 由 compute_readiness 統一計算
         
     return event

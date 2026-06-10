@@ -111,7 +111,8 @@ def extract_dates(event, debug_log=None):
     
     dt = event.get("date_text") or ""
     desc = event.get("clean_description") or ""
-    text = f"{dt} {desc}"
+    enriched = event.get("enriched_metadata_text") or ""
+    text = f"{dt} {enriched} {desc}"
 
     start_match = re.search(r'活動日期[\(（]起[\)）]\s*[:：]\s*([0-9./\-年月日]+)', text)
     end_match = re.search(r'活動日期[\(（]迄[\)）]\s*[:：]\s*([0-9./\-年月日]+)', text)

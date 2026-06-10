@@ -84,6 +84,14 @@ def init_db(filepath):
           search_ready BOOLEAN,
           ai_ready BOOLEAN,
           recommendation_ready BOOLEAN,
+          is_searchable BOOLEAN,
+          published BOOLEAN,
+          has_required_date BOOLEAN,
+          has_title BOOLEAN,
+          has_location BOOLEAN,
+          has_source_url BOOLEAN,
+          missing_fields TEXT,
+          status_reason TEXT,
           exclude_from_recommendation_reason TEXT,
           mvp_candidate BOOLEAN,
           manual_review_required BOOLEAN,
@@ -158,6 +166,7 @@ def init_db(filepath):
         SELECT * FROM activities
         WHERE status = 'active'
           AND is_public_item = 1
+          AND COALESCE(is_searchable, search_ready, 0) = 1
           AND official_detail_url IS NOT NULL
           AND official_detail_url != ''
           AND (COALESCE(date_end, date_start) IS NULL OR date(COALESCE(date_end, date_start)) >= date('now', '+8 hours'))
@@ -169,6 +178,7 @@ def init_db(filepath):
         WHERE status = 'active'
           AND is_activity = 1
           AND ai_ready = 1
+          AND COALESCE(is_searchable, search_ready, 0) = 1
           AND quality_level = 'usable'
           AND manual_review_required = 0
           AND date_start IS NOT NULL
@@ -185,6 +195,7 @@ def init_db(filepath):
         WHERE status = 'active'
           AND is_activity = 1
           AND recommendation_ready = 1
+          AND COALESCE(published, is_public_item, 0) = 1
           AND official_detail_url IS NOT NULL
           AND official_detail_url != ''
           AND (COALESCE(date_end, date_start) IS NULL OR date(COALESCE(date_end, date_start)) >= date('now', '+8 hours'))
@@ -212,7 +223,18 @@ def ensure_columns(conn):
         "registration_evidence_text": "TEXT",
         "quality_warnings": "TEXT",
         "line_ready": "BOOLEAN",
+        "line_card_ready": "BOOLEAN",
+        "search_ready": "BOOLEAN",
+        "ai_ready": "BOOLEAN",
         "recommendation_ready": "BOOLEAN",
+        "is_searchable": "BOOLEAN",
+        "published": "BOOLEAN",
+        "has_required_date": "BOOLEAN",
+        "has_title": "BOOLEAN",
+        "has_location": "BOOLEAN",
+        "has_source_url": "BOOLEAN",
+        "missing_fields": "TEXT",
+        "status_reason": "TEXT",
         "exclude_from_recommendation_reason": "TEXT",
         "ocr_ready": "BOOLEAN",
         "ocr_image_url": "TEXT",
@@ -245,24 +267,25 @@ def save_to_sqlite(events, filepath="scraping/data/output/activities.db"):
     for evt in events:
         apply_stable_ids(evt)
         try:
-            cursor.execute('''
-                INSERT OR REPLACE INTO activities (
-                    source_name, source_key, source_priority, source_url, source_item_id, activity_uid, title, official_detail_url, status,
-                    content_type, item_type, is_activity, is_public_item, is_event_candidate, event_confidence,
-                    date_text, date_start, date_end, time_text, date_parse_status,
-                    location, district, location_parse_status,
-                    organizer, category, description, clean_description,
-                    registration_method, registration_url, registration_parse_status, registration_evidence_text,
-                    fee_text, fee_type, fee_evidence_text, is_free, fee_parse_status,
-                    poster_url, poster_local_path,
-                    ocr_ready, ocr_image_url, ocr_image_path, ocr_text, ocr_summary, ocr_confidence, ocr_status, ocr_warnings,
-                    has_assets, asset_count,
-                    quality_score, quality_level,
-                    scraped_at, content_hash, raw_html_path, parse_warnings, quality_warnings,
-                    line_ready, line_card_ready, search_ready, ai_ready, recommendation_ready,
-                    exclude_from_recommendation_reason, mvp_candidate, manual_review_required
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+            columns = [
+                "source_name", "source_key", "source_priority", "source_url", "source_item_id", "activity_uid", "title", "official_detail_url", "status",
+                "content_type", "item_type", "is_activity", "is_public_item", "is_event_candidate", "event_confidence",
+                "date_text", "date_start", "date_end", "time_text", "date_parse_status",
+                "location", "district", "location_parse_status",
+                "organizer", "category", "description", "clean_description",
+                "registration_method", "registration_url", "registration_parse_status", "registration_evidence_text",
+                "fee_text", "fee_type", "fee_evidence_text", "is_free", "fee_parse_status",
+                "poster_url", "poster_local_path",
+                "ocr_ready", "ocr_image_url", "ocr_image_path", "ocr_text", "ocr_summary", "ocr_confidence", "ocr_status", "ocr_warnings",
+                "has_assets", "asset_count",
+                "quality_score", "quality_level",
+                "scraped_at", "content_hash", "raw_html_path", "parse_warnings", "quality_warnings",
+                "line_ready", "line_card_ready", "search_ready", "ai_ready", "recommendation_ready",
+                "is_searchable", "published", "has_required_date", "has_title", "has_location", "has_source_url",
+                "missing_fields", "status_reason",
+                "exclude_from_recommendation_reason", "mvp_candidate", "manual_review_required",
+            ]
+            values = (
                 evt.get("source_name"), evt.get("source_key"), evt.get("source_priority"), evt.get("source_url"), evt.get("source_item_id"), evt.get("activity_uid"), evt.get("title"), evt.get("official_detail_url") or evt.get("source_url"), evt.get("status", "active"),
                 evt.get("content_type"), evt.get("item_type") or evt.get("content_type"), int(evt.get("is_activity", False)), int(evt.get("is_public_item", False)), int(evt.get("is_event_candidate", False)), evt.get("event_confidence"),
                 evt.get("date_text"), evt.get("date_start"), evt.get("date_end"), evt.get("time_text"), evt.get("date_parse_status"),
@@ -276,8 +299,18 @@ def save_to_sqlite(events, filepath="scraping/data/output/activities.db"):
                 evt.get("quality_score"), evt.get("quality_level"),
                 evt.get("scraped_at"), evt.get("content_hash"), evt.get("raw_html_path"), str(evt.get("parse_warnings", [])), str(evt.get("quality_warnings", [])),
                 int(evt.get("line_ready", evt.get("line_card_ready", False))), int(evt.get("line_card_ready", False)), int(evt.get("search_ready", False)), int(evt.get("ai_ready", False)),
-                int(evt.get("recommendation_ready", False)), evt.get("exclude_from_recommendation_reason"), int(evt.get("mvp_candidate", False)), int(evt.get("manual_review_required", False))
-            ))
+                int(evt.get("recommendation_ready", False)),
+                int(evt.get("is_searchable", False)), int(evt.get("published", False)),
+                int(evt.get("has_required_date", False)), int(evt.get("has_title", False)),
+                int(evt.get("has_location", False)), int(evt.get("has_source_url", False)),
+                str(evt.get("missing_fields", [])), evt.get("status_reason"),
+                evt.get("exclude_from_recommendation_reason"), int(evt.get("mvp_candidate", False)), int(evt.get("manual_review_required", False))
+            )
+            placeholders = ", ".join("?" for _ in columns)
+            cursor.execute(
+                f"INSERT OR REPLACE INTO activities ({', '.join(columns)}) VALUES ({placeholders})",
+                values,
+            )
             
             activity_id = cursor.lastrowid
             

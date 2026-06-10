@@ -6,6 +6,7 @@ from datetime import datetime
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from scrapling import Fetcher, DynamicFetcher
+import json
 
 class BaseScraper:
     def __init__(self, key, name, start_url, fetcher_type="Fetcher"):
@@ -94,6 +95,60 @@ class BaseScraper:
                 return self.compact_text(match.group(1))
         return None
 
+    def extract_html_metadata(self, soup):
+        """
+        從完整 HTML 中提取 head metadata 和 structured data。
+        回傳 dict，供後續 pipeline 使用。
+        不修改 soup 本身。
+        """
+        metadata = {
+            "page_title": "",
+            "meta_description": "",
+            "meta_keywords": "",
+            "og_title": "",
+            "og_description": "",
+            "og_type": "",
+            "og_site_name": "",
+            "structured_data": [],       # JSON-LD 物件列表
+            "all_meta_tags": {},         # name/property -> content
+        }
+
+        # <title>
+        if soup.title:
+            metadata["page_title"] = self.compact_text(soup.title.get_text(" "))
+
+        # <meta> 標籤 — 全部收集
+        for meta in soup.find_all("meta"):
+            name = meta.get("name") or meta.get("property") or ""
+            content = meta.get("content") or ""
+            if name and content:
+                metadata["all_meta_tags"][name.lower()] = content
+                if name.lower() == "description":
+                    metadata["meta_description"] = self.compact_text(content)
+                elif name.lower() == "keywords":
+                    metadata["meta_keywords"] = self.compact_text(content)
+                elif name.lower() == "og:title":
+                    metadata["og_title"] = self.compact_text(content)
+                elif name.lower() == "og:description":
+                    metadata["og_description"] = self.compact_text(content)
+                elif name.lower() == "og:type":
+                    metadata["og_type"] = self.compact_text(content)
+                elif name.lower() == "og:site_name":
+                    metadata["og_site_name"] = self.compact_text(content)
+
+        # JSON-LD structured data
+        for script in soup.find_all("script", type="application/ld+json"):
+            try:
+                data = json.loads(script.string or "{}")
+                if isinstance(data, list):
+                    metadata["structured_data"].extend(data)
+                else:
+                    metadata["structured_data"].append(data)
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        return metadata
+
     def parse_aspx_detail(self, page, parent_url):
         """
         Shared parser for TYCG News_Content.aspx pages.
@@ -106,6 +161,7 @@ class BaseScraper:
 
         html = self.page_html(page)
         soup = BeautifulSoup(html, "html.parser")
+        html_metadata = self.extract_html_metadata(soup)
         for tag in soup(["script", "style", "noscript", "svg"]):
             tag.decompose()
 
@@ -157,6 +213,7 @@ class BaseScraper:
         if registration_url:
             event["registration_url"] = registration_url
             event["registration_method"] = "online"
+        event["html_metadata"] = html_metadata
 
         if html:
             event["raw_html_path"] = self.save_raw_html(parent_url, html)
@@ -173,7 +230,8 @@ class BaseScraper:
 
         html = self.page_html(page)
         soup = BeautifulSoup(html, "html.parser")
-        for tag in soup(["script", "style", "noscript", "svg", "nav", "header", "footer"]):
+        html_metadata = self.extract_html_metadata(soup)
+        for tag in soup(["script", "style", "noscript", "svg", "nav", "footer"]):
             tag.decompose()
 
         title = self.compact_text(fallback_title)
@@ -234,13 +292,18 @@ class BaseScraper:
         if registration_url:
             event["registration_url"] = registration_url
             event["registration_method"] = "online"
+        event["html_metadata"] = html_metadata
         if html:
             event["raw_html_path"] = self.save_raw_html(parent_url, html)
         return event
 
     def extract_registration_url(self, soup, text, base_url):
-        hints = ("網路報名", "報名連結", "Accupass", "Google 表單", "報名網址", "需事先報名")
-        host_hints = ("accupass.com", "forms.gle", "docs.google.com/forms")
+        hints = (
+            "網路報名", "報名連結", "Accupass", "Google 表單", "報名網址", "需事先報名",
+            "立即報名", "線上報名", "報名期間", "報名表單", "名額限制", "額滿",
+            "KKTIX", "BeClass",
+        )
+        host_hints = ("accupass.com", "forms.gle", "docs.google.com/forms", "kktix.com", "beclass.com")
         common_registration_page_hints = ("ActiveList.aspx", "sms=20299")
         if soup:
             soup = BeautifulSoup(str(soup), "html.parser")
@@ -336,6 +399,7 @@ class BaseScraper:
             "exclude_from_recommendation_reason": None,
             
             # Meta
+            "html_metadata": None,
             "scraped_at": datetime.now().isoformat(),
             "content_hash": None,
             "raw_html_path": None,
