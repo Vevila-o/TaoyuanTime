@@ -5,3 +5,6 @@ server.err.log
 .env
 backups/
 .pytest_cache/
+.cursor/
+.serena/
+.codegrath/
