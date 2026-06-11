@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         tags = list(Tag.objects.filter(is_active=True))
-        activities = Activity.objects.filter(is_activity=True).order_by('-updated_at')[:options['limit']]
+        activities = Activity.objects.filter(excluded_from_public=False, is_activity=True).order_by('-updated_at')[:options['limit']]
         created = 0
         skipped = 0
         for activity in activities:

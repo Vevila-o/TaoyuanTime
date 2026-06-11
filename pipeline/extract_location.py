@@ -33,7 +33,7 @@ def extract_location(event, debug_log=None):
     
     # If the scraper found an explicit location_text, use that
     if event.get("location_text"):
-        candidate = event.get("location_text")
+        candidate = clean_location_string(event.get("location_text"))
         if is_plausible_location(candidate):
             location = candidate
 
@@ -44,13 +44,16 @@ def extract_location(event, debug_log=None):
             match = pattern.search(desc)
             if match:
                 loc_candidate = re.split(r"\s*(?:發布單位|主辦單位|活動日期|報名|聯絡人|資料提供)", match.group(1).strip())[0]
+                loc_candidate = clean_location_string(loc_candidate)
                 if is_plausible_location(loc_candidate):
                     location = loc_candidate
                     break
         if not location:
             prose_match = re.search(r"(桃園市[^。；;\n]{2,40}(?:館|中心|公園|學校|廣場|園區|市場|農場|教室|廳|區|路|街|號))", desc)
-            if prose_match and is_plausible_location(prose_match.group(1)):
-                location = prose_match.group(1)
+            if prose_match:
+                loc_candidate = clean_location_string(prose_match.group(1))
+                if is_plausible_location(loc_candidate):
+                    location = loc_candidate
                     
     event["location"] = location
     
@@ -87,6 +90,23 @@ def district_from_known_venue(location):
         if venue in location:
             return district
     return None
+
+def clean_location_string(value):
+    if not value:
+        return ""
+    value = value.strip()
+    # Split by date/time indicators which often get merged into location text
+    split_keywords = [
+        " 展覽期間起", " 活動期間起", " 期間起",
+        "展覽期間起", "活動期間起", "期間起", 
+        "日期：", "時間：", "活動日期", "今年", "報名", 
+        "112-", "113-", "114-", "115-", "2023-", "2024-", "2025-", "2026-"
+    ]
+    for kw in split_keywords:
+        if kw in value:
+            value = value.split(kw)[0].strip()
+    return value
+
 
 def is_plausible_location(value):
     if not value:

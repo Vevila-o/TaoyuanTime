@@ -5,6 +5,7 @@
 """
 from datetime import date
 from zoneinfo import ZoneInfo
+from pipeline.public_exclusion import apply_public_exclusion, final_state_for_event
 
 def compute_readiness(event):
     """
@@ -25,8 +26,10 @@ def compute_readiness(event):
     """
     if not event:
         return event
+    event = apply_public_exclusion(event)
 
     is_activity = bool(event.get("is_activity") or event.get("content_type") == "activity")
+    excluded = bool(event.get("excluded_from_public"))
     has_title = bool(event.get("title"))
     has_date = bool(event.get("date_start"))
     has_location = bool(event.get("location") or event.get("district"))
@@ -47,14 +50,14 @@ def compute_readiness(event):
     line_ready = bool(
         is_activity and has_title and has_url and has_desc
         and has_date and has_location
-        and not invalid_date and not is_expired
+        and not excluded and not invalid_date and not is_expired
     )
     search_ready = bool(
         is_activity and has_title and has_url
         and has_date and has_location
-        and not invalid_date and not is_expired
+        and not excluded and not invalid_date and not is_expired
     )
-    ai_ready = bool(event.get("ai_ready"))  # 保留 ai_readiness.py 的計算結果
+    ai_ready = bool(event.get("ai_ready") and not excluded)  # 保留 ai_readiness.py 的計算結果
     is_searchable = bool(search_ready and quality_ok and not manual_review)
     is_public_item = bool(line_ready and quality_ok and not manual_review)
     recommendation_ready = bool(line_ready and search_ready and not manual_review and quality_ok)
@@ -72,6 +75,8 @@ def compute_readiness(event):
     missing = []
     if not is_activity:
         missing.append("not_activity")
+    if excluded:
+        missing.append("excluded_from_public")
     if not has_title:
         missing.append("missing_title")
     if not has_date:
@@ -104,6 +109,7 @@ def compute_readiness(event):
         "invalid_date_range": "日期區間異常",
         "expired": "活動已過期",
         "manual_review_required": "需人工審核",
+        "excluded_from_public": "已排除前台",
     }
     if not missing:
         if is_expired:
@@ -128,6 +134,8 @@ def compute_readiness(event):
     # exclude_from_recommendation_reason（保持相容）
     if recommendation_ready:
         event["exclude_from_recommendation_reason"] = None
+    elif excluded:
+        event["exclude_from_recommendation_reason"] = event.get("exclude_reason") or "excluded_from_public"
     elif not is_activity:
         event["exclude_from_recommendation_reason"] = "not_activity"
     elif is_expired:
@@ -141,4 +149,5 @@ def compute_readiness(event):
     else:
         event["exclude_from_recommendation_reason"] = "not_ready"
 
+    event["final_state"] = final_state_for_event(event)
     return event

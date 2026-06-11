@@ -9,9 +9,12 @@
 | `handle_postback_event` | 處理 LINE Postback 事件 |
 | `handle_text_message` | 處理 LINE 文字訊息事件 |
 | `handle_citizen_card_postback` | 處理市民卡相關 Postback（顯示條碼、綁定確認、請求位置） |
-| `handle_citizen_card_text` | 處理市民卡相關文字指令（查詢市民卡、輸入卡號綁定） |
+| `handle_citizen_card_text` | 處理市民卡相關文字指令（查詢市民卡、輸入卡號綁定、固定市民卡特約優惠卡片） |
+| `build_citizen_store_message` | 建立中原附近 4 筆固定市民卡特約優惠 LINE Flex 訊息 |
+| `build_citizen_store_carousel` | 建立市民卡特約優惠輪播 Flex 結構 |
+| `build_citizen_store_bubble` | 建立單一市民卡特約優惠 Flex Bubble |
 | `fetch_display_name` | 取得 LINE 使用者顯示名稱 |
-| `handle_location` | 處理位置訊息，搜尋附近特約商店並回覆 Flex 卡片 |
+| `handle_location` | 處理位置訊息，保留附近特約商店搜尋並使用同一套 Flex 卡片樣式 |
 | `get_preference_flex_message` | 產生偏好設定 Flex Message（全版標籤選擇） |
 | `generate_activity_carousel` | 產生活動卡片輪播訊息 |
 | `generate_subscription_carousel` | 產生訂閱活動輪播訊息 |
@@ -237,3 +240,26 @@
 | `attach_crawl_progress` | 附加進度資訊到爬蟲任務物件 |
 | `crawl_task_progress_percent` | 計算爬蟲子任務進度百分比 |
 | `crawl_task_progress_note` | 取得爬蟲子任務進度說明文字 |
+
+---
+
+## Database/events/ai_tagger.py — AI Repair+Tag 與安全補欄位
+
+| 函數 | 說明 |
+|------|------|
+| `tag_activity` | 對活動建立 compact context，呼叫 AI 產生標籤與 repairs |
+| `build_repair_context` | 組合現有欄位、OCR、raw_content、HTML meta/head/main/label 片段，避免餵整頁 HTML |
+| `normalize_ai_repairs` | 驗證 AI repair 建議，拒絕低信心、未知欄位、無證據或格式不合法的修補 |
+| `apply_safe_repairs` | 只補空欄位並寫入 ActivityChangeLog，套用後重算 readiness |
+
+目前 repair 欄位限於 `start_date`、`end_date`、`location`、`district`、`registration_info`、`registration_url`、`fee_type`。自動套用門檻是 `confidence >= 0.65`，日期必須可解析且結束時間不可早於開始時間；地點會限制長度並排除明顯非桃園或導覽雜訊。
+
+## 管理指令 — OCR → AI Repair+Tag → Readiness
+
+| 指令 | 說明 |
+|------|------|
+| `process_activity_ocr` | OCR 候選改為 active、未排除、is_activity、有可 OCR 圖片、未 OCR success、未過期，不再要求 recommendation_ready/high |
+| `ai_tag_activities --repair-gaps-only` | 只處理缺核心欄位的活動，避免已完整爬到的活動被重複 repair |
+| `ai_tag_activities --dry-run --json` | 顯示 repair suggestions 與可套用結果，不寫入 Activity |
+| `ai_tag_activities --apply` | 套用 tags、search profile 與安全 repairs，並重算 readiness |
+| `run_queued_crawl_jobs` | 後台完整更新順序為 crawler/import → OCR → AI repair+tag → apply safe repairs → recompute readiness → public/search/recommend |

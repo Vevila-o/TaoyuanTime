@@ -15,10 +15,12 @@ import django
 django.setup()
 
 from events.ai_tagger import (
+    apply_safe_repairs,
     apply_deterministic_quality_filters,
     classify_warnings,
     extract_strong_region_evidence,
     normalize_ai_result,
+    parse_json_object,
 )
 from events.management.commands.ai_tag_activities import build_audit_item, json_activity_from_item
 
@@ -64,6 +66,153 @@ class AiTagQualityTests(unittest.TestCase):
 
         self.assertEqual(result["accepted_tags"], [])
         self.assertEqual(result["missing_tags"][0]["name"], "不存在標籤")
+
+    def test_normalize_repairs_keeps_valid_and_rejects_unsafe_items(self):
+        future_date = "2026-12-17"
+        result = normalize_ai_result(
+            {
+                "repairs": [
+                    {
+                        "field": "start_date",
+                        "value": future_date,
+                        "confidence": 0.8,
+                        "evidence_text": f"活動日期：{future_date}",
+                        "evidence_source": "ocr",
+                    },
+                    {
+                        "field": "location",
+                        "value": "桃園市大溪區壹號館",
+                        "confidence": 0.4,
+                        "evidence_text": "活動地點：壹號館",
+                        "evidence_source": "html_main",
+                    },
+                    {
+                        "field": "unknown",
+                        "value": "x",
+                        "confidence": 0.9,
+                        "evidence_text": "x",
+                        "evidence_source": "html_main",
+                    },
+                    {
+                        "field": "district",
+                        "value": "大溪區",
+                        "confidence": 0.9,
+                        "evidence_text": "",
+                        "evidence_source": "html_main",
+                    },
+                ]
+            },
+            {},
+            min_confidence=0.6,
+        )
+
+        self.assertEqual(result["repair_suggestions"][0]["field"], "start_date")
+        reject_reasons = {item["reject_reason"] for item in result["rejected_repairs"]}
+        self.assertIn("confidence below 0.65", reject_reasons)
+        self.assertIn("unknown_field", reject_reasons)
+        self.assertIn("missing_evidence", reject_reasons)
+
+    def test_repair_rejects_ambiguous_district_and_non_taoyuan_location(self):
+        result = normalize_ai_result(
+            {
+                "repairs": [
+                    {
+                        "field": "district",
+                        "value": "桃園",
+                        "confidence": 0.9,
+                        "evidence_text": "桃園市民可報名",
+                        "evidence_source": "html_text",
+                    },
+                    {
+                        "field": "location",
+                        "value": "日本神戶市",
+                        "confidence": 0.95,
+                        "evidence_text": "活動地點為日本神戶市",
+                        "evidence_source": "html_text",
+                    },
+                    {
+                        "field": "district",
+                        "value": "大溪",
+                        "confidence": 0.95,
+                        "evidence_text": "活動地點：大溪分館",
+                        "evidence_source": "html_main",
+                    },
+                ]
+            },
+            {},
+            min_confidence=0.6,
+        )
+
+        self.assertEqual(result["repair_suggestions"][0]["field"], "district")
+        self.assertEqual(result["repair_suggestions"][0]["value"], "大溪區")
+        reject_reasons = {item["reject_reason"] for item in result["rejected_repairs"]}
+        self.assertIn("invalid_taoyuan_district", reject_reasons)
+        self.assertIn("non_taoyuan_location", reject_reasons)
+
+    def test_repair_rejects_registration_deadline_as_activity_date(self):
+        result = normalize_ai_result(
+            {
+                "repairs": [
+                    {
+                        "field": "start_date",
+                        "value": "2026-06-01T14:00:00+08:00",
+                        "confidence": 0.9,
+                        "evidence_text": "報名期限 2026-06-01 00:00～",
+                        "evidence_source": "html_main",
+                    },
+                    {
+                        "field": "end_date",
+                        "value": "2026-11-21T16:00:00+08:00",
+                        "confidence": 0.9,
+                        "evidence_text": "活動時間 2026-11-21 14:00 ～ 2026-11-21 16:00",
+                        "evidence_source": "html_main",
+                    },
+                ]
+            },
+            {},
+            min_confidence=0.6,
+        )
+
+        self.assertEqual(result["repair_suggestions"][0]["field"], "end_date")
+        self.assertEqual(
+            result["rejected_repairs"][0]["reject_reason"],
+            "registration_deadline_not_activity_date",
+        )
+
+    def test_safe_repairs_do_not_overwrite_existing_values(self):
+        activity = SimpleNamespace(
+            start_date="existing-date",
+            end_date=None,
+            location="既有地點",
+            district="",
+            registration_info="",
+            registration_url="",
+            fee_type="unknown",
+        )
+        result = {
+            "repair_suggestions": [
+                {
+                    "field": "location",
+                    "value": "新地點",
+                    "confidence": 0.9,
+                    "evidence_text": "地點：新地點",
+                    "evidence_source": "ocr",
+                },
+                {
+                    "field": "district",
+                    "value": "大溪區",
+                    "confidence": 0.9,
+                    "evidence_text": "地點：大溪區",
+                    "evidence_source": "ocr",
+                },
+            ],
+            "rejected_repairs": [],
+        }
+
+        outcome = apply_safe_repairs(activity, result, dry_run=True)
+
+        self.assertEqual(outcome["applied_repairs"][0]["field"], "district")
+        self.assertEqual(outcome["rejected_repairs"][0]["reject_reason"], "existing_value_present")
 
     def test_mutually_exclusive_cost_tags_are_rejected(self):
         tags = tag_map(
@@ -216,6 +365,25 @@ class AiTagQualityTests(unittest.TestCase):
 
         self.assertEqual(result["accepted_tags"][0]["tag_type"], "activity_type")
         self.assertEqual(result["accepted_tags"][0]["name"], "節慶")
+
+    def test_parse_json_object_repairs_missing_commas_between_items(self):
+        parsed = parse_json_object(
+            """
+            {
+              "tags": [
+                {"name": "免費", "tag_type": "cost"}
+                {"name": "大溪", "tag_type": "region"}
+              ],
+              "repairs": [
+                {"field": "location", "value": "壹號館"}
+                {"field": "district", "value": "大溪區"}
+              ]
+            }
+            """
+        )
+
+        self.assertEqual(len(parsed["tags"]), 2)
+        self.assertEqual(parsed["repairs"][1]["field"], "district")
 
     def test_mixed_registration_warning_is_info_not_blocking(self):
         groups = classify_warnings([

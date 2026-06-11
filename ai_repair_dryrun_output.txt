@@ -1,0 +1,2441 @@
+AI tag activities mode=DRY RUN, count=29
+[531] [大溪活動] - AI短影音應用與數位素養體驗 -> ERROR: local: Expecting ',' delimiter: line 74 column 6 (char 1714)
+[536] [大溪活動] - 紙杯大變身！創意鑰匙圈DIY -> ERROR: local: Expecting ',' delimiter: line 68 column 6 (char 1720)
+[537] [大溪活動] - 結構的科學: 開合橋的秘密（倫敦塔橋） -> ERROR: local: Expecting ',' delimiter: line 62 column 6 (char 1542)
+[538] [大溪活動] - 速度的科學: 雲霄飛車大挑戰 -> ERROR: local: Expecting ',' delimiter: line 80 column 6 (char 1965)
+[539] [大溪活動] - 開源星手村：科技合作任務挑戰 -> ERROR: local: Expecting ',' delimiter: line 80 column 6 (char 1983)
+[540] [大溪活動] - 香知香息-擴香石創作 -> ERROR: local: Expecting ',' delimiter: line 87 column 6 (char 2056)
+[543] [大竹演講]冰河表面的探險與科研交會之時 -> ERROR: local: Expecting ',' delimiter: line 76 column 6 (char 1934)
+[544] [平鎮活動]7/11(六) 繪出閱讀的色彩系列活動-壓克力似顏拼貼派對 -> ERROR: local: Expecting ',' delimiter: line 94 column 6 (char 2331)
+[545] [平鎮活動]7/25(六) 繪出閱讀的色彩系列活動-石膏立體浮雕畫 -> ERROR: local: Expecting ',' delimiter: line 94 column 6 (char 2207)
+[546] [平鎮活動]7/26(日) 繪出閱讀的色彩系列活動-年年有魚.鋁箔彩畫 -> ERROR: local: Expecting ',' delimiter: line 80 column 6 (char 1929)
+[547] [平鎮活動]7/4(六) 繪出閱讀的色彩系列活動-⟪南瓜車車⟫ 繪本手作課 -> ERROR: local: Expecting ',' delimiter: line 80 column 6 (char 1953)
+[548] [平鎮活動]7/5(日) 繪出閱讀的色彩系列活動-石英砂肌理畫 -> ERROR: local: Expecting ',' delimiter: line 69 column 6 (char 1707)
+[553] 【閃耀珍珠海岸】主題遊程、好禮套票正式開賣，限定版舒華禮盒驚喜發送 -> ERROR: local: Expecting ',' delimiter: line 69 column 6 (char 1837)
+[555] 【龜山活動】酸鹼小偵探：揭開神奇變色與泡泡實驗的秘密 -> ERROR: local: Expecting ',' delimiter: line 74 column 6 (char 1803)
+[557] 〔總館〕繪本原來還可以這樣讀！(線上課程) -> ERROR: local: Expecting ',' delimiter: line 73 column 6 (char 1727)
+[502] 跟著舒華玩桃園！抽限量「舒華樂桃桃行李箱」收藏攻略一次掌握 -> ERROR: local: Expecting ',' delimiter: line 73 column 6 (char 1732)
+[
+  {
+    "accepted_tags": [
+      {
+        "id": 25,
+        "name": "運動",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "內容明確提及馬拉松賽事，屬於運動類別。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.85,
+        "reason": "文字提及「自費報名」，但推定好禮為免費，且 fee_type 推定為免費，依規則選免費。"
+      },
+      {
+        "id": 43,
+        "name": "需報名",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "文字明確說明「即日起開放報名」及「自費報名參賽」。"
+      },
+      {
+        "id": 49,
+        "name": "優惠未提供",
+        "tag_type": "discount",
+        "confidence": 0.8,
+        "reason": "文字提及「自費報名」，未列出具體市民優惠或折扣資訊。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [],
+    "repair_suggestions": [
+      {
+        "field": "start_date",
+        "value": "2026-11-15",
+        "confidence": 0.95,
+        "evidence_text": "「2026神戶馬拉松」將於11月15日在日本神戶市盛大開跑",
+        "evidence_source": "html_text",
+        "normalized_value": "2026-11-15T00:00:00+08:00"
+      },
+      {
+        "field": "end_date",
+        "value": "2026-11-15",
+        "confidence": 0.9,
+        "evidence_text": "賽事於11月15日開跑，未提及結束日期，推定同天結束。",
+        "evidence_source": "html_text",
+        "normalized_value": "2026-11-15T00:00:00+08:00"
+      },
+      {
+        "field": "registration_url",
+        "value": "https://reurl.cc/9W6LRXRUN",
+        "confidence": 0.95,
+        "evidence_text": "桃園市民可透過指定網站自費報名參賽",
+        "evidence_source": "html_text"
+      },
+      {
+        "field": "registration_info",
+        "value": "桃園市民於8月31日前完成報名並回填資料",
+        "confidence": 0.9,
+        "evidence_text": "凡桃園市民於8月31日前完成神戶馬拉松報名並回填資料",
+        "evidence_source": "html_text"
+      }
+    ],
+    "rejected_repairs": [
+      {
+        "field": "location",
+        "value": "日本神戶市",
+        "confidence": 0.95,
+        "evidence_text": "「2026神戶馬拉松」將於11月15日在日本神戶市盛大開跑",
+        "evidence_source": "html_text",
+        "reject_reason": "non_taoyuan_location"
+      },
+      {
+        "field": "district",
+        "value": "桃園",
+        "confidence": 0.9,
+        "evidence_text": "凡桃園市民於8月31日前完成神戶馬拉松報名",
+        "evidence_source": "html_text",
+        "reject_reason": "invalid_taoyuan_district"
+      }
+    ],
+    "warnings": [
+      "活動地點為日本神戶市，非桃園本地舉辦，但報名對象為桃園市民。",
+      "文字提及「自費報名」，但推定好禮為免費，依規則選「免費」標籤。",
+      "結束日期未明確記載，推定與開跑日期相同。",
+      "優惠資訊未明確列出具體折扣，僅推斷為「優惠未提供」。",
+      "活動雖為國際賽事，但主要推廣對象為桃園市民，可能影響搜尋範圍。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "活動地點為日本神戶市，非桃園本地舉辦，但報名對象為桃園市民。",
+      "文字提及「自費報名」，但推定好禮為免費，依規則選「免費」標籤。",
+      "結束日期未明確記載，推定與開跑日期相同。",
+      "優惠資訊未明確列出具體折扣，僅推斷為「優惠未提供」。",
+      "活動雖為國際賽事，但主要推廣對象為桃園市民，可能影響搜尋範圍。"
+    ],
+    "confidence": 0.875,
+    "search_keywords": [
+      "神戶馬拉松",
+      "雙城馬拉松",
+      "舒華樂桃桃",
+      "葉舒華",
+      "國際馬拉松"
+    ],
+    "search_topics": [
+      "馬拉松",
+      "體育賽事",
+      "國際交流",
+      "旅遊好禮"
+    ],
+    "search_synonyms": [
+      "跑步",
+      "競走",
+      "長跑",
+      "路跑"
+    ],
+    "activity_id": 528,
+    "activity_title": "2026神戶馬拉松開放報名　桃園市民參賽送舒華樂桃桃行李箱",
+    "current_tags": [
+      {
+        "name": "導覽",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "運動",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "需報名",
+        "tag_type": "cost"
+      }
+    ],
+    "new_tags": [
+      {
+        "id": 49,
+        "name": "優惠未提供",
+        "tag_type": "discount",
+        "confidence": 0.8,
+        "reason": "文字提及「自費報名」，未列出具體市民優惠或折扣資訊。"
+      }
+    ],
+    "existing_tags_not_in_ai_result": [
+      {
+        "name": "導覽",
+        "tag_type": "activity_type"
+      }
+    ],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"運動\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"內容明確提及馬拉松賽事，屬於運動類別。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.85,\n      \"reason\": \"文字提及「自費報名」，但推定好禮為免費，且 fee_type 推定為免費，依規則選免費。\"\n    },\n    {\n      \"name\": \"需報名\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"文字明確說明「即日起開放報名」及「自費報名參賽」。\"\n    },\n    {\n      \"name\": \"優惠未提供\",\n      \"tag_type\": \"discount\",\n      \"confidence\": 0.8,\n      \"reason\": \"文字提及「自費報名」，未列出具體市民優惠或折扣資訊。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"2026-11-15\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"「2026神戶馬拉松」將於11月15日在日本神戶市盛大開跑\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"2026-11-15\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"賽事於11月15日開跑，未提及結束日期，推定同天結束。\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"location\",\n      \"value\": \"日本神戶市\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"「2026神戶馬拉松」將於11月15日在日本神戶市盛大開跑\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"district\",\n      \"value\": \"桃園\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"凡桃園市民於8月31日前完成神戶馬拉松報名\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"https://reurl.cc/9W6LRXRUN\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"桃園市民可透過指定網站自費報名參賽\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"桃園市民於8月31日前完成報名並回填資料\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"凡桃園市民於8月31日前完成神戶馬拉松報名並回填資料\",\n      \"evidence_source\": \"html_text\"\n    }\n  ],\n  \"search_keywords\": [\n    \"神戶馬拉松\",\n    \"雙城馬拉松\",\n    \"舒華樂桃桃\",\n    \"葉舒華\",\n    \"國際馬拉松\"\n  ],\n  \"search_topics\": [\n    \"馬拉松\",\n    \"體育賽事\",\n    \"國際交流\",\n    \"旅遊好禮\"\n  ],\n  \"search_synonyms\": [\n    \"跑步\",\n    \"競走\",\n    \"長跑\",\n    \"路跑\"\n  ],\n  \"warnings\": [\n    \"活動地點為日本神戶市，非桃園本地舉辦，但報名對象為桃園市民。\",\n    \"文字提及「自費報名」，但推定好禮為免費，依規則選「免費」標籤。\",\n    \"結束日期未明確記載，推定與開跑日期相同。\",\n    \"優惠資訊未明確列出具體折扣，僅推斷為「優惠未提供」。\",\n    \"活動雖為國際賽事，但主要推廣對象為桃園市民，可能影響搜尋範圍。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "start_date",
+        "value": "2026-11-15",
+        "confidence": 0.95,
+        "evidence_text": "「2026神戶馬拉松」將於11月15日在日本神戶市盛大開跑",
+        "evidence_source": "html_text",
+        "normalized_value": "2026-11-15T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2026-11-15T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "end_date",
+        "value": "2026-11-15",
+        "confidence": 0.9,
+        "evidence_text": "賽事於11月15日開跑，未提及結束日期，推定同天結束。",
+        "evidence_source": "html_text",
+        "normalized_value": "2026-11-15T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2026-11-15T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "registration_url",
+        "value": "https://reurl.cc/9W6LRXRUN",
+        "confidence": 0.95,
+        "evidence_text": "桃園市民可透過指定網站自費報名參賽",
+        "evidence_source": "html_text",
+        "old_value": "",
+        "new_value": "https://reurl.cc/9W6LRXRUN",
+        "dry_run": true
+      },
+      {
+        "field": "registration_info",
+        "value": "桃園市民於8月31日前完成報名並回填資料",
+        "confidence": 0.9,
+        "evidence_text": "凡桃園市民於8月31日前完成神戶馬拉松報名並回填資料",
+        "evidence_source": "html_text",
+        "old_value": "",
+        "new_value": "桃園市民於8月31日前完成報名並回填資料",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "activity_id": 531,
+    "activity_title": "[大溪活動] - AI短影音應用與數位素養體驗",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 74 column 6 (char 1714)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.95,
+        "reason": "HTML主內容區明確標註「活動費用 免費」，OCR文字亦顯示「會費:0元」。"
+      },
+      {
+        "id": 7,
+        "name": "大溪",
+        "tag_type": "region",
+        "confidence": 0.95,
+        "reason": "活動地點位於桃園市立圖書館大溪分館，區分為大溪區。"
+      }
+    ],
+    "missing_tags": [
+      {
+        "name": "科學",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "活動內容涵蓋科學、數位、手作三大主題，且標題含「科學魔術」，明確提及視覺與科學祕密。",
+        "review_level": "taxonomy"
+      }
+    ],
+    "rejected_tags": [
+      {
+        "id": 36,
+        "name": "青年",
+        "tag_type": "audience",
+        "confidence": 0.3,
+        "reason": "活動雖針對國小學生，但內容包含AI攝影、3C體驗等數位科技主題，可能吸引青年參與，但主要對象仍為學生。",
+        "reject_reason": "confidence below 0.6",
+        "reject_level": "info"
+      },
+      {
+        "id": 34,
+        "name": "親子",
+        "tag_type": "audience",
+        "confidence": 0.95,
+        "reason": "活動對象明確標示為國小1-6年級學生，符合親子活動定義。",
+        "reject_reason": "audience tag lacks explicit evidence",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [
+      {
+        "field": "start_date",
+        "value": "2026-07-11",
+        "confidence": 0.9,
+        "evidence_text": "7/11 奇幻科學魔術探案隊",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-07-11T00:00:00+08:00"
+      },
+      {
+        "field": "end_date",
+        "value": "2026-12-15",
+        "confidence": 0.9,
+        "evidence_text": "12/15 3C墨香繪紙藝",
+        "evidence_source": "ocr",
+        "normalized_value": "2026-12-15T00:00:00+08:00"
+      },
+      {
+        "field": "registration_url",
+        "value": "https://www.tyl.edu.tw/neweng/",
+        "confidence": 0.85,
+        "evidence_text": "詳情請至桃園市立圖書館新英線上報名",
+        "evidence_source": "ocr"
+      },
+      {
+        "field": "registration_info",
+        "value": "郵政報名、名額有限、額滿為止",
+        "confidence": 0.9,
+        "evidence_text": "報名方式:郵政報名、名額有限、額滿為止",
+        "evidence_source": "ocr"
+      }
+    ],
+    "rejected_repairs": [],
+    "warnings": [
+      "活動時間為2026年，OCR文字顯示7月至12月每週六，但HTML主內容區僅顯示單一場次7/18，兩者時間範圍有衝突。",
+      "OCR文字顯示報名方式為郵政報名，但HTML主內容區顯示「立即報名」按鈕，未明確連結至郵政報名頁面，可能存在報名方式描述不一致。",
+      "活動對象雖為國小學生，但內容包含AI與3C體驗，可能吸引非學生族群，audience標籤僅選親子可能不足以涵蓋所有潛在參與者。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "活動時間為2026年，OCR文字顯示7月至12月每週六，但HTML主內容區僅顯示單一場次7/18，兩者時間範圍有衝突。",
+      "OCR文字顯示報名方式為郵政報名，但HTML主內容區顯示「立即報名」按鈕，未明確連結至郵政報名頁面，可能存在報名方式描述不一致。",
+      "活動對象雖為國小學生，但內容包含AI與3C體驗，可能吸引非學生族群，audience標籤僅選親子可能不足以涵蓋所有潛在參與者。"
+    ],
+    "confidence": 0.95,
+    "search_keywords": [
+      "奇幻科學魔術",
+      "大溪玩科",
+      "國小學生",
+      "AI攝影",
+      "紙杯變身"
+    ],
+    "search_topics": [
+      "科學魔術",
+      "數位體驗",
+      "手作活動",
+      "親子教育",
+      "桃園市立圖書館"
+    ],
+    "search_synonyms": [
+      "魔術探案",
+      "科學實驗",
+      "創意坊",
+      "科技任務"
+    ],
+    "activity_id": 532,
+    "activity_title": "[大溪活動] - 奇幻科學魔術探索隊",
+    "current_tags": [
+      {
+        "name": "藝文",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "一般",
+        "tag_type": "audience"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "大溪",
+        "tag_type": "region"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [
+      {
+        "name": "藝文",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "一般",
+        "tag_type": "audience"
+      }
+    ],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"科學\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動內容涵蓋科學、數位、手作三大主題，且標題含「科學魔術」，明確提及視覺與科學祕密。\"\n    },\n    {\n      \"name\": \"親子\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動對象明確標示為國小1-6年級學生，符合親子活動定義。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.95,\n      \"reason\": \"HTML主內容區明確標註「活動費用 免費」，OCR文字亦顯示「會費:0元」。\"\n    },\n    {\n      \"name\": \"大溪\",\n      \"tag_type\": \"region\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動地點位於桃園市立圖書館大溪分館，區分為大溪區。\"\n    },\n    {\n      \"name\": \"青年\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.3,\n      \"reason\": \"活動雖針對國小學生，但內容包含AI攝影、3C體驗等數位科技主題，可能吸引青年參與，但主要對象仍為學生。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"2026-07-11\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"7/11 奇幻科學魔術探案隊\",\n      \"evidence_source\": \"html_main\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"2026-12-15\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"12/15 3C墨香繪紙藝\",\n      \"evidence_source\": \"ocr\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"https://www.tyl.edu.tw/neweng/\",\n      \"confidence\": 0.85,\n      \"evidence_text\": \"詳情請至桃園市立圖書館新英線上報名\",\n      \"evidence_source\": \"ocr\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"郵政報名、名額有限、額滿為止\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"報名方式:郵政報名、名額有限、額滿為止\",\n      \"evidence_source\": \"ocr\"\n    }\n  ],\n  \"search_keywords\": [\n    \"奇幻科學魔術\",\n    \"大溪玩科\",\n    \"國小學生\",\n    \"AI攝影\",\n    \"紙杯變身\"\n  ],\n  \"search_topics\": [\n    \"科學魔術\",\n    \"數位體驗\",\n    \"手作活動\",\n    \"親子教育\",\n    \"桃園市立圖書館\"\n  ],\n  \"search_synonyms\": [\n    \"魔術探案\",\n    \"科學實驗\",\n    \"創意坊\",\n    \"科技任務\"\n  ],\n  \"warnings\": [\n    \"活動時間為2026年，OCR文字顯示7月至12月每週六，但HTML主內容區僅顯示單一場次7/18，兩者時間範圍有衝突。\",\n    \"OCR文字顯示報名方式為郵政報名，但HTML主內容區顯示「立即報名」按鈕，未明確連結至郵政報名頁面，可能存在報名方式描述不一致。\",\n    \"活動對象雖為國小學生，但內容包含AI與3C體驗，可能吸引非學生族群，audience標籤僅選親子可能不足以涵蓋所有潛在參與者。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "start_date",
+        "value": "2026-07-11",
+        "confidence": 0.9,
+        "evidence_text": "7/11 奇幻科學魔術探案隊",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-07-11T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2026-07-11T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "end_date",
+        "value": "2026-12-15",
+        "confidence": 0.9,
+        "evidence_text": "12/15 3C墨香繪紙藝",
+        "evidence_source": "ocr",
+        "normalized_value": "2026-12-15T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2026-12-15T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "registration_url",
+        "value": "https://www.tyl.edu.tw/neweng/",
+        "confidence": 0.85,
+        "evidence_text": "詳情請至桃園市立圖書館新英線上報名",
+        "evidence_source": "ocr",
+        "old_value": "",
+        "new_value": "https://www.tyl.edu.tw/neweng/",
+        "dry_run": true
+      },
+      {
+        "field": "registration_info",
+        "value": "郵政報名、名額有限、額滿為止",
+        "confidence": 0.9,
+        "evidence_text": "報名方式:郵政報名、名額有限、額滿為止",
+        "evidence_source": "ocr",
+        "old_value": "",
+        "new_value": "郵政報名、名額有限、額滿為止",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "ocr_has_text": true,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 22,
+        "name": "手作",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "活動內容包含寶特瓶回收、多肉植栽實作、紙杯變身等動手製作項目。"
+      },
+      {
+        "id": 19,
+        "name": "親子",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "活動對象明確為國小1-6年級學生，並強調讓孩子與家長一起參與。"
+      },
+      {
+        "id": 30,
+        "name": "閱讀",
+        "tag_type": "activity_type",
+        "confidence": 0.6,
+        "reason": "活動名稱含「3C墨香繪紙藝」及「鐘日音由來」，涉及文字創作與閱讀，但主要為實作。"
+      },
+      {
+        "id": 7,
+        "name": "大溪",
+        "tag_type": "region",
+        "confidence": 0.95,
+        "reason": "活動地點位於桃園市立圖書館大溪分館，且標題含大溪活動。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.5,
+        "reason": "OCR文字顯示會費0元，但HTML主內容區顯示材料費150元現場繳交，存在矛盾。",
+        "reject_reason": "confidence below 0.6",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [
+      {
+        "field": "end_date",
+        "value": "2026-11-21T16:00:00+08:00",
+        "confidence": 0.9,
+        "evidence_text": "活動時間 2026-11-21 14:00 ～ 2026-11-21 16:00",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-11-21T16:00:00+08:00"
+      },
+      {
+        "field": "registration_info",
+        "value": "郵政報名、名額有限、額滿為止",
+        "confidence": 0.9,
+        "evidence_text": "報名方式:郵政報名、名額有限、額滿為止",
+        "evidence_source": "ocr"
+      },
+      {
+        "field": "registration_url",
+        "value": "https://www.tyl.gov.tw/neweng/",
+        "confidence": 0.85,
+        "evidence_text": "詳情請至桃園市立圖書館新英線上報名",
+        "evidence_source": "ocr"
+      }
+    ],
+    "rejected_repairs": [
+      {
+        "field": "start_date",
+        "value": "2026-06-01T14:00:00+08:00",
+        "confidence": 0.9,
+        "evidence_text": "報名期限 2026-06-01 00:00～",
+        "evidence_source": "html_main",
+        "reject_reason": "registration_deadline_not_activity_date"
+      }
+    ],
+    "warnings": [
+      "費用欄位矛盾：OCR顯示會費0元，但HTML主內容區顯示材料費150元現場繳交，無法確定最終收費狀況。",
+      "免費標籤置信度低：因存在材料費150元的明確證據，推定免費可能不準確，建議確認實際收費方式。",
+      "報名網址需驗證：OCR提及「新英線上報名」，但無完整URL，需依官方網站確認正確連結。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "費用欄位矛盾：OCR顯示會費0元，但HTML主內容區顯示材料費150元現場繳交，無法確定最終收費狀況。",
+      "免費標籤置信度低：因存在材料費150元的明確證據，推定免費可能不準確，建議確認實際收費方式。",
+      "報名網址需驗證：OCR提及「新英線上報名」，但無完整URL，需依官方網站確認正確連結。"
+    ],
+    "confidence": 0.863,
+    "search_keywords": [
+      "大溪玩科",
+      "環保創客",
+      "多肉植栽",
+      "寶特瓶回收",
+      "親子手作"
+    ],
+    "search_topics": [
+      "大溪區活動",
+      "桃園市立圖書館活動",
+      "國小學生活動",
+      "環保教育活動"
+    ],
+    "search_synonyms": [
+      "大溪區",
+      "康莊分館",
+      "親子共學",
+      "DIY手作"
+    ],
+    "activity_id": 535,
+    "activity_title": "[大溪活動] - 環保創客與多肉植栽實作",
+    "current_tags": [
+      {
+        "name": "手作",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "親子",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "閱讀",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "大溪",
+        "tag_type": "region"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      }
+    ],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"手作\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動內容包含寶特瓶回收、多肉植栽實作、紙杯變身等動手製作項目。\"\n    },\n    {\n      \"name\": \"親子\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動對象明確為國小1-6年級學生，並強調讓孩子與家長一起參與。\"\n    },\n    {\n      \"name\": \"閱讀\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.6,\n      \"reason\": \"活動名稱含「3C墨香繪紙藝」及「鐘日音由來」，涉及文字創作與閱讀，但主要為實作。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.5,\n      \"reason\": \"OCR文字顯示會費0元，但HTML主內容區顯示材料費150元現場繳交，存在矛盾。\"\n    },\n    {\n      \"name\": \"大溪\",\n      \"tag_type\": \"region\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動地點位於桃園市立圖書館大溪分館，且標題含大溪活動。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"2026-06-01T14:00:00+08:00\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"報名期限 2026-06-01 00:00～\",\n      \"evidence_source\": \"html_main\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"2026-11-21T16:00:00+08:00\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"活動時間 2026-11-21 14:00 ～ 2026-11-21 16:00\",\n      \"evidence_source\": \"html_main\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"郵政報名、名額有限、額滿為止\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"報名方式:郵政報名、名額有限、額滿為止\",\n      \"evidence_source\": \"ocr\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"https://www.tyl.gov.tw/neweng/\",\n      \"confidence\": 0.85,\n      \"evidence_text\": \"詳情請至桃園市立圖書館新英線上報名\",\n      \"evidence_source\": \"ocr\"\n    }\n  ],\n  \"search_keywords\": [\n    \"大溪玩科\",\n    \"環保創客\",\n    \"多肉植栽\",\n    \"寶特瓶回收\",\n    \"親子手作\"\n  ],\n  \"search_topics\": [\n    \"大溪區活動\",\n    \"桃園市立圖書館活動\",\n    \"國小學生活動\",\n    \"環保教育活動\"\n  ],\n  \"search_synonyms\": [\n    \"大溪區\",\n    \"康莊分館\",\n    \"親子共學\",\n    \"DIY手作\"\n  ],\n  \"warnings\": [\n    \"費用欄位矛盾：OCR顯示會費0元，但HTML主內容區顯示材料費150元現場繳交，無法確定最終收費狀況。\",\n    \"免費標籤置信度低：因存在材料費150元的明確證據，推定免費可能不準確，建議確認實際收費方式。\",\n    \"報名網址需驗證：OCR提及「新英線上報名」，但無完整URL，需依官方網站確認正確連結。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "end_date",
+        "value": "2026-11-21T16:00:00+08:00",
+        "confidence": 0.9,
+        "evidence_text": "活動時間 2026-11-21 14:00 ～ 2026-11-21 16:00",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-11-21T16:00:00+08:00",
+        "old_value": "",
+        "new_value": "2026-11-21T16:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "registration_info",
+        "value": "郵政報名、名額有限、額滿為止",
+        "confidence": 0.9,
+        "evidence_text": "報名方式:郵政報名、名額有限、額滿為止",
+        "evidence_source": "ocr",
+        "old_value": "",
+        "new_value": "郵政報名、名額有限、額滿為止",
+        "dry_run": true
+      },
+      {
+        "field": "registration_url",
+        "value": "https://www.tyl.gov.tw/neweng/",
+        "confidence": 0.85,
+        "evidence_text": "詳情請至桃園市立圖書館新英線上報名",
+        "evidence_source": "ocr",
+        "old_value": "",
+        "new_value": "https://www.tyl.gov.tw/neweng/",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "ocr_has_text": true,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "activity_id": 536,
+    "activity_title": "[大溪活動] - 紙杯大變身！創意鑰匙圈DIY",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 68 column 6 (char 1720)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 537,
+    "activity_title": "[大溪活動] - 結構的科學: 開合橋的秘密（倫敦塔橋）",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 62 column 6 (char 1542)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 538,
+    "activity_title": "[大溪活動] - 速度的科學: 雲霄飛車大挑戰",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 80 column 6 (char 1965)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 539,
+    "activity_title": "[大溪活動] - 開源星手村：科技合作任務挑戰",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 80 column 6 (char 1983)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 540,
+    "activity_title": "[大溪活動] - 香知香息-擴香石創作",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 87 column 6 (char 2056)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 543,
+    "activity_title": "[大竹演講]冰河表面的探險與科研交會之時",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 76 column 6 (char 1934)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 544,
+    "activity_title": "[平鎮活動]7/11(六) 繪出閱讀的色彩系列活動-壓克力似顏拼貼派對",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 94 column 6 (char 2331)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 545,
+    "activity_title": "[平鎮活動]7/25(六) 繪出閱讀的色彩系列活動-石膏立體浮雕畫",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 94 column 6 (char 2207)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 546,
+    "activity_title": "[平鎮活動]7/26(日) 繪出閱讀的色彩系列活動-年年有魚.鋁箔彩畫",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 80 column 6 (char 1929)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 547,
+    "activity_title": "[平鎮活動]7/4(六) 繪出閱讀的色彩系列活動-⟪南瓜車車⟫ 繪本手作課",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 80 column 6 (char 1953)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 548,
+    "activity_title": "[平鎮活動]7/5(日) 繪出閱讀的色彩系列活動-石英砂肌理畫",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 69 column 6 (char 1707)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 553,
+    "activity_title": "【閃耀珍珠海岸】主題遊程、好禮套票正式開賣，限定版舒華禮盒驚喜發送",
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "error": "local: Expecting ',' delimiter: line 69 column 6 (char 1837)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "activity_id": 555,
+    "activity_title": "【龜山活動】酸鹼小偵探：揭開神奇變色與泡泡實驗的秘密",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 74 column 6 (char 1803)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 15,
+        "name": "講座",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "活動內容為分享清潔技巧的講座形式"
+      },
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.9,
+        "reason": "html_main 明確標註參加對象為一般民眾"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.95,
+        "reason": "html_main 與 html_meta 均明確標註活動費用為免費"
+      },
+      {
+        "id": 49,
+        "name": "優惠未提供",
+        "tag_type": "discount",
+        "confidence": 0.9,
+        "reason": "文字未提及任何具體優惠資訊，且無明確無優惠聲明"
+      },
+      {
+        "id": 5,
+        "name": "龜山",
+        "tag_type": "region",
+        "confidence": 0.95,
+        "reason": "標題與活動地點均明確指出為龜山分館"
+      }
+    ],
+    "missing_tags": [
+      {
+        "name": "環保",
+        "tag_type": "activity_type",
+        "confidence": 0.9,
+        "reason": "標題與簡介強調環保清潔與減少化學用品使用",
+        "review_level": "taxonomy"
+      }
+    ],
+    "rejected_tags": [
+      {
+        "id": 34,
+        "name": "親子",
+        "tag_type": "audience",
+        "confidence": 0.5,
+        "reason": "活動地點位於親子閱覽區，但主要對象為一般民眾，推論度低",
+        "reject_reason": "confidence below 0.6",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [
+      {
+        "field": "start_date",
+        "value": "2026-07-18T10:00:00+08:00",
+        "confidence": 0.98,
+        "evidence_text": "活動時間 2026-07-18 10:00 ～ 2026-07-18 12:00",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-07-18T10:00:00+08:00"
+      },
+      {
+        "field": "end_date",
+        "value": "2026-07-18T12:00:00+08:00",
+        "confidence": 0.98,
+        "evidence_text": "活動時間 2026-07-18 10:00 ～ 2026-07-18 12:00",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-07-18T12:00:00+08:00"
+      },
+      {
+        "field": "registration_info",
+        "value": "網路報名，正取 20 人，備取 5 人",
+        "confidence": 0.95,
+        "evidence_text": "活動地點：尚未開放報名 正取：20 備取：5",
+        "evidence_source": "html_main"
+      },
+      {
+        "field": "registration_url",
+        "value": "https://www.typl.gov.tw",
+        "confidence": 0.85,
+        "evidence_text": "詳情請至桃園市立圖書館新英線上報名",
+        "evidence_source": "ocr"
+      }
+    ],
+    "rejected_repairs": [],
+    "warnings": [
+      "OCR 文字顯示大溪玩科活動，與頁面標題龜山活動內容不符，以頁面標題為準。",
+      "current_tags 包含親子，但 html_main 明確對象為一般民眾，推論度低。",
+      "registration_url 僅從 OCR 推斷為圖書館首頁，非直接連結。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "OCR 文字顯示大溪玩科活動，與頁面標題龜山活動內容不符，以頁面標題為準。",
+      "current_tags 包含親子，但 html_main 明確對象為一般民眾，推論度低。",
+      "registration_url 僅從 OCR 推斷為圖書館首頁，非直接連結。"
+    ],
+    "confidence": 0.93,
+    "search_keywords": [
+      "高效環保清潔",
+      "居家清潔技巧",
+      "天然清潔小妙方",
+      "減少化學用品",
+      "生活智慧"
+    ],
+    "search_topics": [
+      "環保清潔",
+      "居家整理",
+      "天然清潔劑",
+      "生活小撇步"
+    ],
+    "search_synonyms": [
+      "環保",
+      "綠色清潔",
+      "無毒清潔",
+      "天然清潔"
+    ],
+    "activity_id": 556,
+    "activity_title": "【龜山活動】高效環保清潔：讓家事變簡單的生活妙點子",
+    "current_tags": [
+      {
+        "name": "親子",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "講座",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "閱讀",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "一般",
+        "tag_type": "audience"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "優惠未提供",
+        "tag_type": "discount"
+      },
+      {
+        "name": "龜山",
+        "tag_type": "region"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [
+      {
+        "name": "親子",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "閱讀",
+        "tag_type": "activity_type"
+      }
+    ],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"講座\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動內容為分享清潔技巧的講座形式\"\n    },\n    {\n      \"name\": \"環保\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.9,\n      \"reason\": \"標題與簡介強調環保清潔與減少化學用品使用\"\n    },\n    {\n      \"name\": \"一般\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.9,\n      \"reason\": \"html_main 明確標註參加對象為一般民眾\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.95,\n      \"reason\": \"html_main 與 html_meta 均明確標註活動費用為免費\"\n    },\n    {\n      \"name\": \"優惠未提供\",\n      \"tag_type\": \"discount\",\n      \"confidence\": 0.9,\n      \"reason\": \"文字未提及任何具體優惠資訊，且無明確無優惠聲明\"\n    },\n    {\n      \"name\": \"龜山\",\n      \"tag_type\": \"region\",\n      \"confidence\": 0.95,\n      \"reason\": \"標題與活動地點均明確指出為龜山分館\"\n    },\n    {\n      \"name\": \"親子\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.5,\n      \"reason\": \"活動地點位於親子閱覽區，但主要對象為一般民眾，推論度低\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"2026-07-18T10:00:00+08:00\",\n      \"confidence\": 0.98,\n      \"evidence_text\": \"活動時間 2026-07-18 10:00 ～ 2026-07-18 12:00\",\n      \"evidence_source\": \"html_main\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"2026-07-18T12:00:00+08:00\",\n      \"confidence\": 0.98,\n      \"evidence_text\": \"活動時間 2026-07-18 10:00 ～ 2026-07-18 12:00\",\n      \"evidence_source\": \"html_main\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"網路報名，正取 20 人，備取 5 人\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"活動地點：尚未開放報名 正取：20 備取：5\",\n      \"evidence_source\": \"html_main\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"https://www.typl.gov.tw\",\n      \"confidence\": 0.85,\n      \"evidence_text\": \"詳情請至桃園市立圖書館新英線上報名\",\n      \"evidence_source\": \"ocr\"\n    }\n  ],\n  \"search_keywords\": [\n    \"高效環保清潔\",\n    \"居家清潔技巧\",\n    \"天然清潔小妙方\",\n    \"減少化學用品\",\n    \"生活智慧\"\n  ],\n  \"search_topics\": [\n    \"環保清潔\",\n    \"居家整理\",\n    \"天然清潔劑\",\n    \"生活小撇步\"\n  ],\n  \"search_synonyms\": [\n    \"環保\",\n    \"綠色清潔\",\n    \"無毒清潔\",\n    \"天然清潔\"\n  ],\n  \"warnings\": [\n    \"OCR 文字顯示大溪玩科活動，與頁面標題龜山活動內容不符，以頁面標題為準。\",\n    \"current_tags 包含親子，但 html_main 明確對象為一般民眾，推論度低。\",\n    \"registration_url 僅從 OCR 推斷為圖書館首頁，非直接連結。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "start_date",
+        "value": "2026-07-18T10:00:00+08:00",
+        "confidence": 0.98,
+        "evidence_text": "活動時間 2026-07-18 10:00 ～ 2026-07-18 12:00",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-07-18T10:00:00+08:00",
+        "old_value": "",
+        "new_value": "2026-07-18T10:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "end_date",
+        "value": "2026-07-18T12:00:00+08:00",
+        "confidence": 0.98,
+        "evidence_text": "活動時間 2026-07-18 10:00 ～ 2026-07-18 12:00",
+        "evidence_source": "html_main",
+        "normalized_value": "2026-07-18T12:00:00+08:00",
+        "old_value": "",
+        "new_value": "2026-07-18T12:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "registration_info",
+        "value": "網路報名，正取 20 人，備取 5 人",
+        "confidence": 0.95,
+        "evidence_text": "活動地點：尚未開放報名 正取：20 備取：5",
+        "evidence_source": "html_main",
+        "old_value": "",
+        "new_value": "網路報名，正取 20 人，備取 5 人",
+        "dry_run": true
+      },
+      {
+        "field": "registration_url",
+        "value": "https://www.typl.gov.tw",
+        "confidence": 0.85,
+        "evidence_text": "詳情請至桃園市立圖書館新英線上報名",
+        "evidence_source": "ocr",
+        "old_value": "",
+        "new_value": "https://www.typl.gov.tw",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "ocr_has_text": true,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "activity_id": 557,
+    "activity_title": "〔總館〕繪本原來還可以這樣讀！(線上課程)",
+    "activity_uid": "",
+    "source_key": "library_activity_rss",
+    "ocr_status": "success",
+    "error": "local: Expecting ',' delimiter: line 73 column 6 (char 1727)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 21,
+        "name": "導覽",
+        "tag_type": "activity_type",
+        "confidence": 1.0,
+        "reason": "標題與內容明確提及「外語導覽服務」及「導覽路線」"
+      },
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.8,
+        "reason": "內容提及歡迎外國朋友旅遊，推測為一般民眾，非特定學生或長輩"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 1.0,
+        "reason": "is_free 為 true，且 fee_description 推定免費，無收費證據"
+      },
+      {
+        "id": 7,
+        "name": "大溪",
+        "tag_type": "region",
+        "confidence": 1.0,
+        "reason": "district 為大溪區，且內容多次提及大溪老城區"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [
+      {
+        "id": 36,
+        "name": "青年",
+        "tag_type": "audience",
+        "confidence": 0.3,
+        "reason": "大溪為青年文化重鎮，但內容未明確針對青年，僅推測",
+        "reject_reason": "confidence below 0.6",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [
+      {
+        "field": "location",
+        "value": "大溪老城區",
+        "confidence": 0.9,
+        "evidence_text": "歡迎來大溪老城區走走",
+        "evidence_source": "html_text"
+      },
+      {
+        "field": "registration_info",
+        "value": "免報名",
+        "confidence": 1.0,
+        "evidence_text": "requires_registration 為 false",
+        "evidence_source": "existing_field"
+      }
+    ],
+    "rejected_repairs": [
+      {
+        "field": "start_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "無日期資訊",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "end_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "無日期資訊",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "無 URL 資訊",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "audience 標籤為一般，雖推測適合外國遊客，但內容未明確排除其他族群。",
+      "start_date 與 end_date 皆為空，無法確認活動時間範圍。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "audience 標籤為一般，雖推測適合外國遊客，但內容未明確排除其他族群。",
+      "start_date 與 end_date 皆為空，無法確認活動時間範圍。"
+    ],
+    "confidence": 0.95,
+    "search_keywords": [
+      "大溪",
+      "外語導覽",
+      "日語導覽",
+      "英語導覽",
+      "旅遊",
+      "導覽路線"
+    ],
+    "search_topics": [
+      "導覽",
+      "旅遊",
+      "大溪"
+    ],
+    "search_synonyms": [
+      "外語友善",
+      "多語言導覽"
+    ],
+    "activity_id": 559,
+    "activity_title": "大溪外語導覽服務上線",
+    "current_tags": [
+      {
+        "name": "導覽",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "一般",
+        "tag_type": "audience"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "大溪",
+        "tag_type": "region"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"導覽\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 1.0,\n      \"reason\": \"標題與內容明確提及「外語導覽服務」及「導覽路線」\"\n    },\n    {\n      \"name\": \"一般\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.8,\n      \"reason\": \"內容提及歡迎外國朋友旅遊，推測為一般民眾，非特定學生或長輩\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 1.0,\n      \"reason\": \"is_free 為 true，且 fee_description 推定免費，無收費證據\"\n    },\n    {\n      \"name\": \"大溪\",\n      \"tag_type\": \"region\",\n      \"confidence\": 1.0,\n      \"reason\": \"district 為大溪區，且內容多次提及大溪老城區\"\n    },\n    {\n      \"name\": \"青年\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.3,\n      \"reason\": \"大溪為青年文化重鎮，但內容未明確針對青年，僅推測\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"無日期資訊\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"無日期資訊\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"location\",\n      \"value\": \"大溪老城區\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"歡迎來大溪老城區走走\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"免報名\",\n      \"confidence\": 1.0,\n      \"evidence_text\": \"requires_registration 為 false\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"無 URL 資訊\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"大溪\",\n    \"外語導覽\",\n    \"日語導覽\",\n    \"英語導覽\",\n    \"旅遊\",\n    \"導覽路線\"\n  ],\n  \"search_topics\": [\n    \"導覽\",\n    \"旅遊\",\n    \"大溪\"\n  ],\n  \"search_synonyms\": [\n    \"外語友善\",\n    \"多語言導覽\"\n  ],\n  \"warnings\": [\n    \"audience 標籤為一般，雖推測適合外國遊客，但內容未明確排除其他族群。\",\n    \"region 標籤選大溪，符合 district 大溪區，無矛盾。\",\n    \"cost 標籤為免費，依 is_free 與 fee_description 判斷，無矛盾。\",\n    \"registration_info 標為免報名，依 requires_registration 為 false 判斷，無矛盾。\",\n    \"start_date 與 end_date 皆為空，無法確認活動時間範圍。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "location",
+        "value": "大溪老城區",
+        "confidence": 0.9,
+        "evidence_text": "歡迎來大溪老城區走走",
+        "evidence_source": "html_text",
+        "old_value": "",
+        "new_value": "大溪老城區",
+        "dry_run": true
+      },
+      {
+        "field": "registration_info",
+        "value": "免報名",
+        "confidence": 1.0,
+        "evidence_text": "requires_registration 為 false",
+        "evidence_source": "existing_field",
+        "old_value": "",
+        "new_value": "免報名",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 20,
+        "name": "戶外",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "活動標題與描述為探索北橫，北橫為山區步道，符合戶外活動定義。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "is_free 為 true，fee_description 明確指出推定免費。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [],
+    "repair_suggestions": [],
+    "rejected_repairs": [
+      {
+        "field": "start_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "end_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "location",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "district",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_info",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "活動資訊極少，無法推斷具體地點、日期或報名方式。",
+      "fee_type 雖為 assumed_free，但依規則僅能標註 cost 為免費，fee_type 保持 unknown 或 free 需依實際證據，目前依 is_free 標註免費。",
+      "目前無證據支持任何地區或具體地點，無法填入 district 或 location。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "活動資訊極少，無法推斷具體地點、日期或報名方式。",
+      "fee_type 雖為 assumed_free，但依規則僅能標註 cost 為免費，fee_type 保持 unknown 或 free 需依實際證據，目前依 is_free 標註免費。",
+      "目前無證據支持任何地區或具體地點，無法填入 district 或 location。"
+    ],
+    "confidence": 0.925,
+    "search_keywords": [
+      "北橫",
+      "登山",
+      "步道",
+      "桃園"
+    ],
+    "search_topics": [
+      "戶外活動",
+      "自然探索",
+      "免費活動"
+    ],
+    "search_synonyms": [
+      "徒步",
+      "健行",
+      "郊遊"
+    ],
+    "activity_id": 562,
+    "activity_title": "探索北橫",
+    "current_tags": [
+      {
+        "name": "戶外",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"戶外\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動標題與描述為探索北橫，北橫為山區步道，符合戶外活動定義。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"is_free 為 true，fee_description 明確指出推定免費。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"location\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"district\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"北橫\",\n    \"登山\",\n    \"步道\",\n    \"桃園\"\n  ],\n  \"search_topics\": [\n    \"戶外活動\",\n    \"自然探索\",\n    \"免費活動\"\n  ],\n  \"search_synonyms\": [\n    \"徒步\",\n    \"健行\",\n    \"郊遊\"\n  ],\n  \"warnings\": [\n    \"活動資訊極少，無法推斷具體地點、日期或報名方式。\",\n    \"fee_type 雖為 assumed_free，但依規則僅能標註 cost 為免費，fee_type 保持 unknown 或 free 需依實際證據，目前依 is_free 標註免費。\",\n    \"目前無證據支持任何地區或具體地點，無法填入 district 或 location。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.95,
+        "reason": "活動名稱與描述未限定特定族群，符合一般民眾參與。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "is_free 為 true 且 fee_description 推定免費，符合免費定義。"
+      },
+      {
+        "id": 16,
+        "name": "市集",
+        "tag_type": "activity_type",
+        "confidence": 0.85,
+        "reason": "「100 碗」通常指美食攤位聚集，符合市集特徵。"
+      },
+      {
+        "id": 27,
+        "name": "美食",
+        "tag_type": "activity_type",
+        "confidence": 0.85,
+        "reason": "「100 碗」暗示餐飲美食攤位，符合美食分類。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [
+      {
+        "id": 34,
+        "name": "親子",
+        "tag_type": "audience",
+        "confidence": 0.6,
+        "reason": "「100 碗」常見於親子友善活動，但無明確文字證據，僅為弱推論。",
+        "reject_reason": "audience tag lacks explicit evidence",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [],
+    "rejected_repairs": [
+      {
+        "field": "start_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "end_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "location",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "district",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_info",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "活動資訊極少，無法確認具體日期、地點與報名方式，僅能推斷為一般免費市集。",
+      "audience 標籤「親子」僅為弱推論，無明確文字證據支持，可能不準確。",
+      "fee_type 雖推定免費，但原始資料未明確寫出「免費」二字，依規則僅標註 cost 為免費。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "活動資訊極少，無法確認具體日期、地點與報名方式，僅能推斷為一般免費市集。",
+      "audience 標籤「親子」僅為弱推論，無明確文字證據支持，可能不準確。",
+      "fee_type 雖推定免費，但原始資料未明確寫出「免費」二字，依規則僅標註 cost 為免費。"
+    ],
+    "confidence": 0.888,
+    "search_keywords": [
+      "桃園100碗",
+      "美食市集",
+      "免費活動",
+      "桃園美食節"
+    ],
+    "search_topics": [
+      "美食",
+      "市集",
+      "免費活動"
+    ],
+    "search_synonyms": [
+      "100碗",
+      "美食攤位",
+      "餐飲市集"
+    ],
+    "activity_id": 564,
+    "activity_title": "桃園100碗",
+    "current_tags": [
+      {
+        "name": "一般",
+        "tag_type": "audience"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      }
+    ],
+    "new_tags": [
+      {
+        "id": 16,
+        "name": "市集",
+        "tag_type": "activity_type",
+        "confidence": 0.85,
+        "reason": "「100 碗」通常指美食攤位聚集，符合市集特徵。"
+      },
+      {
+        "id": 27,
+        "name": "美食",
+        "tag_type": "activity_type",
+        "confidence": 0.85,
+        "reason": "「100 碗」暗示餐飲美食攤位，符合美食分類。"
+      }
+    ],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"一般\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動名稱與描述未限定特定族群，符合一般民眾參與。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"is_free 為 true 且 fee_description 推定免費，符合免費定義。\"\n    },\n    {\n      \"name\": \"市集\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.85,\n      \"reason\": \"「100 碗」通常指美食攤位聚集，符合市集特徵。\"\n    },\n    {\n      \"name\": \"美食\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.85,\n      \"reason\": \"「100 碗」暗示餐飲美食攤位，符合美食分類。\"\n    },\n    {\n      \"name\": \"親子\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.6,\n      \"reason\": \"「100 碗」常見於親子友善活動，但無明確文字證據，僅為弱推論。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"location\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"district\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"桃園 100 碗\",\n    \"美食市集\",\n    \"免費活動\",\n    \"桃園美食節\"\n  ],\n  \"search_topics\": [\n    \"美食\",\n    \"市集\",\n    \"免費活動\"\n  ],\n  \"search_synonyms\": [\n    \"100 碗\",\n    \"美食攤位\",\n    \"餐飲市集\"\n  ],\n  \"warnings\": [\n    \"活動資訊極少，無法確認具體日期、地點與報名方式，僅能推斷為一般免費市集。\",\n    \"audience 標籤「親子」僅為弱推論，無明確文字證據支持，可能不準確。\",\n    \"fee_type 雖推定免費，但原始資料未明確寫出「免費」二字，依規則僅標註 cost 為免費。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 19,
+        "name": "親子",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "標題與內容多次提及「親子戲水」、「滿足不同年齡層」，明確指向親子活動。"
+      },
+      {
+        "id": 20,
+        "name": "戶外",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "活動地點為溪邊戲水區，屬戶外自然環境活動。"
+      },
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.9,
+        "reason": "內容提及「闔家戲水」、「滿足不同年齡層」，未限制特定族群，推定為一般民眾。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "文字明確描述「全面開放」且無提及收費，推定為免費。"
+      },
+      {
+        "id": 49,
+        "name": "優惠未提供",
+        "tag_type": "discount",
+        "confidence": 0.85,
+        "reason": "文中未提及任何優惠資訊，符合缺漏定義。"
+      },
+      {
+        "id": 13,
+        "name": "復興",
+        "tag_type": "region",
+        "confidence": 0.95,
+        "reason": "標題與內容均明確指出地點為「復興區小烏來」。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [
+      {
+        "id": 30,
+        "name": "閱讀",
+        "tag_type": "activity_type",
+        "confidence": 0.3,
+        "reason": "文中提及「聆聽溪水的呢喃」，雖非主要活動，但符合白名單中較寬泛的閱讀/聽覺體驗分類。",
+        "reject_reason": "confidence below 0.6",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [
+      {
+        "field": "start_date",
+        "value": "2024-06-08T00:00:00+08:00",
+        "confidence": 0.95,
+        "evidence_text": "6 月 6 日（週六）起",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-06-08T00:00:00+08:00"
+      },
+      {
+        "field": "end_date",
+        "value": "2024-09-30T00:00:00+08:00",
+        "confidence": 0.95,
+        "evidence_text": "9 月 28 日（週一）",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-09-30T00:00:00+08:00"
+      },
+      {
+        "field": "registration_info",
+        "value": "免預約",
+        "confidence": 0.9,
+        "evidence_text": "requires_registration: false",
+        "evidence_source": "existing_field"
+      }
+    ],
+    "rejected_repairs": [
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "無明確 URL",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "日期計算：6 月 6 日為週六，9 月 28 日為週一，推定活動持續至週一結束。",
+      "費用推論：文字未明說收費，依規則推定為免費，若實際有收費需修正。",
+      "地區一致性：district 欄位為「復興區」，region tag 為「復興」，兩者一致。",
+      "audience 標籤：雖有親子特色，但內容涵蓋全齡層，故標註為「一般」較妥當。",
+      "活動類型：「閱讀」標籤置信度低，僅因文中提及聆聽溪水而選入，非主要活動類型。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "日期計算：6 月 6 日為週六，9 月 28 日為週一，推定活動持續至週一結束。",
+      "費用推論：文字未明說收費，依規則推定為免費，若實際有收費需修正。",
+      "地區一致性：district 欄位為「復興區」，region tag 為「復興」，兩者一致。",
+      "audience 標籤：雖有親子特色，但內容涵蓋全齡層，故標註為「一般」較妥當。",
+      "活動類型：「閱讀」標籤置信度低，僅因文中提及聆聽溪水而選入，非主要活動類型。"
+    ],
+    "confidence": 0.917,
+    "search_keywords": [
+      "小烏來",
+      "宇內溪",
+      "戲水",
+      "親子",
+      "溫泉",
+      "天空步道"
+    ],
+    "search_topics": [
+      "夏季活動",
+      "親子遊",
+      "桃園景點",
+      "戶外玩水"
+    ],
+    "search_synonyms": [
+      "週末",
+      "暑假",
+      "親子同樂",
+      "休閒"
+    ],
+    "activity_id": 565,
+    "activity_title": "桃園夏日親子戲水首選，小烏來宇內溪戲水區 6月6日起開放",
+    "current_tags": [
+      {
+        "name": "戶外",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "親子",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "一般",
+        "tag_type": "audience"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "優惠未提供",
+        "tag_type": "discount"
+      },
+      {
+        "name": "復興",
+        "tag_type": "region"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"親子\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"標題與內容多次提及「親子戲水」、「滿足不同年齡層」，明確指向親子活動。\"\n    },\n    {\n      \"name\": \"戶外\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動地點為溪邊戲水區，屬戶外自然環境活動。\"\n    },\n    {\n      \"name\": \"一般\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.9,\n      \"reason\": \"內容提及「闔家戲水」、「滿足不同年齡層」，未限制特定族群，推定為一般民眾。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"文字明確描述「全面開放」且無提及收費，推定為免費。\"\n    },\n    {\n      \"name\": \"優惠未提供\",\n      \"tag_type\": \"discount\",\n      \"confidence\": 0.85,\n      \"reason\": \"文中未提及任何優惠資訊，符合缺漏定義。\"\n    },\n    {\n      \"name\": \"復興\",\n      \"tag_type\": \"region\",\n      \"confidence\": 0.95,\n      \"reason\": \"標題與內容均明確指出地點為「復興區小烏來」。\"\n    },\n    {\n      \"name\": \"閱讀\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.3,\n      \"reason\": \"文中提及「聆聽溪水的呢喃」，雖非主要活動，但符合白名單中較寬泛的閱讀/聽覺體驗分類。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"2024-06-08T00:00:00+08:00\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"6 月 6 日（週六）起\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"2024-09-30T00:00:00+08:00\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"9 月 28 日（週一）\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"免預約\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"requires_registration: false\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"無明確 URL\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"小烏來\",\n    \"宇內溪\",\n    \"戲水\",\n    \"親子\",\n    \"溫泉\",\n    \"天空步道\"\n  ],\n  \"search_topics\": [\n    \"夏季活動\",\n    \"親子遊\",\n    \"桃園景點\",\n    \"戶外玩水\"\n  ],\n  \"search_synonyms\": [\n    \"週末\",\n    \"暑假\",\n    \"親子同樂\",\n    \"休閒\"\n  ],\n  \"warnings\": [\n    \"日期計算：6 月 6 日為週六，9 月 28 日為週一，推定活動持續至週一結束。\",\n    \"費用推論：文字未明說收費，依規則推定為免費，若實際有收費需修正。\",\n    \"地區一致性：district 欄位為「復興區」，region tag 為「復興」，兩者一致。\",\n    \"audience 標籤：雖有親子特色，但內容涵蓋全齡層，故標註為「一般」較妥當。\",\n    \"活動類型：「閱讀」標籤置信度低，僅因文中提及聆聽溪水而選入，非主要活動類型。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "start_date",
+        "value": "2024-06-08T00:00:00+08:00",
+        "confidence": 0.95,
+        "evidence_text": "6 月 6 日（週六）起",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-06-08T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2024-06-08T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "end_date",
+        "value": "2024-09-30T00:00:00+08:00",
+        "confidence": 0.95,
+        "evidence_text": "9 月 28 日（週一）",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-09-30T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2024-09-30T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "registration_info",
+        "value": "免預約",
+        "confidence": 0.9,
+        "evidence_text": "requires_registration: false",
+        "evidence_source": "existing_field",
+        "old_value": "",
+        "new_value": "免預約",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 32,
+        "name": "藝文",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "星巴克城市杯屬於城市文化敘事與藝術設計，符合藝文定義。"
+      },
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.9,
+        "reason": "文中提到「邀民眾按圖索驥」，對象為一般大眾。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "文中明確提及「5 月 6 日正式開賣」且無收費說明，推定為免費商品。"
+      },
+      {
+        "id": 31,
+        "name": "客家",
+        "tag_type": "activity_type",
+        "confidence": 0.85,
+        "reason": "文中提及「春季龍潭客家聚落魯冰花」，活動內容包含客家文化元素。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [
+      {
+        "id": 36,
+        "name": "青年",
+        "tag_type": "audience",
+        "confidence": 0.7,
+        "reason": "星巴克 Discovery 系列常吸引年輕族群，且為城市行銷活動。",
+        "reject_reason": "audience tag lacks explicit evidence",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [
+      {
+        "field": "start_date",
+        "value": "2024-05-06",
+        "confidence": 0.95,
+        "evidence_text": "5 月 6 日正式開賣",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-05-06T00:00:00+08:00"
+      },
+      {
+        "field": "end_date",
+        "value": "2024-05-06",
+        "confidence": 0.8,
+        "evidence_text": "5 月 6 日正式開賣",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-05-06T00:00:00+08:00"
+      },
+      {
+        "field": "registration_info",
+        "value": "無需報名",
+        "confidence": 0.95,
+        "evidence_text": "requires_registration: false",
+        "evidence_source": "existing_field"
+      }
+    ],
+    "rejected_repairs": [
+      {
+        "field": "district",
+        "value": "桃園",
+        "confidence": 0.9,
+        "evidence_text": "桃園首度入選...雙北、台中、台南、高雄與桃園並列",
+        "evidence_source": "html_text",
+        "reject_reason": "invalid_taoyuan_district"
+      },
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "無明確網址",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "start_date 與 end_date 均推定為 5 月 6 日，因文中僅提及開賣日期，未說明結束時間。",
+      "district 欄位填為「桃園」，因活動為全市性推廣，未指定單一行政區。",
+      "cost 欄位推定為「免費」，基於開賣商品且無收費資訊，符合免預約邏輯。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "start_date 與 end_date 均推定為 5 月 6 日，因文中僅提及開賣日期，未說明結束時間。",
+      "district 欄位填為「桃園」，因活動為全市性推廣，未指定單一行政區。",
+      "cost 欄位推定為「免費」，基於開賣商品且無收費資訊，符合免預約邏輯。"
+    ],
+    "confidence": 0.9,
+    "search_keywords": [
+      "星巴克",
+      "Discovery城市系列",
+      "城市杯",
+      "桃園觀光",
+      "咖啡杯"
+    ],
+    "search_topics": [
+      "咖啡文化",
+      "城市行銷",
+      "旅遊商品",
+      "國際觀光"
+    ],
+    "search_synonyms": [
+      "星巴克杯",
+      "城市杯系列",
+      "Discovery地圖",
+      "桃園咖啡"
+    ],
+    "activity_id": 568,
+    "activity_title": "桃園首度躍上星巴克Discovery系列城市杯 5月6日全台首發 展現國門之都生活魅力",
+    "current_tags": [
+      {
+        "name": "客家",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "藝文",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "一般",
+        "tag_type": "audience"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"藝文\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"星巴克城市杯屬於城市文化敘事與藝術設計，符合藝文定義。\"\n    },\n    {\n      \"name\": \"一般\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.9,\n      \"reason\": \"文中提到「邀民眾按圖索驥」，對象為一般大眾。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"文中明確提及「5 月 6 日正式開賣」且無收費說明，推定為免費商品。\"\n    },\n    {\n      \"name\": \"客家\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.85,\n      \"reason\": \"文中提及「春季龍潭客家聚落魯冰花」，活動內容包含客家文化元素。\"\n    },\n    {\n      \"name\": \"青年\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.7,\n      \"reason\": \"星巴克 Discovery 系列常吸引年輕族群，且為城市行銷活動。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"2024-05-06\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"5 月 6 日正式開賣\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"2024-05-06\",\n      \"confidence\": 0.8,\n      \"evidence_text\": \"5 月 6 日正式開賣\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"district\",\n      \"value\": \"桃園\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"桃園首度入選...雙北、台中、台南、高雄與桃園並列\",\n      \"evidence_source\": \"html_text\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"無需報名\",\n      \"confidence\": 0.95,\n      \"evidence_text\": \"requires_registration: false\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"無明確網址\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"星巴克\",\n    \"Discovery 城市系列\",\n    \"城市杯\",\n    \"桃園觀光\",\n    \"咖啡杯\"\n  ],\n  \"search_topics\": [\n    \"咖啡文化\",\n    \"城市行銷\",\n    \"旅遊商品\",\n    \"國際觀光\"\n  ],\n  \"search_synonyms\": [\n    \"星巴克杯\",\n    \"城市杯系列\",\n    \"Discovery 地圖\",\n    \"桃園咖啡\"\n  ],\n  \"warnings\": [\n    \"start_date 與 end_date 均推定為 5 月 6 日，因文中僅提及開賣日期，未說明結束時間。\",\n    \"district 欄位填為「桃園」，因活動為全市性推廣，未指定單一行政區。\",\n    \"cost 欄位推定為「免費」，基於開賣商品且無收費資訊，符合免預約邏輯。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "start_date",
+        "value": "2024-05-06",
+        "confidence": 0.95,
+        "evidence_text": "5 月 6 日正式開賣",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-05-06T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2024-05-06T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "end_date",
+        "value": "2024-05-06",
+        "confidence": 0.8,
+        "evidence_text": "5 月 6 日正式開賣",
+        "evidence_source": "html_text",
+        "normalized_value": "2024-05-06T00:00:00+08:00",
+        "old_value": "",
+        "new_value": "2024-05-06T00:00:00+08:00",
+        "dry_run": true
+      },
+      {
+        "field": "registration_info",
+        "value": "無需報名",
+        "confidence": 0.95,
+        "evidence_text": "requires_registration: false",
+        "evidence_source": "existing_field",
+        "old_value": "",
+        "new_value": "無需報名",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 20,
+        "name": "戶外",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "活動名稱含 P@rk，且白名單已有此標籤，符合活動性質。"
+      },
+      {
+        "id": 32,
+        "name": "藝文",
+        "tag_type": "activity_type",
+        "confidence": 0.85,
+        "reason": "活動名稱含宇宙、P@rk 等詞，推測為藝術或文化相關活動。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "is_free 為 true，fee_description 明確寫未明確收費推定免費。"
+      },
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.7,
+        "reason": "活動名稱未限定對象，且 is_free 為 true，推測適合一般民眾。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [],
+    "repair_suggestions": [],
+    "rejected_repairs": [
+      {
+        "field": "start_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "end_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "location",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "district",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_info",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "活動名稱含 P@rk 與宇宙，但無明確日期、地點資訊，無法確認具體舉辦時間與場所。",
+      "audience 標籤為一般，因活動名稱未明確限制對象，僅依免費性質推斷。",
+      "fee_type 為 assumed_free，但文字描述為推定免費，若實際收費則與標籤矛盾。"
+    ],
+    "blocking_warnings": [
+      "fee_type 為 assumed_free，但文字描述為推定免費，若實際收費則與標籤矛盾。"
+    ],
+    "info_warnings": [
+      "活動名稱含 P@rk 與宇宙，但無明確日期、地點資訊，無法確認具體舉辦時間與場所。",
+      "audience 標籤為一般，因活動名稱未明確限制對象，僅依免費性質推斷。"
+    ],
+    "confidence": 0.85,
+    "search_keywords": [
+      "樂桃園",
+      "P@rkGo",
+      "來去園宇宙",
+      "戶外活動",
+      "藝文展覽"
+    ],
+    "search_topics": [
+      "桃園市",
+      "樂桃園",
+      "免費活動",
+      "親子活動"
+    ],
+    "search_synonyms": [
+      "P@rkGo",
+      "來去園",
+      "宇宙展",
+      "戶外空間"
+    ],
+    "activity_id": 569,
+    "activity_title": "樂桃園P@rk Go/來去園宇宙",
+    "current_tags": [
+      {
+        "name": "戶外",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "藝文",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      }
+    ],
+    "new_tags": [
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.7,
+        "reason": "活動名稱未限定對象，且 is_free 為 true，推測適合一般民眾。"
+      }
+    ],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "needs_review",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"戶外\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"活動名稱含 P@rk，且白名單已有此標籤，符合活動性質。\"\n    },\n    {\n      \"name\": \"藝文\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.85,\n      \"reason\": \"活動名稱含宇宙、P@rk 等詞，推測為藝術或文化相關活動。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"is_free 為 true，fee_description 明確寫未明確收費推定免費。\"\n    },\n    {\n      \"name\": \"一般\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.7,\n      \"reason\": \"活動名稱未限定對象，且 is_free 為 true，推測適合一般民眾。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"location\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"district\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"樂桃園\",\n    \"P@rk Go\",\n    \"來去園宇宙\",\n    \"戶外活動\",\n    \"藝文展覽\"\n  ],\n  \"search_topics\": [\n    \"桃園市\",\n    \"樂桃園\",\n    \"免費活動\",\n    \"親子活動\"\n  ],\n  \"search_synonyms\": [\n    \"P@rk Go\",\n    \"來去園\",\n    \"宇宙展\",\n    \"戶外空間\"\n  ],\n  \"warnings\": [\n    \"活動名稱含 P@rk 與宇宙，但無明確日期、地點資訊，無法確認具體舉辦時間與場所。\",\n    \"audience 標籤為一般，因活動名稱未明確限制對象，僅依免費性質推斷。\",\n    \"fee_type 為 assumed_free，但文字描述為推定免費，若實際收費則與標籤矛盾。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 21,
+        "name": "導覽",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "標題含「山海線」且描述提及「多元行程」，符合導覽活動特徵。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "is_free 為 true，fee_description 明確指出「推定免費」。"
+      },
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.85,
+        "reason": "描述提及「想做的事」與「多元行程」，未限定特定族群，推論為一般民眾。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [],
+    "repair_suggestions": [],
+    "rejected_repairs": [
+      {
+        "field": "start_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "end_date",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "location",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "district",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_info",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      },
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "日期、地點、報名資訊欄位皆為空，無法確認具體活動時間與區域。",
+      "OCR 文字與頁面欄位均無提供具體日期與地點證據，無法推斷。",
+      "audience 標籤為推論，因缺乏明確對象描述。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "日期、地點、報名資訊欄位皆為空，無法確認具體活動時間與區域。",
+      "OCR 文字與頁面欄位均無提供具體日期與地點證據，無法推斷。",
+      "audience 標籤為推論，因缺乏明確對象描述。"
+    ],
+    "confidence": 0.9,
+    "search_keywords": [
+      "山海線",
+      "多元行程",
+      "桃園觀光導覽",
+      "遊桃園APP"
+    ],
+    "search_topics": [
+      "旅遊",
+      "景點導覽",
+      "行程規劃"
+    ],
+    "search_synonyms": [
+      "導覽",
+      "行程",
+      "路線"
+    ],
+    "activity_id": 575,
+    "activity_title": "青春山海線",
+    "current_tags": [
+      {
+        "name": "導覽",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      }
+    ],
+    "new_tags": [
+      {
+        "id": 38,
+        "name": "一般",
+        "tag_type": "audience",
+        "confidence": 0.85,
+        "reason": "描述提及「想做的事」與「多元行程」，未限定特定族群，推論為一般民眾。"
+      }
+    ],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"導覽\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"標題含「山海線」且描述提及「多元行程」，符合導覽活動特徵。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"is_free 為 true，fee_description 明確指出「推定免費」。\"\n    },\n    {\n      \"name\": \"一般\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.85,\n      \"reason\": \"描述提及「想做的事」與「多元行程」，未限定特定族群，推論為一般民眾。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"start_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"end_date\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"location\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"district\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"山海線\",\n    \"多元行程\",\n    \"桃園觀光導覽\",\n    \"遊桃園 APP\"\n  ],\n  \"search_topics\": [\n    \"旅遊\",\n    \"景點導覽\",\n    \"行程規劃\"\n  ],\n  \"search_synonyms\": [\n    \"導覽\",\n    \"行程\",\n    \"路線\"\n  ],\n  \"warnings\": [\n    \"日期、地點、報名資訊欄位皆為空，無法確認具體活動時間與區域。\",\n    \"OCR 文字與頁面欄位均無提供具體日期與地點證據，無法推斷。\",\n    \"audience 標籤為推論，因缺乏明確對象描述。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 21,
+        "name": "導覽",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "標題含主題遊程，且現已有此標籤，符合導覽性質。"
+      },
+      {
+        "id": 20,
+        "name": "戶外",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "地點為濱海地區，屬戶外活動。"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "is_free 為 true，fee_type 推定免費，文字未明確收費。"
+      },
+      {
+        "id": 1,
+        "name": "桃園",
+        "tag_type": "region",
+        "confidence": 0.95,
+        "reason": "標題與地點均明確指向桃園。"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [
+      {
+        "id": 36,
+        "name": "青年",
+        "tag_type": "audience",
+        "confidence": 0.3,
+        "reason": "主題遊程常吸引青年，但無明確對象證據，僅為弱推測。",
+        "reject_reason": "confidence below 0.6",
+        "reject_level": "info"
+      }
+    ],
+    "repair_suggestions": [
+      {
+        "field": "registration_info",
+        "value": "免預約",
+        "confidence": 0.9,
+        "evidence_text": "requires_registration: false",
+        "evidence_source": "existing_field"
+      }
+    ],
+    "rejected_repairs": [
+      {
+        "field": "district",
+        "value": "桃園",
+        "confidence": 0.8,
+        "evidence_text": "location: 桃園濱海地區",
+        "evidence_source": "existing_field",
+        "reject_reason": "invalid_taoyuan_district"
+      },
+      {
+        "field": "registration_url",
+        "value": "",
+        "confidence": 0.0,
+        "evidence_text": "requires_registration: false",
+        "evidence_source": "existing_field",
+        "reject_reason": "confidence below 0.65"
+      }
+    ],
+    "warnings": [
+      "audience 標籤青年無明確文字證據，僅為弱推測，建議不選或需更多資料。",
+      "district 推斷為桃園，因 location 為桃園濱海地區，無更精確行政區名稱。",
+      "registration_url 為空，因 requires_registration 為 false，無報名網址。",
+      "fee_type 雖推定免費，但文字描述為未明確收費，依規則保守標註免費。",
+      "current_tags 已包含導覽、戶外、免費、桃園，新標籤僅補充青年（低置信度）。"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "audience 標籤青年無明確文字證據，僅為弱推測，建議不選或需更多資料。",
+      "district 推斷為桃園，因 location 為桃園濱海地區，無更精確行政區名稱。",
+      "registration_url 為空，因 requires_registration 為 false，無報名網址。",
+      "fee_type 雖推定免費，但文字描述為未明確收費，依規則保守標註免費。",
+      "current_tags 已包含導覽、戶外、免費、桃園，新標籤僅補充青年（低置信度）。"
+    ],
+    "confidence": 0.938,
+    "search_keywords": [
+      "桃園濱海",
+      "主題遊程",
+      "導覽",
+      "免費",
+      "戶外"
+    ],
+    "search_topics": [
+      "桃園旅遊",
+      "濱海活動",
+      "免費導覽",
+      "親子遊程"
+    ],
+    "search_synonyms": [
+      "主題遊程",
+      "導覽",
+      "遊覽",
+      "導覽行程"
+    ],
+    "activity_id": 499,
+    "activity_title": "桃園珍珠海岸主題遊程",
+    "current_tags": [
+      {
+        "name": "導覽",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "戶外",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "桃園",
+        "tag_type": "region"
+      }
+    ],
+    "new_tags": [],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"導覽\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"標題含主題遊程，且現已有此標籤，符合導覽性質。\"\n    },\n    {\n      \"name\": \"戶外\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"地點為濱海地區，屬戶外活動。\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"is_free 為 true，fee_type 推定免費，文字未明確收費。\"\n    },\n    {\n      \"name\": \"桃園\",\n      \"tag_type\": \"region\",\n      \"confidence\": 0.95,\n      \"reason\": \"標題與地點均明確指向桃園。\"\n    },\n    {\n      \"name\": \"青年\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.3,\n      \"reason\": \"主題遊程常吸引青年，但無明確對象證據，僅為弱推測。\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"district\",\n      \"value\": \"桃園\",\n      \"confidence\": 0.8,\n      \"evidence_text\": \"location: 桃園濱海地區\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_info\",\n      \"value\": \"免預約\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"requires_registration: false\",\n      \"evidence_source\": \"existing_field\"\n    },\n    {\n      \"field\": \"registration_url\",\n      \"value\": \"\",\n      \"confidence\": 0.0,\n      \"evidence_text\": \"requires_registration: false\",\n      \"evidence_source\": \"existing_field\"\n    }\n  ],\n  \"search_keywords\": [\n    \"桃園濱海\",\n    \"主題遊程\",\n    \"導覽\",\n    \"免費\",\n    \"戶外\"\n  ],\n  \"search_topics\": [\n    \"桃園旅遊\",\n    \"濱海活動\",\n    \"免費導覽\",\n    \"親子遊程\"\n  ],\n  \"search_synonyms\": [\n    \"主題遊程\",\n    \"導覽\",\n    \"遊覽\",\n    \"導覽行程\"\n  ],\n  \"warnings\": [\n    \"audience 標籤青年無明確文字證據，僅為弱推測，建議不選或需更多資料。\",\n    \"district 推斷為桃園，因 location 為桃園濱海地區，無更精確行政區名稱。\",\n    \"registration_url 為空，因 requires_registration 為 false，無報名網址。\",\n    \"fee_type 雖推定免費，但文字描述為未明確收費，依規則保守標註免費。\",\n    \"current_tags 已包含導覽、戶外、免費、桃園，新標籤僅補充青年（低置信度）。\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "registration_info",
+        "value": "免預約",
+        "confidence": 0.9,
+        "evidence_text": "requires_registration: false",
+        "evidence_source": "existing_field",
+        "old_value": "",
+        "new_value": "免預約",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": false
+  },
+  {
+    "activity_id": 502,
+    "activity_title": "跟著舒華玩桃園！抽限量「舒華樂桃桃行李箱」收藏攻略一次掌握",
+    "activity_uid": "",
+    "source_key": "travel_openapi",
+    "ocr_status": "skipped_not_front_pool",
+    "error": "local: Expecting ',' delimiter: line 73 column 6 (char 1732)",
+    "manual_evaluation": "needs_review"
+  },
+  {
+    "accepted_tags": [
+      {
+        "id": 14,
+        "name": "展覽",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "標題與內容明確提及「台灣設計展」及「展覽活動」"
+      },
+      {
+        "id": 33,
+        "name": "青年",
+        "tag_type": "activity_type",
+        "confidence": 0.95,
+        "reason": "主題為「桃園青年設計城市展」，對象為高中職及大專院校學生"
+      },
+      {
+        "id": 41,
+        "name": "免費",
+        "tag_type": "cost",
+        "confidence": 0.9,
+        "reason": "文字未提及收費，且推定免費符合規則"
+      },
+      {
+        "id": 43,
+        "name": "需報名",
+        "tag_type": "cost",
+        "confidence": 0.95,
+        "reason": "明確提供線上報名表單連結與徵件辦法"
+      },
+      {
+        "id": 35,
+        "name": "學生",
+        "tag_type": "audience",
+        "confidence": 0.95,
+        "reason": "徵件對象明確限定為桃園市高中職及大專院校學生"
+      },
+      {
+        "id": 2,
+        "name": "中壢",
+        "tag_type": "region",
+        "confidence": 0.85,
+        "reason": "展覽地點為中原文創園區，位於中壢區"
+      },
+      {
+        "id": 32,
+        "name": "藝文",
+        "tag_type": "activity_type",
+        "confidence": 0.7,
+        "reason": "設計展屬於藝術與文化領域"
+      }
+    ],
+    "missing_tags": [],
+    "rejected_tags": [],
+    "repair_suggestions": [
+      {
+        "field": "district",
+        "value": "中壢區",
+        "confidence": 0.9,
+        "evidence_text": "📍展覽地點｜中原文創園區",
+        "evidence_source": "html_main"
+      }
+    ],
+    "rejected_repairs": [],
+    "warnings": [
+      "location 欄位原值為多段文字，已建議簡化為地點",
+      "district 推斷為中壢，因中原文創園區位於中壢區"
+    ],
+    "blocking_warnings": [],
+    "info_warnings": [
+      "location 欄位原值為多段文字，已建議簡化為地點",
+      "district 推斷為中壢，因中原文創園區位於中壢區"
+    ],
+    "confidence": 0.893,
+    "search_keywords": [
+      "2026台灣設計展",
+      "桃園青年設計城市展",
+      "青春匯萃",
+      "中原文創園區",
+      "設計徵件"
+    ],
+    "search_topics": [
+      "設計展覽",
+      "青年活動",
+      "校園徵件",
+      "桃園市活動"
+    ],
+    "search_synonyms": [
+      "設計展",
+      "青年展",
+      "創作比賽",
+      "入選通知"
+    ],
+    "activity_id": 527,
+    "activity_title": "✨2026台灣設計展｜2026桃園青年設計城市展徵件開跑🔥",
+    "current_tags": [
+      {
+        "name": "展覽",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "青年",
+        "tag_type": "activity_type"
+      },
+      {
+        "name": "免費",
+        "tag_type": "cost"
+      },
+      {
+        "name": "需報名",
+        "tag_type": "cost"
+      }
+    ],
+    "new_tags": [
+      {
+        "id": 35,
+        "name": "學生",
+        "tag_type": "audience",
+        "confidence": 0.95,
+        "reason": "徵件對象明確限定為桃園市高中職及大專院校學生"
+      },
+      {
+        "id": 2,
+        "name": "中壢",
+        "tag_type": "region",
+        "confidence": 0.85,
+        "reason": "展覽地點為中原文創園區，位於中壢區"
+      },
+      {
+        "id": 32,
+        "name": "藝文",
+        "tag_type": "activity_type",
+        "confidence": 0.7,
+        "reason": "設計展屬於藝術與文化領域"
+      }
+    ],
+    "existing_tags_not_in_ai_result": [],
+    "manual_evaluation": "review_recommended",
+    "raw_response": "{\n  \"tags\": [\n    {\n      \"name\": \"展覽\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"標題與內容明確提及「台灣設計展」及「展覽活動」\"\n    },\n    {\n      \"name\": \"青年\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.95,\n      \"reason\": \"主題為「桃園青年設計城市展」，對象為高中職及大專院校學生\"\n    },\n    {\n      \"name\": \"免費\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.9,\n      \"reason\": \"文字未提及收費，且推定免費符合規則\"\n    },\n    {\n      \"name\": \"需報名\",\n      \"tag_type\": \"cost\",\n      \"confidence\": 0.95,\n      \"reason\": \"明確提供線上報名表單連結與徵件辦法\"\n    },\n    {\n      \"name\": \"學生\",\n      \"tag_type\": \"audience\",\n      \"confidence\": 0.95,\n      \"reason\": \"徵件對象明確限定為桃園市高中職及大專院校學生\"\n    },\n    {\n      \"name\": \"中壢\",\n      \"tag_type\": \"region\",\n      \"confidence\": 0.85,\n      \"reason\": \"展覽地點為中原文創園區，位於中壢區\"\n    },\n    {\n      \"name\": \"藝文\",\n      \"tag_type\": \"activity_type\",\n      \"confidence\": 0.7,\n      \"reason\": \"設計展屬於藝術與文化領域\"\n    }\n  ],\n  \"repairs\": [\n    {\n      \"field\": \"district\",\n      \"value\": \"中壢\",\n      \"confidence\": 0.9,\n      \"evidence_text\": \"📍展覽地點｜中原文創園區\",\n      \"evidence_source\": \"html_main\"\n    }\n  ],\n  \"search_keywords\": [\n    \"2026台灣設計展\",\n    \"桃園青年設計城市展\",\n    \"青春匯萃\",\n    \"中原文創園區\",\n    \"設計徵件\"\n  ],\n  \"search_topics\": [\n    \"設計展覽\",\n    \"青年活動\",\n    \"校園徵件\",\n    \"桃園市活動\"\n  ],\n  \"search_synonyms\": [\n    \"設計展\",\n    \"青年展\",\n    \"創作比賽\",\n    \"入選通知\"\n  ],\n  \"warnings\": [\n    \"location 欄位原值為多段文字，已建議簡化為地點\",\n    \"district 推斷為中壢，因中原文創園區位於中壢區\"\n  ]\n}",
+    "provider": "local",
+    "model": "qwen",
+    "applied_repairs": [
+      {
+        "field": "district",
+        "value": "中壢區",
+        "confidence": 0.9,
+        "evidence_text": "📍展覽地點｜中原文創園區",
+        "evidence_source": "html_main",
+        "old_value": "",
+        "new_value": "中壢區",
+        "dry_run": true
+      }
+    ],
+    "applied_tags": [],
+    "activity_uid": "",
+    "source_key": "youth",
+    "ocr_status": "skipped_not_front_pool",
+    "ocr_has_text": false,
+    "fee_type": "assumed_free",
+    "is_free": true,
+    "requires_registration": true
+  }
+]

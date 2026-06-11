@@ -138,7 +138,7 @@ https://你的-ngrok-domain.ngrok-free.app/callback
 3. 按「一鍵完整更新」或建立完整更新任務。
 4. 進任務詳情看進度與結果。
 
-完整更新會做：爬蟲、匯入、過期活動自動下架、AI Tag、搜尋語意、AI 摘要與 OCR。它不會定時自己跑；要更新時手動按後台即可。
+完整更新會做：爬蟲、匯入、過期活動自動下架、OCR、AI repair+tag、安全補欄位、readiness 重算、搜尋語意與 AI 摘要。它不會定時自己跑；要更新時手動按後台即可。
 
 資料保存原則：
 
@@ -148,6 +148,14 @@ https://你的-ngrok-domain.ngrok-free.app/callback
 - `scraping\data\output\activities_all.json`、`health_report.json` 等最新輸出檔會被下一次爬蟲覆寫；這是更新最新狀態，不是清歷史。若要保存每一次爬蟲快照，需另外備份。
 
 ## 8. 常用資料與 AI 指令
+
+展示用中原市民卡特約優惠：
+
+```powershell
+python manage.py seed_zhongyuan_citizen_stores --apply --skip-checks
+```
+
+這會寫入 4 筆固定 `Store` 資料。LINE 使用者傳「附近的市民卡特約商店」時，會直接收到這 4 張優惠卡片，不需要分享位置。
 
 匯入既有 JSON dry-run：
 
@@ -183,7 +191,14 @@ python manage.py run_crawler_pipeline --activate --skip-dynamic --primary-limit 
 python manage.py run_queued_crawl_jobs --limit 1
 ```
 
-完整更新流程會做：爬蟲、匯入、過期活動自動下架、AI Tag、搜尋語意、AI 摘要與 OCR。它不會定時自己跑；需要你手動按後台或手動執行 command。
+完整更新流程會做：爬蟲、匯入、過期活動自動下架、OCR、AI repair+tag、安全補欄位、readiness 重算、搜尋語意與 AI 摘要。它不會定時自己跑；需要你手動按後台或手動執行 command。
+
+缺漏補救原則：
+
+- OCR 先跑，讓海報文字可以進入後續 AI repair+tag 的上下文。
+- AI repair+tag 不只上標籤，也會嘗試補活動日期、地點、地區、報名資訊、報名網址與費用類型。
+- 自動補欄位只補空欄位，不覆蓋既有值；人工確認要覆蓋時，從後台編輯或用專案指令處理。
+- 後台完整更新會優先處理 active、未排除、未過期、且有缺漏欄位的活動；已經直接爬到完整資料的活動不會被重複 repair。
 
 只建立/處理 queued job 的情況：
 
@@ -286,6 +301,13 @@ LINE 自然語言與 tracking 回歸：
 
 ```powershell
 python manage.py smoke_extreme_line_flow
+```
+
+市民卡特約優惠最小驗收：
+
+```powershell
+python manage.py seed_zhongyuan_citizen_stores --apply --skip-checks
+python manage.py shell -c "from events.models import Store; print(Store.objects.filter(district='中壢').count())"
 ```
 
 主要頁面 smoke 可用 Django test client：

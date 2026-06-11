@@ -4,6 +4,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import Counter
 from datetime import datetime, time as datetime_time, timedelta
 
 from django.conf import settings
@@ -12,7 +13,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from linebot.models import FlexSendMessage, TextSendMessage
 
-from events.models import AIProcessingLog, ActionLog, Activity, LineConversationState, PushDeliveryLog, Subscription, Tag, UserProfile
+from events.models import AIProcessingLog, ActionLog, Activity, ActivitySearchProfile, LineConversationState, PushDeliveryLog, Subscription, Tag, UserProfile
 from events.ai_providers import call_json_with_fallback, call_text_with_fallback, payload_messages
 from events.services import (
   activity_business_key,
@@ -345,6 +346,7 @@ def get_active_subscribed_activities(user, limit=10):
   subscriptions = (Subscription.objects
                    .select_related('activity')
                    .filter(user=user, status='active', activity__status='active')
+                   .filter(activity__excluded_from_public=False, activity__is_activity=True)
                    .filter(Q(activity__end_date__isnull=True) | Q(activity__end_date__gte=now))
                    .order_by('activity__start_date', '-created_at')[:limit])
   return dedupe_activities_by_business_key([subscription.activity for subscription in subscriptions if subscription.activity], limit=limit)
@@ -587,6 +589,7 @@ def is_activity_followup_question(text):
     '這個', '這些', '剛剛', '那個', '那些', '要錢', '免費', '費用', '票價',
     '需要報名', '要報名', '報名', '在哪', '哪裡', '地點', '地址',
     '什麼時候', '時間', '幾點', '適合小孩', '適合親子', '小孩適合',
+    '在幹嘛', '在幹麻', '幹嘛', '幹麻', '做什麼', '玩什麼', '內容', '介紹', '是什麼',
   )
   return any(term in compact for term in followup_terms)
 
@@ -610,12 +613,35 @@ def choose_context_activity(text, activities):
   return activities[0] if len(activities) == 1 or any(term in compact for term in ('這個', '那個')) else None
 
 
+def build_activity_description_reply(activity):
+  summary = compact_activity_summary(activity, limit=160)
+  title = activity.title or '這個活動'
+  detail_url = safe_detail_url(activity)
+  tag_names = [tag.name for tag in activity.tags.all()[:4]]
+  known_parts = [
+    f'時間：{format_time_range(activity)}',
+    f'地點：{(activity.district or "桃園")} {activity.location or "活動現場"}'.strip(),
+  ]
+  if tag_names:
+    known_parts.append(f'類型：{"、".join(tag_names)}')
+  if detail_url:
+    known_parts.append(f'詳情：{detail_url}')
+
+  if summary and summary != title:
+    return TextSendMessage(text=f'{title}：{summary}\n' + '\n'.join(known_parts))
+  return TextSendMessage(text=f'{title}：目前資料庫沒有更完整的活動內容摘要，我先列出已知資訊。\n' + '\n'.join(known_parts))
+
+
 def answer_activity_followup(user, text, state):
   activities = context_activities(state) if state else []
   if not activities:
     return None
   compact = re.sub(r'\s+', '', text or '')
   activity = choose_context_activity(text, activities)
+
+  if any(term in compact for term in ('在幹嘛', '在幹麻', '幹嘛', '幹麻', '做什麼', '玩什麼', '內容', '介紹', '是什麼')):
+    target = activity or activities[0]
+    return build_activity_description_reply(target)
 
   if any(term in compact for term in ('免費', '要錢', '費用', '票價')):
     targets = [activity] if activity else activities
@@ -778,7 +804,7 @@ def handle_refined_search_text(user, text, state):
 def classify_line_intent(user, text, state=None):
   fallback = rule_classify_line_intent(text, state=state)
   # Deterministic control phrases should not be overridden by the model.
-  if fallback in {'more_results', 'refine_search'}:
+  if fallback == 'more_results':
     return fallback
   if fallback == 'activity_search' and high_confidence_activity_query(text):
     return fallback
@@ -851,8 +877,6 @@ def rule_classify_line_intent(text, state=None):
     return 'preference_help'
   if '訂閱' in normalized and not is_activity_query(text):
     return 'subscription_help'
-  if state and looks_like_refinement(text) and not high_confidence_activity_query(text):
-    return 'refine_search'
   if is_activity_query(text) or contains_known_tag(text):
     return 'activity_search'
   return 'unsupported_chat'
@@ -987,6 +1011,12 @@ def search_activities_for_line(user, query, limit=3, offset=0, conditions=None, 
     return ([], conditions) if return_conditions else []
   pool_size = max(30, limit + offset + 10)
   candidates = query_activities_by_conditions(conditions, limit=pool_size)
+  
+  if not candidates:
+    # If no results and it was strict, try relaxing immediately
+    relaxed_conditions = dict(conditions)
+    relaxed_conditions['strict_topics'] = []
+    candidates = query_activities_by_conditions(relaxed_conditions, limit=pool_size)
   if not candidates and not semantic_terms_from_conditions(conditions):
     candidates = search_activities_by_rules(query, limit=pool_size)
   if not candidates:
@@ -1052,6 +1082,8 @@ def build_activity_intro_text(activities, query_context='推薦活動', user=Non
   notice = next((getattr(activity, '_line_notice', '') for activity in activities if getattr(activity, '_line_notice', '')), '')
   if notice:
     return f'{notice}\n我先整理 {count} 個相近活動給你參考，詳細時間地點請以官方頁為準。'
+  if any(getattr(activity, '_search_plan_score', 0) for activity in activities):
+    return f'目前找到 {count} 個符合「{query_context}」的活動，詳細時間地點請以官方頁為準。'
   ai_intro = build_activity_intro_text_with_ai(activities, query_context, user=user)
   if ai_intro:
     return ai_intro
@@ -1440,7 +1472,7 @@ def subscribe_activity(user, activity_id, source_action='subscribe_activity'):
   if not activity:
     return TextSendMessage(text='找不到這筆活動，可能已經下架或資料更新。')
   now = timezone.now()
-  if activity.status != 'active' or (activity.end_date and activity.end_date < now):
+  if activity.excluded_from_public or not activity.is_activity or activity.status != 'active' or (activity.end_date and activity.end_date < now):
     return TextSendMessage(text='這個活動目前已下架或已結束，不能訂閱。')
   equivalent_subscription = equivalent_subscription_for_activity(user, activity, include_cancelled=True)
   if equivalent_subscription:
@@ -1579,17 +1611,71 @@ def search_activities_by_rules(query, limit=10):
   return query_activities_by_conditions(rule_extract_conditions(query), limit=limit)
 
 
+def build_search_context():
+  available_tags = {}
+  for tag_type, name in Tag.objects.filter(is_active=True).order_by('tag_type', 'name').values_list('tag_type', 'name'):
+    available_tags.setdefault(tag_type, []).append(name)
+
+  return {
+    'available_tags': available_tags,
+    'searchable_vocabulary': search_vocabulary_terms(limit=300),
+  }
+
+
+def search_vocabulary_terms(limit=300):
+  counts = Counter()
+  profiles = ActivitySearchProfile.objects.filter(status='success').values_list('keywords', 'topics', 'synonyms')
+  for keywords, topics, synonyms in profiles:
+    for value in (keywords or []) + (topics or []) + (synonyms or []):
+      term = str(value or '').strip()
+      if len(term) >= 2:
+        counts[term] += 1
+  return [term for term, count in counts.most_common(limit) if count >= 2]
+
+
+def expand_terms_with_search_vocabulary(terms):
+  terms = merge_query_terms(terms, limit=60)
+  if not terms:
+    return []
+  vocabulary = search_vocabulary_terms()
+  expanded = list(terms)
+  for term in terms:
+    contained = [
+      candidate
+      for candidate in vocabulary
+      if candidate != term and candidate in term
+    ]
+    for candidate in sorted(contained, key=len, reverse=True):
+      if any(candidate in existing and len(existing) > len(candidate) for existing in contained):
+        continue
+      if candidate not in expanded:
+        expanded.append(candidate)
+  return expanded[:60]
+
+
+def db_search_terms_from_conditions(conditions):
+  terms = merge_query_terms(
+    (conditions or {}).get('keyword'),
+    (conditions or {}).get('soft_topics'),
+    (conditions or {}).get('related_terms'),
+    limit=40,
+  )
+  return expand_terms_with_search_vocabulary(terms)
+
+
 def extract_conditions_from_message(user, query):
   started_at = time.monotonic()
   fallback = rule_extract_conditions(query)
   try:
+    search_context = build_search_context()
     payload = {
       'message': query,
       'allowed_districts': list(DISTRICTS),
-      'allowed_tags': list(Tag.objects.filter(is_active=True).values_list('name', flat=True)[:200]),
+      'available_tags': search_context['available_tags'],
+      'searchable_vocabulary': search_context['searchable_vocabulary'],
       'output_schema': {
         'district': 'one district name without 區, or empty string',
-        'tag_names': 'array of existing allowed tag names',
+        'tag_names': 'array of existing tag names from available_tags',
         'is_free': 'true, false, or null',
         'soft_topics': 'array of broad search topics, can include non-tag natural words',
         'related_terms': 'array of synonyms or related search terms',
@@ -1597,6 +1683,90 @@ def extract_conditions_from_message(user, query):
         'relax_order': 'array of fields to relax, for example keyword, is_free, soft_topics, district',
       },
       'examples': [
+        {
+          'message': '展覽',
+          'conditions': {
+            'district': '',
+            'tag_names': ['展覽'],
+            'is_free': None,
+            'keyword': '',
+            'soft_topics': ['展覽'],
+            'related_terms': ['藝文', '藝術', '文化'],
+            'relax_order': ['soft_topics', 'tag_names'],
+          },
+        },
+        {
+          'message': '想跟女朋友去',
+          'conditions': {
+            'district': '',
+            'tag_names': ['情侶'],
+            'is_free': None,
+            'keyword': '',
+            'soft_topics': ['約會', '情侶'],
+            'related_terms': ['兩人', '藝文', '展覽'],
+            'relax_order': ['soft_topics', 'tag_names'],
+          },
+        },
+        {
+          'message': '想玩泥巴',
+          'conditions': {
+            'district': '',
+            'tag_names': ['手作'],
+            'is_free': None,
+            'keyword': '',
+            'soft_topics': ['陶藝', '手作'],
+            'related_terms': ['黏土', '陶土', '陶瓷'],
+            'relax_order': ['soft_topics', 'related_terms', 'tag_names'],
+          },
+        },
+        {
+          'message': '有文化幣可以用的活動',
+          'conditions': {
+            'district': '',
+            'tag_names': [],
+            'is_free': None,
+            'keyword': '文化幣',
+            'soft_topics': ['文化幣'],
+            'related_terms': ['青年文化幣', '文化成年禮金'],
+            'relax_order': ['keyword', 'soft_topics'],
+          },
+        },
+        {
+          'message': '有文化幣活動嗎',
+          'conditions': {
+            'district': '',
+            'tag_names': [],
+            'is_free': None,
+            'keyword': '文化幣',
+            'soft_topics': ['文化幣'],
+            'related_terms': ['青年文化幣', '文化成年禮金'],
+            'relax_order': ['keyword', 'soft_topics'],
+          },
+        },
+        {
+          'message': '我有文化幣。幫我找活動',
+          'conditions': {
+            'district': '',
+            'tag_names': [],
+            'is_free': None,
+            'keyword': '文化幣',
+            'soft_topics': ['文化幣'],
+            'related_terms': ['青年文化幣', '文化成年禮金'],
+            'relax_order': ['keyword', 'soft_topics'],
+          },
+        },
+        {
+          'message': '我想找靜態活動',
+          'conditions': {
+            'district': '',
+            'tag_names': ['展覽', '閱讀', '講座'],
+            'is_free': None,
+            'keyword': '',
+            'soft_topics': ['展覽', '閱讀', '講座', '藝文'],
+            'related_terms': ['室內', '安靜', '不用跑跳', '欣賞'],
+            'relax_order': ['soft_topics', 'tag_names'],
+          },
+        },
         {
           'message': '我想帶小孩玩',
           'conditions': {
@@ -1610,7 +1780,7 @@ def extract_conditions_from_message(user, query):
           },
         },
         {
-          'message': '週末中壢免費親子活動',
+          'message': '中壢免費親子',
           'conditions': {
             'district': '中壢',
             'tag_names': ['親子'],
@@ -1621,15 +1791,34 @@ def extract_conditions_from_message(user, query):
             'relax_order': ['soft_topics', 'tag_names', 'is_free', 'district'],
           },
         },
+        {
+          'message': '桃園有什麼',
+          'conditions': {
+            'district': '桃園',
+            'tag_names': [],
+            'is_free': None,
+            'keyword': '',
+            'soft_topics': [],
+            'related_terms': [],
+            'relax_order': ['district'],
+          },
+        },
       ],
     }
     response = call_json_with_fallback(
       payload_messages(
         '你是桃園活動查詢搜尋計畫產生器。只輸出 JSON，不要解釋。'
         '你的任務是把活動相關口語轉成資料庫查詢條件，不可推薦或創造活動。'
-        'district/tag_names 只能使用允許清單；tag_names 是正式篩選條件。'
-        'soft_topics/related_terms 只作 ActivitySearchProfile 搜尋語意，不是正式 tag、不要放入使用者偏好。'
-        '口語句要寬鬆處理；像「桃園的」「有沒有桃園活動」只抽 district=桃園，不要把語助詞放進 keyword。'
+        'district 只能使用 allowed_districts；tag_names 只能使用 available_tags 各分類中的既有值。'
+        'keyword 和 soft_topics 優先使用 searchable_vocabulary 中真實存在於資料庫的詞，但可保留使用者明確輸入的新詞。'
+        'keyword 必須只放核心可搜尋名詞或專有詞，不要放整句話。'
+        'keyword 必須移除語助詞與查詢用詞，例如：有、沒有、嗎、的、呢、吧、啊、想、要、找、看、活動、可以、用。'
+        '例如「有文化幣活動嗎」只能輸出 keyword=文化幣，不能輸出「有文化幣 嗎」或「文化幣活動」。'
+        '使用者說「我有 X」「我拿到 X」「可以用 X」時，通常是在描述可使用的票券、補助或優惠，keyword 只取 X 的核心名詞。'
+        '使用者說「靜態活動」「不要跑跳」「想安靜看」時，這是活動型態偏好，請優先對應到 available_tags 中的展覽、閱讀、講座、藝文等靜態類型，不要把「靜態活動」當 keyword。'
+        'related_terms 用於擴展語意搜尋，可以是同義詞、口語表達或資料庫詞彙。'
+        'soft_topics/related_terms 只作資料庫搜尋語意，不是正式 tag、不要放入使用者偏好。'
+        '口語句要寬鬆處理；像「桃園的」「有沒有桃園活動」只抽 district=桃園，不要把語助詞、查詢動詞或活動泛稱放進 keyword。'
         '「我想帶小孩玩」這類生活語境可用 tag_names=親子，並把兒童/小朋友/家庭/放電放進 related_terms。'
         '「心情好差」「你會陪我聊天嗎」不是活動查詢，通常不應進到此搜尋計畫。若使用者有輸入類似的話語，請給與正向的回覆無法執行',
         payload,
@@ -1676,6 +1865,21 @@ def query_activities_by_conditions(conditions, limit=10):
     qs = qs.filter(start_date__gte=start_date)
   if end_date:
     qs = qs.filter(start_date__lte=end_date)
+
+  search_terms = db_search_terms_from_conditions(conditions or {})
+  if search_terms:
+    search_q = Q()
+    for term in search_terms:
+      search_q |= (
+        Q(title__icontains=term)
+        | Q(description__icontains=term)
+        | Q(ai_summary__icontains=term)
+        | Q(ocr_summary__icontains=term)
+        | Q(ocr_text__icontains=term)
+        | Q(tags__name__icontains=term)
+        | Q(search_profile__search_text__icontains=term)
+      )
+    qs = qs.filter(search_q)
 
   candidates = list(qs.distinct().order_by('start_date', 'id')[:max(limit * 6, limit)])
   scored = score_activities_for_search_plan(candidates, conditions or {})
@@ -2027,7 +2231,7 @@ def semantic_terms_from_conditions(conditions):
   terms = merge_query_terms(terms, conditions.get('tag_names'), limit=60)
   terms = merge_query_terms(terms, conditions.get('soft_topics'), limit=60)
   terms = merge_query_terms(terms, conditions.get('related_terms'), limit=60)
-  return terms
+  return expand_terms_with_search_vocabulary(terms)
 
 
 def activity_search_blob(activity):
@@ -2051,13 +2255,14 @@ def score_activities_for_search_plan(activities, conditions):
   terms = semantic_terms_from_conditions(conditions)
   if not terms:
     return []
+  has_keyword = bool((conditions or {}).get('keyword'))
   strict_terms = set(strict_topic_terms(conditions))
-  primary_terms = set(merge_query_terms(
+  primary_terms = set(expand_terms_with_search_vocabulary(merge_query_terms(
     conditions.get('keyword'),
     conditions.get('soft_topics'),
-    [term for term in (conditions.get('related_terms') or []) if term not in {'運動', '戶外'} and term not in WEAK_SEMANTIC_TERMS],
+    [term for term in (conditions.get('related_terms') or []) if term not in WEAK_SEMANTIC_TERMS],
     limit=40,
-  ))
+  )))
   tag_names = set((conditions or {}).get('tag_names') or [])
   scored = []
   for activity in activities:
@@ -2077,6 +2282,7 @@ def score_activities_for_search_plan(activities, conditions):
     strong_score = 0
     primary_score = 0
     strict_surface_match = False
+    primary_high_confidence = False
     for term in terms:
       if not term:
         continue
@@ -2085,18 +2291,23 @@ def score_activities_for_search_plan(activities, conditions):
         term_score += 30
         if term in primary_terms:
           strict_surface_match = True
+          primary_high_confidence = True
       if term in activity_tags:
         term_score += 22
         if term in primary_terms:
           strict_surface_match = True
+          primary_high_confidence = True
       if tag_names and term in tag_names and term in activity_tags:
         term_score += 12
       if term in profile_text:
         term_score += 18
         if term in primary_terms and term in profile_terms_text:
           strict_surface_match = True
+          primary_high_confidence = True
       if term in summary:
         term_score += 12
+        if term in primary_terms:
+          primary_high_confidence = True
       if term in blob:
         term_score += 6
       if term_score:
@@ -2113,12 +2324,20 @@ def score_activities_for_search_plan(activities, conditions):
       score += 8
     if score > 0 and strong_score > 0:
       if strict_terms and not (strict_surface_match or len(matched_primary_terms) >= 2):
-        continue
+        score -= 15
+      activity._search_plan_score = score
+      activity._semantic_high_confidence = primary_high_confidence
       activity._semantic_matches = matched_terms[:6]
       activity._semantic_relaxed = primary_score == 0
       if activity._semantic_relaxed:
         activity._line_notice = '先推薦相近活動。'
       scored.append((activity, score))
+  if has_keyword and any(getattr(activity, '_semantic_high_confidence', False) for activity, _score in scored):
+    scored = [
+      (activity, score)
+      for activity, score in scored
+      if getattr(activity, '_semantic_high_confidence', False)
+    ]
   return sorted(scored, key=lambda pair: (-pair[1], pair[0].start_date or timezone.now(), pair[0].id))
 
 
@@ -2134,7 +2353,7 @@ def apply_nearby_preference(user, conditions):
 
 def rank_activities_for_user(user, activities):
   if not user:
-    return sorted(activities, key=lambda activity: (activity.start_date or timezone.now(), activity.id))
+    return sorted(activities, key=lambda activity: (-getattr(activity, '_search_plan_score', 0), activity.start_date or timezone.now(), activity.id))
   preferences = preferred_tag_sets(user)
   action_counts = recent_action_counts(user)
   seen_keys = recent_seen_business_keys(user)
@@ -2152,7 +2371,8 @@ def rank_activities_for_user(user, activities):
     seen_penalty = -18 if seen_keys.intersection(activity_business_keys(activity)) else 0
     subscribed_penalty = -25 if subscribed_keys.intersection(activity_business_keys(activity)) else 0
     date_score = 1 if activity.start_date else 0
-    return type_score + region_score + audience_score + cost_score + discount_score + action_score + seen_penalty + subscribed_penalty + date_score
+    semantic_score = getattr(activity, '_search_plan_score', 0)
+    return semantic_score + type_score + region_score + audience_score + cost_score + discount_score + action_score + seen_penalty + subscribed_penalty + date_score
 
   return sorted(activities, key=lambda activity: (-score(activity), activity.start_date or timezone.now(), activity.id))
 

@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
+from pipeline.public_exclusion import apply_public_exclusion
 
 
 def _today():
@@ -56,9 +57,11 @@ def _apply_freshness(event):
 
 def check_line_card_readiness(event):
     if not event: return event
+    event = apply_public_exclusion(event)
     event = _apply_freshness(event)
     
     is_activity = bool(event.get("is_activity") or event.get("content_type") == "activity")
+    excluded = bool(event.get("excluded_from_public"))
     official_url = event.get("official_detail_url") or event.get("source_url")
     has_location = bool(event.get("location") or event.get("district"))
     has_date = bool(event.get("date_start"))
@@ -68,11 +71,11 @@ def check_line_card_readiness(event):
     # Check for line_card_ready
     line_card_ready = bool(
         is_activity and event.get("title") and official_url and
-        event.get("clean_description") and has_date and has_location and not invalid_date_range and not is_expired
+        event.get("clean_description") and has_date and has_location and not excluded and not invalid_date_range and not is_expired
     )
         
     # Check for search_ready
-    search_ready = bool(is_activity and event.get("title") and official_url and has_date and has_location and not invalid_date_range and not is_expired)
+    search_ready = bool(is_activity and event.get("title") and official_url and has_date and has_location and not excluded and not invalid_date_range and not is_expired)
         
     use_default_image = False
     if not event.get("poster_local_path"):
@@ -86,6 +89,8 @@ def check_line_card_readiness(event):
     missing = []
     if not is_activity:
         missing.append("not_activity")
+    if excluded:
+        missing.append("excluded_from_public")
     if not event.get("title"):
         missing.append("missing_title")
     if not official_url:
@@ -103,7 +108,9 @@ def check_line_card_readiness(event):
     event["line_not_ready_reason"] = None if line_card_ready else ",".join(missing or ["unknown"])
     event["recommendation_ready"] = bool(line_card_ready and search_ready and not event.get("manual_review_required"))
     if not event["recommendation_ready"]:
-        if not is_activity:
+        if excluded:
+            event["exclude_from_recommendation_reason"] = event.get("exclude_reason") or "excluded_from_public"
+        elif not is_activity:
             event["exclude_from_recommendation_reason"] = "not_activity"
         elif is_expired:
             event["exclude_from_recommendation_reason"] = "expired"

@@ -14,6 +14,7 @@ from pipeline.extract_dates import extract_dates
 from pipeline.extract_fee import extract_fee
 from pipeline.extract_location import extract_location
 from pipeline.line_card_readiness import check_line_card_readiness
+from pipeline.compute_readiness import compute_readiness
 from pipeline.normalize_text import normalize_text
 from pipeline.save_sqlite import save_to_sqlite
 from pipeline.save_json import save_to_json
@@ -36,6 +37,59 @@ class QualityPipelineTests(unittest.TestCase):
         self.assertFalse(event["line_card_ready"])
         self.assertFalse(event["recommendation_ready"])
         self.assertEqual(event["exclude_from_recommendation_reason"], "not_activity")
+
+    def test_penalty_list_is_publicly_excluded_even_with_date_and_location(self):
+        event = {
+            "title": "違反發展觀光條例經裁罰之非法旅宿名單至115年5月31日止",
+            "clean_description": "裁罰名單公告，地點桃園市政府。",
+            "source_url": "https://example.com/penalty",
+            "date_start": "2026-05-31",
+            "location": "桃園市政府",
+            "quality_level": "usable",
+        }
+
+        event = compute_readiness(check_line_card_readiness(classify_content(event)))
+
+        self.assertEqual(event["content_type"], "penalty_list")
+        self.assertTrue(event["excluded_from_public"])
+        self.assertEqual(event["exclude_reason"], "penalty_list")
+        self.assertEqual(event["final_state"], "non_activity")
+        self.assertFalse(event["line_ready"])
+        self.assertFalse(event["recommendation_ready"])
+        self.assertFalse(event["published"])
+
+    def test_venue_notice_is_publicly_excluded_even_when_it_mentions_activity(self):
+        event = {
+            "title": "【公告】中路運動公園網球場配合活動暫停對外開放時間",
+            "clean_description": "公告網球場因活動暫停開放，請民眾留意。",
+            "source_url": "https://example.com/venue",
+            "date_start": "2026-06-20",
+            "location": "中路運動公園",
+            "quality_level": "usable",
+        }
+
+        event = compute_readiness(check_line_card_readiness(classify_content(event)))
+
+        self.assertEqual(event["content_type"], "venue_notice")
+        self.assertTrue(event["excluded_from_public"])
+        self.assertFalse(event["line_ready"])
+        self.assertEqual(event["exclude_from_recommendation_reason"], "venue_notice")
+
+    def test_news_promo_without_activity_fields_is_publicly_excluded(self):
+        event = {
+            "title": "舒華現身香港、新加坡 桃園觀光廣告海外再掀話題",
+            "clean_description": "桃園觀光宣傳成果新聞，海外廣告引發討論。",
+            "source_url": "https://example.com/news",
+            "date_start": "2026-06-20",
+            "location": "桃園市",
+            "quality_level": "usable",
+        }
+
+        event = compute_readiness(check_line_card_readiness(classify_content(event)))
+
+        self.assertEqual(event["content_type"], "news")
+        self.assertTrue(event["excluded_from_public"])
+        self.assertFalse(event["recommendation_ready"])
 
     def test_location_rejects_sentence_fragment(self):
         event = {
@@ -185,7 +239,7 @@ class QualityPipelineTests(unittest.TestCase):
         event = classify_content(event)
         event = check_line_card_readiness(event)
 
-        self.assertEqual(event["content_type"], "announcement")
+        self.assertEqual(event["content_type"], "admin_notice")
         self.assertFalse(event["is_activity"])
         self.assertFalse(event["recommendation_ready"])
 
@@ -224,6 +278,9 @@ class QualityPipelineTests(unittest.TestCase):
             "is_public_item",
             "line_ready",
             "recommendation_ready",
+            "excluded_from_public",
+            "exclude_reason",
+            "final_state",
             "quality_warnings",
             "exclude_from_recommendation_reason",
             "fee_type",

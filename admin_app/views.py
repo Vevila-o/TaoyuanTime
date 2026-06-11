@@ -10,7 +10,7 @@ from pathlib import Path
 import yaml
 from django.conf import settings
 from django.core.management import call_command
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Case, When, Value, IntegerField
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -48,6 +48,7 @@ from .diagnostics import (
   is_expired,
   read_health_report,
   recent_recommended_activity_ids,
+  recompute_activity_readiness,
 )
 
 
@@ -62,7 +63,7 @@ def dashboard(request):
   now = timezone.now()
   active_count = Activity.objects.filter(status='active').count()
   total_count = Activity.objects.count()
-  line_ready_count = Activity.objects.filter(line_ready=True).count()
+  line_ready_count = Activity.objects.filter(excluded_from_public=False, line_ready=True).count()
   subscription_count = Subscription.objects.count()
   user_count = UserProfile.objects.count()
   push_total = PushDeliveryLog.objects.count()
@@ -80,12 +81,13 @@ def dashboard(request):
   filter_summary, top_filter_reasons = exposure_summary()
   missing_search_profile_count = Activity.objects.filter(
     status='active',
+    excluded_from_public=False,
     recommendation_ready=True,
   ).filter(Q(search_profile__isnull=True) | ~Q(search_profile__status='success')).count()
   dead_link_count = Activity.objects.filter(status='active', official_link_status='dead').count()
   database_status = '需處理缺口' if (
-    Activity.objects.filter(status='active', end_date__lt=now).exists()
-    or Activity.objects.filter(status='active', line_ready=True).filter(Q(image_url='') | Q(image_url__icontains='placehold.co')).exists()
+    Activity.objects.filter(status='active', excluded_from_public=False, end_date__lt=now).exists()
+    or Activity.objects.filter(status='active', excluded_from_public=False, line_ready=True).filter(Q(image_url='') | Q(image_url__icontains='placehold.co')).exists()
     or missing_search_profile_count
     or dead_link_count
   ) else '正常'
@@ -95,10 +97,10 @@ def dashboard(request):
     'draft_count': Activity.objects.filter(status='draft').count(),
     'inactive_count': Activity.objects.filter(status='inactive').count(),
     'line_ready_count': line_ready_count,
-    'serviceable_active_count': Activity.objects.filter(status='active').filter(Q(end_date__isnull=True) | Q(end_date__gte=now)).count(),
-    'expired_active_count': Activity.objects.filter(status='active', end_date__lt=now).count(),
-    'missing_detail_count': Activity.objects.filter(status='active', line_ready=True).filter(Q(official_detail_url__isnull=True) | Q(official_detail_url='')).count(),
-    'placeholder_image_count': Activity.objects.filter(status='active', line_ready=True).filter(Q(image_url='') | Q(image_url__icontains='placehold.co')).count(),
+    'serviceable_active_count': Activity.objects.filter(status='active', excluded_from_public=False).filter(Q(end_date__isnull=True) | Q(end_date__gte=now)).count(),
+    'expired_active_count': Activity.objects.filter(status='active', excluded_from_public=False, end_date__lt=now).count(),
+    'missing_detail_count': Activity.objects.filter(status='active', excluded_from_public=False, line_ready=True).filter(Q(official_detail_url__isnull=True) | Q(official_detail_url='')).count(),
+    'placeholder_image_count': Activity.objects.filter(status='active', excluded_from_public=False, line_ready=True).filter(Q(image_url='') | Q(image_url__icontains='placehold.co')).count(),
     'test_user_count': UserProfile.objects.filter(Q(line_user_id__startswith='codex') | Q(line_user_id__startswith='line-test') | Q(line_user_id='debug-user')).count(),
     'subscription_count': subscription_count,
     'user_count': user_count,
@@ -198,7 +200,7 @@ def operations(request):
       return redirect('operationJobDetail', id=job.id)
 
   now = timezone.now()
-  active_serviceable = Activity.objects.filter(status='active').filter(Q(end_date__isnull=True) | Q(end_date__gte=now))
+  active_serviceable = Activity.objects.filter(status='active', excluded_from_public=False).filter(Q(end_date__isnull=True) | Q(end_date__gte=now))
   summary_candidates = [
     activity for activity in active_serviceable.filter(
       is_activity=True,
@@ -255,7 +257,7 @@ def operations(request):
     'ocr_has_image_count': ocr_has_image_qs.count(),
     'ocr_no_image_count': ocr_no_image_qs.count(),
     'activity_asset_count': ActivityAsset.objects.count(),
-    'expired_active_count': Activity.objects.filter(status='active', end_date__lt=now).count(),
+    'expired_active_count': Activity.objects.filter(status='active', excluded_from_public=False, end_date__lt=now).count(),
     'health_report': read_health_report(),
     'missing_summary_examples': missing_summary_candidates[:10],
     'ai_tag_examples': pending_ai_tag_qs[:10],
@@ -280,15 +282,15 @@ def activityList(request):
   if district:
     qs = qs.filter(district__icontains=district)
   if readiness == 'line_ready':
-    qs = qs.filter(line_ready=True)
+    qs = qs.filter(excluded_from_public=False, line_ready=True)
   elif readiness == 'needs_review':
-    qs = qs.filter(Q(status='draft') | Q(line_ready=False) | Q(recommendation_ready=False))
+    qs = qs.filter(excluded_from_public=False).exclude(status='inactive').filter(Q(status='draft') | Q(line_ready=False) | Q(recommendation_ready=False))
   elif readiness == 'expired_active':
-    qs = qs.filter(status='active', end_date__lt=timezone.now())
+    qs = qs.filter(status='active', excluded_from_public=False, end_date__lt=timezone.now())
   elif readiness == 'missing_detail':
-    qs = qs.filter(status='active', line_ready=True).filter(Q(official_detail_url__isnull=True) | Q(official_detail_url=''))
+    qs = qs.filter(status='active', excluded_from_public=False, line_ready=True).filter(Q(official_detail_url__isnull=True) | Q(official_detail_url=''))
   elif readiness == 'fallback_image':
-    qs = qs.filter(status='active', line_ready=True).filter(Q(image_url='') | Q(image_url__icontains='placehold.co'))
+    qs = qs.filter(status='active', excluded_from_public=False, line_ready=True).filter(Q(image_url='') | Q(image_url__icontains='placehold.co'))
   elif readiness == 'seed_sample':
     qs = qs.filter(Q(source_url__contains='/sample/') | Q(official_detail_url__contains='/sample/') | Q(title__startswith='測試非活動'))
   elif readiness == 'missing_search_profile':
@@ -299,7 +301,23 @@ def activityList(request):
     qs = qs.filter(official_link_status='dead')
   elif readiness in {'line_blocked', 'recommendation_blocked', 'ai_summary_blocked', 'ocr_blocked', 'quality_warning'}:
     qs = apply_readiness_filter(qs, readiness)
-  activities = list(qs.order_by('-updated_at')[:200])
+  now_dt = timezone.now()
+  qs = qs.annotate(
+    is_available=Case(
+      When(
+        Q(status='active') &
+        Q(excluded_from_public=False) &
+        Q(line_ready=True) &
+        Q(recommendation_ready=True) &
+        Q(is_public_item=True) &
+        (Q(end_date__isnull=True) | Q(end_date__gte=now_dt)),
+        then=Value(1)
+      ),
+      default=Value(0),
+      output_field=IntegerField()
+    )
+  )
+  activities = list(qs.order_by('-is_available', '-updated_at')[:200])
   for activity in activities:
     activity.exposure_diagnostic = activity_exposure_diagnostic(activity, now=timezone.now())
   context = {
@@ -329,6 +347,7 @@ def activityEdit(request, id):
     for field, value in values.items():
       setattr(activity, field, value)
     activity.save()
+    recompute_activity_readiness(activity, save=True)
     apply_activity_tags(activity, request.POST.getlist('tags'))
     audit(request, 'update_activity', activity, {'title': activity.title})
     messages.success(request, '活動已更新。')
@@ -353,6 +372,7 @@ def activitySetStatus(request, id):
     return redirect('activityList')
   activity.status = status
   activity.save(update_fields=['status', 'updated_at'])
+  recompute_activity_readiness(activity, save=True)
   audit(request, 'set_status', activity, {'status': status})
   messages.success(request, f'活動已更新為 {activity.get_status_display()}。')
   return redirect('activityList')
@@ -374,6 +394,8 @@ def activitySetReadiness(request, id):
       hard_errors.append('活動已過期')
     if not activity.is_activity:
       hard_errors.append('資料不是活動')
+    if activity.excluded_from_public:
+      hard_errors.append('資料已排除前台')
     if not has_official_detail(activity):
       hard_errors.append('缺官方詳細頁')
     if activity.quality_level == 'rejected':
@@ -383,6 +405,8 @@ def activitySetReadiness(request, id):
       return redirect('activityEdit', id=id)
   setattr(activity, target, value)
   activity.save(update_fields=[target, 'updated_at'])
+  if not value:
+    recompute_activity_readiness(activity, save=True)
   audit(request, 'set_readiness', activity, {'target': target, 'value': value})
   messages.success(request, f'{target} 已更新為 {"啟用" if value else "關閉"}。')
   return redirect('activityEdit', id=id)
@@ -409,7 +433,7 @@ def tagReview(request):
   return render(request, 'tagReview.html', {
     'suggestions': suggestions,
     'ai_tag_target_count': apply_readiness_filter(Activity.objects.all(), 'recommendation_blocked').count(),
-    'recommendation_ready_count': Activity.objects.filter(status='active', recommendation_ready=True).filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.now())).exclude(official_detail_url='').count(),
+    'recommendation_ready_count': Activity.objects.filter(status='active', excluded_from_public=False, recommendation_ready=True).filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.now())).exclude(official_detail_url='').count(),
   })
 
 
@@ -507,7 +531,7 @@ def pushManagement(request):
     return redirect('pushManagement')
 
   activity_q = request.GET.get('activity_q', '').strip()
-  activity_qs = Activity.objects.filter(status='active').filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.now()))
+  activity_qs = Activity.objects.filter(status='active', excluded_from_public=False).filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.now()))
   if activity_q:
     activity_qs = activity_qs.filter(Q(title__icontains=activity_q) | Q(location__icontains=activity_q) | Q(district__icontains=activity_q))
   activity_limit = 50 if activity_q else 20
@@ -649,6 +673,7 @@ def lineQuerySimulator(request):
     classify_line_intent,
     get_valid_conversation_state,
     handle_line_text_message,
+    query_activities_by_conditions,
     search_activities_for_line,
   )
 
@@ -686,6 +711,7 @@ def lineQuerySimulator(request):
         for activity in Activity.objects.filter(id__in=activity_ids).select_related('search_profile').prefetch_related('tags')
       }
       ordered_activities = [activities_by_id[item_id] for item_id in activity_ids if item_id in activities_by_id]
+      db_candidates = query_activities_by_conditions(conditions, limit=50) if conditions else []
       result = {
         'query': query,
         'intent': intent,
@@ -694,6 +720,7 @@ def lineQuerySimulator(request):
         'has_flex': has_flex,
         'conditions_json': json.dumps(conditions or {}, ensure_ascii=False, indent=2, default=str),
         'activities': ordered_activities,
+        'db_candidates': db_candidates,
       }
 
   return render(request, 'lineQuerySimulator.html', {
@@ -850,7 +877,7 @@ def activityChanges(request):
 
 
 def activity_form_values(data, activity=None):
-  return {
+  values = {
     'title': data.get('title', '').strip() or '未命名活動',
     'description': data.get('description', '').strip(),
     'location': data.get('location', '').strip(),
@@ -867,8 +894,12 @@ def activity_form_values(data, activity=None):
     'line_ready': activity.line_ready if activity else False,
     'ai_ready': activity.ai_ready if activity else False,
     'recommendation_ready': activity.recommendation_ready if activity else False,
-    'is_activity': True,
-    'is_public_item': True,
+    'item_type': data.get('item_type') or (activity.item_type if activity else 'activity'),
+    'is_activity': data.get('is_activity') == 'on',
+    'is_public_item': data.get('is_public_item') == 'on',
+    'excluded_from_public': data.get('excluded_from_public') == 'on',
+    'exclude_reason': data.get('exclude_reason', '').strip(),
+    'final_state': data.get('final_state') or (activity.final_state if activity else 'needs_review'),
     'fee_type': data.get('fee_type') or 'unknown',
     'manual_verified': data.get('manual_verified') == 'on',
     'manual_overrides': parse_manual_overrides(data.get('manual_overrides', '')),
@@ -876,6 +907,16 @@ def activity_form_values(data, activity=None):
     'organizer': data.get('organizer', '').strip(),
     'registration_url': data.get('registration_url', '').strip(),
   }
+  if values['excluded_from_public']:
+    values.update({
+      'is_activity': False,
+      'is_public_item': False,
+      'line_ready': False,
+      'ai_ready': False,
+      'recommendation_ready': False,
+      'final_state': values['final_state'] if values['final_state'] in {'non_activity', 'system_excluded'} else 'system_excluded',
+    })
+  return values
 
 
 def activity_form_context(activity=None):
@@ -887,6 +928,8 @@ def activity_form_context(activity=None):
     'selected_tag_ids': selected_tag_ids,
     'status_choices': Activity.STATUS_CHOICES,
     'fee_choices': Activity.FEE_TYPE_CHOICES,
+    'item_type_choices': Activity.ITEM_TYPE_CHOICES,
+    'final_state_choices': Activity.FINAL_STATE_CHOICES,
   }
 
 

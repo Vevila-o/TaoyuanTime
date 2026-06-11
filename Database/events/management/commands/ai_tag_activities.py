@@ -8,15 +8,14 @@ from django.db.models import Q
 from django.utils import timezone
 
 from events.ai_providers import provider_order
-from events.ai_tagger import apply_accepted_tags, tag_activity_with_ai
+from events.ai_tagger import PROMPT_VERSION, apply_accepted_tags, apply_safe_repairs, tag_activity_with_ai
 from events.ai_tagger import get_active_tag_map, get_ai_tagger_config
 from events.models import AIProcessingLog, Activity, ActivityTagSuggestion, Tag
 from events.search_profiles import update_activity_search_profile
-from events.services import get_recommendation_ready_activities
 
 
 class Command(BaseCommand):
-    help = "Use the local AI server to suggest tags for recommendation-ready activities."
+    help = "Use the local AI server to repair missing fields and suggest tags for active activities."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -83,6 +82,11 @@ class Command(BaseCommand):
             action="store_true",
             help="Skip database activities that already have a successful AI tagging log.",
         )
+        parser.add_argument(
+            "--repair-gaps-only",
+            action="store_true",
+            help="Only process active activities with missing core repair fields.",
+        )
 
     def handle(self, *args, **options):
         limit = options["limit"]
@@ -105,6 +109,7 @@ class Command(BaseCommand):
             options["json_offset"],
             options["source_key"],
             options["skip_tagged_success"],
+            options["repair_gaps_only"],
         )
         if not activities:
             self.stdout.write(self.style.WARNING("No activities found."))
@@ -133,7 +138,7 @@ class Command(BaseCommand):
                     activity=activity,
                     task_type="tagging",
                     model="/".join(provider_order())[:100],
-                    prompt_version="tag-v1",
+                    prompt_version=PROMPT_VERSION,
                     input_summary=activity.title[:500],
                     output_json={"error": sanitize_ai_error(str(exc))},
                     status="failed",
@@ -144,13 +149,16 @@ class Command(BaseCommand):
                 continue
 
             applied_tags = []
+            repair_outcome = apply_safe_repairs(activity, result, dry_run=not apply_changes)
+            if apply_changes and repair_outcome.get("applied_repairs"):
+                activity.refresh_from_db()
             if apply_changes:
                 applied_tags = apply_accepted_tags(activity, result)
             if create_suggestions and not result.get("error"):
                 created, skipped = create_pending_suggestions(activity, result)
                 suggestions_created += created
                 suggestions_skipped += skipped
-            if not result.get("error"):
+            if apply_changes and not result.get("error"):
                 update_activity_search_profile(activity, ai_result=result)
             result["applied_tags"] = [
                 {"id": tag.id, "name": tag.name, "tag_type": tag.tag_type}
@@ -161,11 +169,14 @@ class Command(BaseCommand):
                 activity=activity,
                 task_type="tagging",
                 model=f"{result.get('provider', 'ai')}:{result.get('model', '')}"[:100],
-                prompt_version="tag-v1",
+                prompt_version=PROMPT_VERSION,
                 input_summary=activity.title[:500],
                 output_json={
                     "accepted_tags": result.get("accepted_tags", []),
                     "new_tags": result.get("new_tags", []),
+                    "repair_suggestions": result.get("repair_suggestions", []),
+                    "applied_repairs": result.get("applied_repairs", []),
+                    "rejected_repairs": result.get("rejected_repairs", []),
                     "warnings": result.get("warnings", []),
                     "search_keywords": result.get("search_keywords", []),
                     "search_topics": result.get("search_topics", []),
@@ -190,30 +201,40 @@ class Command(BaseCommand):
                 f"Suggestions: created={suggestions_created}, skipped={suggestions_skipped}"
             ))
 
-    def _get_activities(self, activity_id, limit, real_only, input_json, json_offset, source_key, skip_tagged_success):
+    def _get_activities(
+        self,
+        activity_id,
+        limit,
+        real_only,
+        input_json,
+        json_offset,
+        source_key,
+        skip_tagged_success,
+        repair_gaps_only=False,
+    ):
         if input_json:
             if activity_id:
                 raise CommandError("--activity-id cannot be used with --input-json.")
             return self._get_json_activities(input_json, limit, json_offset, source_key)
         if activity_id:
-            qs = Activity.objects.filter(id=activity_id)
+            qs = Activity.objects.filter(id=activity_id, excluded_from_public=False)
         else:
-            qs = get_recommendation_ready_activities().filter(
+            qs = Activity.objects.filter(
                 status="active",
+                excluded_from_public=False,
                 is_activity=True,
-                recommendation_ready=True,
-                quality_level="high",
             ).filter(
                 Q(end_date__isnull=True) | Q(end_date__gte=timezone.now())
-            ).exclude(
-                official_detail_url=""
             )
+            if repair_gaps_only:
+                qs = qs.filter(repair_gap_filter())
         if real_only:
             qs = qs.exclude(source_url__contains="/sample/")
         if skip_tagged_success and not activity_id:
             tagged_ids = AIProcessingLog.objects.filter(
                 task_type="tagging",
                 status="success",
+                prompt_version=PROMPT_VERSION,
                 activity_id__isnull=False,
             ).values_list("activity_id", flat=True)
             qs = qs.exclude(id__in=tagged_ids)
@@ -245,6 +266,9 @@ class Command(BaseCommand):
         blocking_warnings = result.get("blocking_warnings", result.get("warnings", []))
         info_warnings = result.get("info_warnings", [])
         applied = _format_tags(result.get("applied_tags", []))
+        repairs = _format_repairs(result.get("repair_suggestions", []))
+        applied_repairs = _format_repairs(result.get("applied_repairs", []))
+        rejected_repairs = _format_repairs(result.get("rejected_repairs", []), include_reason=True)
 
         self._safe_write("")
         self._safe_write(f"[{result['activity_id']}] {result['activity_title']}")
@@ -255,6 +279,10 @@ class Command(BaseCommand):
             self._safe_write(f"  missing_tags_rejected: {missing}")
         if rejected:
             self._safe_write(f"  rejected_tags: {rejected}")
+        if repairs:
+            self._safe_write(f"  repair_suggestions: {repairs}")
+        if rejected_repairs:
+            self._safe_write(f"  rejected_repairs: {rejected_repairs}")
         if blocking_warnings:
             self._safe_write(f"  blocking_warnings: {' | '.join(blocking_warnings)}")
         if info_warnings:
@@ -263,6 +291,9 @@ class Command(BaseCommand):
         self._safe_write(f"  manual_evaluation: {result.get('manual_evaluation')}")
         if apply_changes:
             self._safe_write(self.style.SUCCESS(f"  applied_tags: {applied or '-'}"))
+            self._safe_write(self.style.SUCCESS(f"  applied_repairs: {applied_repairs or '-'}"))
+        elif applied_repairs:
+            self._safe_write(f"  applied_if_apply: {applied_repairs}")
 
     def _safe_write(self, message):
         encoding = getattr(self.stdout, "encoding", None) or "utf-8"
@@ -279,6 +310,31 @@ def _format_tags(tags):
         label = f"{name}({tag_type})"
         if confidence is not None:
             label = f"{label}@{confidence:.2f}"
+        parts.append(label)
+    return ", ".join(parts)
+
+
+def repair_gap_filter():
+    return (
+        Q(start_date__isnull=True)
+        | Q(location="")
+        | Q(district="")
+        | Q(fee_type="unknown")
+        | (Q(requires_registration=True) & (Q(registration_info="") | Q(registration_url="")))
+    )
+
+
+def _format_repairs(repairs, *, include_reason=False):
+    parts = []
+    for repair in repairs:
+        field = repair.get("field")
+        value = repair.get("new_value") or repair.get("normalized_value") or repair.get("value")
+        confidence = repair.get("confidence")
+        label = f"{field}={value}"
+        if confidence is not None:
+            label = f"{label}@{confidence:.2f}"
+        if include_reason and repair.get("reject_reason"):
+            label = f"{label}({repair['reject_reason']})"
         parts.append(label)
     return ", ".join(parts)
 

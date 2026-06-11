@@ -87,11 +87,12 @@ class Command(BaseCommand):
 def summary_targets(options):
     now = timezone.now()
     if options.get('activity_id'):
-        qs = Activity.objects.filter(id=options['activity_id'])
+        qs = Activity.objects.filter(id=options['activity_id'], excluded_from_public=False)
     else:
         qs = Activity.objects.filter(
             is_activity=True,
             status='active',
+            excluded_from_public=False,
         ).filter(
             Q(end_date__isnull=True) | Q(end_date__gte=now)
         ).filter(

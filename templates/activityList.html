@@ -33,7 +33,7 @@
       <!-- 狀態篩選 -->
       <select name="status" class="filter-select">
         <option value="">全部狀態</option>
-        <option value="active" {% if filters.status == "active" %}selected{% endif %}>上架中</option>
+        <option value="active" {% if filters.status == "active" %}selected{% endif %}>啟用資料</option>
         <option value="inactive" {% if filters.status == "inactive" %}selected{% endif %}>已下架</option>
         <option value="draft" {% if filters.status == "draft" %}selected{% endif %}>草稿</option>
       </select>
@@ -48,7 +48,7 @@
       <select name="readiness" class="filter-select">
         <option value="">全部 readiness</option>
         <option value="line_ready" {% if filters.readiness == "line_ready" %}selected{% endif %}>LINE ready</option>
-        <option value="needs_review" {% if filters.readiness == "needs_review" %}selected{% endif %}>待審核</option>
+        <option value="needs_review" {% if filters.readiness == "needs_review" %}selected{% endif %}>待補資料</option>
         <option value="expired_active" {% if filters.readiness == "expired_active" %}selected{% endif %}>過期仍上架</option>
         <option value="missing_detail" {% if filters.readiness == "missing_detail" %}selected{% endif %}>缺官方詳細頁</option>
         <option value="fallback_image" {% if filters.readiness == "fallback_image" %}selected{% endif %}>圖片需 fallback</option>
@@ -76,7 +76,6 @@
             <th>開始時間</th>
             <th>結束時間</th>
             <th>狀態</th>
-            <th>Ready</th>
             <th>圖片</th>
             <th>篩選診斷</th>
             <th>操作</th>
@@ -94,17 +93,25 @@
             <td>{{ activity.district|default:"-" }}</td>
             <td>{{ activity.start_date|date:"Y/m/d H:i"|default:"-" }}</td>
             <td>{{ activity.end_date|date:"Y/m/d H:i"|default:"-" }}</td>
-            <td><span class="badge {{ activity.status }}">{{ activity.get_status_display }}</span></td>
             <td>
-              {% if activity.line_ready %}<span class="badge active">LINE</span>{% endif %}
-              {% if activity.recommendation_ready %}<span class="badge active">推薦</span>{% endif %}
-              {% if not activity.line_ready and not activity.recommendation_ready %}<span class="badge draft">待審</span>{% endif %}
+              {% if activity.excluded_from_public %}
+                <span class="badge inactive">{{ activity.get_final_state_display|default:"非活動" }}</span>
+                {% if activity.exclude_reason %}<div class="small text-muted">{{ activity.exclude_reason }}</div>{% endif %}
+              {% elif activity.status == "inactive" %}
+                <span class="badge inactive">已下架</span>
+              {% elif activity.status == "draft" %}
+                <span class="badge draft">草稿</span>
+              {% elif activity.line_ready and activity.recommendation_ready and activity.is_public_item %}
+                <span class="badge active">上架中</span>
+              {% else %}
+                <span class="badge draft">待補資料</span>
+              {% endif %}
             </td>
             <td class="small">
               {% if activity.image_url and "placehold.co" not in activity.image_url %}
                 <span class="text-success">有圖</span>
               {% else %}
-                <span class="text-danger">fallback</span>
+                <span class="text-muted">fallback</span>
               {% endif %}
               <div>OCR {{ activity.ocr_status|default:"未執行" }}</div>
             </td>
@@ -137,7 +144,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="9">目前沒有活動資料</td>
+            <td colspan="8">目前沒有活動資料</td>
           </tr>
           {% endfor %}
         </tbody>

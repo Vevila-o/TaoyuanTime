@@ -9,8 +9,10 @@ from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime
 
 from events.models import Activity, ActivityAsset, ActivityChangeLog, ImportRun, SourceWebsite, Tag
-from events.services import infer_taoyuan_district_from_text, normalize_taoyuan_district
+from events.services import infer_taoyuan_district_from_text, normalize_taoyuan_district, infer_roc_datetimes_from_text, backfill_missing_fields
+from admin_app.diagnostics import recompute_activity_readiness
 from pipeline.extract_fee import extract_registration_url
+from pipeline.public_exclusion import apply_public_exclusion, final_state_for_event
 
 
 QUALITY_LEVEL_BY_SCORE = (
@@ -36,39 +38,6 @@ def parse_event_datetime(value, *, end_of_day=False):
     if timezone.is_naive(dt):
         return timezone.make_aware(dt, timezone.get_current_timezone())
     return dt
-
-
-ROC_DATE_PATTERN = re.compile(r"(?P<year>1\d{2})[/-](?P<month>\d{1,2})[/-](?P<day>\d{1,2})")
-
-
-def parse_roc_date(value, *, end_of_day=False):
-    if not value:
-        return None
-    match = ROC_DATE_PATTERN.search(str(value))
-    if not match:
-        return None
-    year = int(match.group("year")) + 1911
-    month = int(match.group("month"))
-    day = int(match.group("day"))
-    dt = datetime.combine(datetime(year, month, day).date(), time.max if end_of_day else time.min)
-    return timezone.make_aware(dt, timezone.get_current_timezone())
-
-
-def infer_roc_datetimes_from_text(*texts):
-    text = " ".join(str(item or "") for item in texts if item)
-    start = None
-    end = None
-    start_match = re.search(r"(?:展覽期間起|活動期間起|期間起|起)[:：\s]*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
-    end_match = re.search(r"(?:展覽期間訖|活動期間訖|期間訖|訖|至)[:：\s]*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
-    range_match = re.search(r"((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})\s*[~～至]\s*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
-    if start_match:
-        start = parse_roc_date(start_match.group(1))
-    if end_match:
-        end = parse_roc_date(end_match.group(1), end_of_day=True)
-    if range_match:
-        start = start or parse_roc_date(range_match.group(1))
-        end = end or parse_roc_date(range_match.group(2), end_of_day=True)
-    return start, end
 
 
 def as_bool(value, default=False):
@@ -217,6 +186,7 @@ def sync_activity_asset(activity, item):
 
 
 def activity_values(item, source):
+    apply_public_exclusion(item)
     source_url = item.get("source_url") or item.get("official_detail_url")
     official_url = item.get("official_detail_url") or source_url
     description = item.get("clean_description") or item.get("description") or ""
@@ -286,6 +256,9 @@ def activity_values(item, source):
         "line_ready": as_bool(item.get("line_ready"), as_bool(item.get("line_card_ready"), False)),
         "ai_ready": as_bool(item.get("ai_ready"), False),
         "recommendation_ready": as_bool(item.get("recommendation_ready"), False),
+        "excluded_from_public": as_bool(item.get("excluded_from_public"), False),
+        "exclude_reason": item.get("exclude_reason") or "",
+        "final_state": item.get("final_state") or final_state_for_event(item),
         "official_detail_url": official_url,
         "source_key": item.get("source_key") or "",
         "source_item_id": item.get("source_item_id") or item.get("id") or "",
@@ -415,6 +388,18 @@ class Command(BaseCommand):
                     if not activity:
                         activity = Activity.objects.filter(source_url=source_url).first()
                     if activity:
+                        if activity.excluded_from_public:
+                            values.update({
+                                "status": activity.status,
+                                "excluded_from_public": True,
+                                "exclude_reason": activity.exclude_reason or values.get("exclude_reason") or "manual_excluded",
+                                "final_state": activity.final_state or "non_activity",
+                                "is_activity": False,
+                                "is_public_item": False,
+                                "line_ready": False,
+                                "ai_ready": False,
+                                "recommendation_ready": False,
+                            })
                         values = apply_manual_overrides(activity, values)
                         record_activity_changes(activity, values, values.get("source_key") or "import_crawler_json")
                         for field, value in values.items():
@@ -424,6 +409,13 @@ class Command(BaseCommand):
                     else:
                         activity = Activity.objects.create(**values)
                         created += 1
+                        
+                    # 1. Backfill from raw HTML if needed
+                    backfill_missing_fields(activity)
+                    
+                    # 2. Recompute readiness based on final DB fields
+                    recompute_activity_readiness(activity, save=True)
+                    
                     activity.tags.set(tags)
                     sync_activity_asset(activity, item)
 

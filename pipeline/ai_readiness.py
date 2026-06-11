@@ -14,7 +14,10 @@ def check_ai_readiness(event):
     if len(raw_desc) > 0:
         noise_ratio = 1 - (len(clean_desc) / len(raw_desc))
         
-    if content_type != "activity" and not event.get("is_activity"):
+    if event.get("excluded_from_public"):
+        ai_ready = False
+        ai_reject_reason = event.get("exclude_reason") or "Excluded from public surfaces"
+    elif content_type != "activity" and not event.get("is_activity"):
         ai_ready = False
         ai_reject_reason = f"content_type is {content_type}, not activity"
     elif event.get("status") == "inactive" or event.get("freshness_status") == "expired":

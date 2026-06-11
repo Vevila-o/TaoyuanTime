@@ -55,7 +55,7 @@ def get_public_items():
     now = timezone.now()
     qs = Activity.objects.filter(status='active').filter(
         Q(end_date__isnull=True) | Q(end_date__gte=now)
-    ).filter(is_public_item=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='')
+    ).filter(excluded_from_public=False, is_activity=True, is_public_item=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='')
     return qs
 
 
@@ -65,7 +65,7 @@ def get_ai_ready_activities():
     now = timezone.now()
     qs = Activity.objects.filter(status='active').filter(
         Q(end_date__isnull=True) | Q(end_date__gte=now)
-    ).filter(is_activity=True, ai_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='')
+    ).filter(excluded_from_public=False, is_activity=True, ai_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='')
     return qs
 
 
@@ -75,7 +75,7 @@ def get_recommendation_ready_activities():
     now = timezone.now()
     qs = Activity.objects.filter(status='active').filter(
         Q(end_date__isnull=True) | Q(end_date__gte=now)
-    ).filter(is_activity=True, recommendation_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='')
+    ).filter(excluded_from_public=False, is_activity=True, recommendation_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='')
     return qs
 
 
@@ -116,7 +116,7 @@ def get_line_card_payload(activity: Activity) -> dict:
 
     Only return payload if activity.line_ready is True.
     """
-    if not getattr(activity, 'line_ready', False):
+    if getattr(activity, 'excluded_from_public', False) or not getattr(activity, 'line_ready', False):
         return None
     return {
         'title': activity.title,

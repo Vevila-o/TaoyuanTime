@@ -165,6 +165,7 @@ AI_PROVIDER_ORDER=local,openai
 
 - 後台活動管理（新增/編輯/上下架）、儀表板、標籤審核、使用者管理、推播 campaign。
 - LINE Bot：偏好設定、推薦活動、已訂閱活動、訂閱/取消訂閱、詳細資訊、導航、加入行事曆。
+- LINE Bot：傳「附近的市民卡特約商店」會直接回覆中原附近 4 筆固定市民卡特約優惠卡片。
 - DB-grounded 自然語言活動查詢，不編造資料庫不存在的活動。
 - AI tag / AI summary / OCR，可用本地 OpenAI-compatible API 或 OpenAI fallback。
 - 爬蟲 pipeline 與既有活動 JSON 匯入。
@@ -180,7 +181,9 @@ AI_PROVIDER_ORDER=local,openai
 3. 按「一鍵完整更新」。
 4. 到任務詳情確認狀態是 success 或 partial。
 
-「一鍵完整更新」會處理爬蟲、匯入、過期下架、AI Tag、搜尋語意、AI 摘要與 OCR。過期活動只會下架，不會刪除歷史資料或爬蟲保存檔案。
+「一鍵完整更新」會處理爬蟲、匯入、過期下架、OCR、AI repair+tag、安全補欄位、readiness 重算、搜尋語意與 AI 摘要。過期活動只會下架，不會刪除歷史資料或爬蟲保存檔案。
+
+AI repair+tag 只會自動補空欄位，不覆蓋既有人工或爬蟲欄位；可補核心欄位包含活動日期、地點、地區、報名資訊、報名網址與費用類型。修補證據與套用結果會記錄在 `AIProcessingLog.output_json`，實際欄位異動會寫入 `ActivityChangeLog`。
 
 ## 常用指令
 
@@ -198,6 +201,14 @@ python manage.py migrate
 python manage.py import_crawler_json --input scraping\data\output\activities_all.json --activate
 ```
 
+匯入展示用中原市民卡特約優惠：
+
+```powershell
+python manage.py seed_zhongyuan_citizen_stores --apply --skip-checks
+```
+
+這會 upsert 4 筆固定 `Store`：大魯閣遊戲愛樂園、養鍋、必勝客、肯德基。LINE 收到「附近的市民卡特約商店」會直接回這 4 張卡片，不要求使用者分享位置。
+
 小批次爬蟲測試，不匯入：
 
 ```powershell
@@ -209,6 +220,15 @@ python manage.py run_crawler_pipeline --no-import --no-assets --skip-dynamic --s
 ```powershell
 python manage.py run_crawler_pipeline --activate --skip-dynamic --primary-limit 20 --secondary-limit 20 --max-runtime 10
 ```
+
+只針對缺漏欄位活動跑 AI repair+tag：
+
+```powershell
+python manage.py ai_tag_activities --repair-gaps-only --dry-run --json
+python manage.py ai_tag_activities --repair-gaps-only --apply
+```
+
+後台「一鍵完整更新」也會使用同一套缺漏補救流程；已經直接爬到完整日期、地點與報名資訊的活動不會被 repair-gaps-only 重複處理。
 
 完整更新建議走後台 `/crawlJobs/` 的「一鍵完整更新」。若後台只建立 queued job、沒有自動背景程序，可手動跑：
 

@@ -9,12 +9,13 @@ from django.utils import timezone
 
 from events.ai_providers import create_no_proxy_session
 from events.models import AIProcessingLog, Activity
-from events.services import backfill_activity_assets_from_images, is_seed_activity
+from events.services import backfill_activity_assets_from_images, is_seed_activity, backfill_missing_fields
+from admin_app.diagnostics import recompute_activity_readiness
 from pipeline.ocr_client import call_ocr
 
 
 class Command(BaseCommand):
-    help = "Process OCR for high-quality activities with local image files."
+    help = "Process OCR for active public activities with usable images."
 
     def add_arguments(self, parser):
         parser.add_argument("--limit", type=int, default=20)
@@ -26,13 +27,12 @@ class Command(BaseCommand):
         dry_run = bool(options["dry_run"])
         backfill_result = backfill_activity_assets_from_images(dry_run=dry_run)
         if options.get("activity_id"):
-            qs = Activity.objects.filter(id=options["activity_id"])
+            qs = Activity.objects.filter(id=options["activity_id"], excluded_from_public=False)
         else:
             qs = Activity.objects.filter(
                 status="active",
+                excluded_from_public=False,
                 is_activity=True,
-                recommendation_ready=True,
-                quality_level="high",
             )
         qs = (
             qs.exclude(ocr_status="success")
@@ -99,6 +99,12 @@ class Command(BaseCommand):
                     output_json={"ocr_status": activity.ocr_status},
                     status="success",
                 )
+                
+                # Try backfilling dates and locations from OCR text
+                backfill_missing_fields(activity)
+                # Recompute readiness (this saves the activity if there are updates to dates/locations/status)
+                recompute_activity_readiness(activity, save=True)
+                
                 success += 1
             except Exception as exc:
                 failed += 1

@@ -8,6 +8,8 @@ from django.db.models import Max, Q
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
+from events.ai_tagger import PROMPT_VERSION
+from events.management.commands.ai_tag_activities import repair_gap_filter
 from events.models import AIProcessingLog, Activity, CrawlJob, CrawlTask, ImportRun
 from events.search_profiles import update_activity_search_profile
 from events.services import is_seed_activity
@@ -166,10 +168,10 @@ def run_full_pipeline_job(job, command):
     limit = int(options.get('post_process_limit') or options.get('primary_limit') or 1)
     cooldown_hours = int(options.get('failure_cooldown_hours') or 24)
     for stage_key, label, runner in (
-        ('tagging', 'AI Tag', run_ai_tag_stage),
+        ('ocr', 'OCR', run_ocr_stage),
+        ('tagging', 'AI Repair+Tag', run_ai_tag_stage),
         ('search_profile', '搜尋語意', run_search_profile_stage),
         ('summary', 'AI 摘要', run_summary_stage),
-        ('ocr', 'OCR', run_ocr_stage),
     ):
         task = start_stage(job, label, f'正在準備 {label} 候選。')
         try:
@@ -308,6 +310,7 @@ def run_ai_tag_stage(task, priority_ids, limit, cooldown_hours):
         'ai_tag_activities',
         apply=True,
         skip_tagged_success=True,
+        repair_gaps_only=True,
     ))
 
 
@@ -425,23 +428,24 @@ def eligible_stage_queryset(stage, cooldown_hours):
     ).values_list('activity_id', flat=True)
     qs = Activity.objects.filter(
         status='active',
+        excluded_from_public=False,
         is_activity=True,
     ).filter(
         Q(end_date__isnull=True) | Q(end_date__gte=now)
     ).exclude(
-        official_detail_url=''
-    ).exclude(
         id__in=recent_failed
     ).prefetch_related('tags')
-    if stage in {'tagging', 'search_profile', 'ocr'}:
+    if stage == 'search_profile':
         qs = qs.filter(recommendation_ready=True, quality_level='high')
     if stage == 'tagging':
         success_ids = AIProcessingLog.objects.filter(
             task_type='tagging',
             status='success',
+            prompt_version=PROMPT_VERSION,
             activity_id__isnull=False,
         ).values_list('activity_id', flat=True)
         qs = qs.exclude(id__in=success_ids)
+        qs = qs.filter(repair_gap_filter())
     elif stage == 'search_profile':
         qs = qs.filter(Q(search_profile__isnull=True) | ~Q(search_profile__status='success'))
     elif stage == 'summary':

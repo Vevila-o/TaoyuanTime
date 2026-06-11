@@ -86,6 +86,9 @@ def init_db(filepath):
           recommendation_ready BOOLEAN,
           is_searchable BOOLEAN,
           published BOOLEAN,
+          excluded_from_public BOOLEAN,
+          exclude_reason TEXT,
+          final_state TEXT,
           has_required_date BOOLEAN,
           has_title BOOLEAN,
           has_location BOOLEAN,
@@ -165,6 +168,7 @@ def init_db(filepath):
         CREATE VIEW IF NOT EXISTS public_search_items AS
         SELECT * FROM activities
         WHERE status = 'active'
+          AND COALESCE(excluded_from_public, 0) = 0
           AND is_public_item = 1
           AND COALESCE(is_searchable, search_ready, 0) = 1
           AND official_detail_url IS NOT NULL
@@ -176,6 +180,7 @@ def init_db(filepath):
         CREATE VIEW IF NOT EXISTS ai_query_items AS
         SELECT * FROM activities
         WHERE status = 'active'
+          AND COALESCE(excluded_from_public, 0) = 0
           AND is_activity = 1
           AND ai_ready = 1
           AND COALESCE(is_searchable, search_ready, 0) = 1
@@ -193,6 +198,7 @@ def init_db(filepath):
         CREATE VIEW IF NOT EXISTS recommendation_items AS
         SELECT * FROM activities
         WHERE status = 'active'
+          AND COALESCE(excluded_from_public, 0) = 0
           AND is_activity = 1
           AND recommendation_ready = 1
           AND COALESCE(published, is_public_item, 0) = 1
@@ -229,6 +235,9 @@ def ensure_columns(conn):
         "recommendation_ready": "BOOLEAN",
         "is_searchable": "BOOLEAN",
         "published": "BOOLEAN",
+        "excluded_from_public": "BOOLEAN",
+        "exclude_reason": "TEXT",
+        "final_state": "TEXT",
         "has_required_date": "BOOLEAN",
         "has_title": "BOOLEAN",
         "has_location": "BOOLEAN",
@@ -281,7 +290,7 @@ def save_to_sqlite(events, filepath="scraping/data/output/activities.db"):
                 "quality_score", "quality_level",
                 "scraped_at", "content_hash", "raw_html_path", "parse_warnings", "quality_warnings",
                 "line_ready", "line_card_ready", "search_ready", "ai_ready", "recommendation_ready",
-                "is_searchable", "published", "has_required_date", "has_title", "has_location", "has_source_url",
+                "is_searchable", "published", "excluded_from_public", "exclude_reason", "final_state", "has_required_date", "has_title", "has_location", "has_source_url",
                 "missing_fields", "status_reason",
                 "exclude_from_recommendation_reason", "mvp_candidate", "manual_review_required",
             ]
@@ -301,6 +310,7 @@ def save_to_sqlite(events, filepath="scraping/data/output/activities.db"):
                 int(evt.get("line_ready", evt.get("line_card_ready", False))), int(evt.get("line_card_ready", False)), int(evt.get("search_ready", False)), int(evt.get("ai_ready", False)),
                 int(evt.get("recommendation_ready", False)),
                 int(evt.get("is_searchable", False)), int(evt.get("published", False)),
+                int(evt.get("excluded_from_public", False)), evt.get("exclude_reason"), evt.get("final_state"),
                 int(evt.get("has_required_date", False)), int(evt.get("has_title", False)),
                 int(evt.get("has_location", False)), int(evt.get("has_source_url", False)),
                 str(evt.get("missing_fields", [])), evt.get("status_reason"),

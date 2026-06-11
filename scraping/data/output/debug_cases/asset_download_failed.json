@@ -2352,6 +2352,18 @@
     "reason": "too_small: 90x90"
   },
   {
+    "title": "〔總館〕繪本原來還可以這樣讀！(線上課程)",
+    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9725",
+    "asset_url": "https://www.typl.gov.tw/Content/images/ic_nav-login.png",
+    "reason": "too_small: 54x54"
+  },
+  {
+    "title": "〔總館〕繪本原來還可以這樣讀！(線上課程)",
+    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9725",
+    "asset_url": "https://www.typl.gov.tw/Content/images/ic_fb-s.png",
+    "reason": "too_small: 28x64"
+  },
+  {
     "title": "【紅梅活動】7/11(六)暑期生態探險-一起去丸子蟲星球尋寶--米老鼠家族-可愛的鼠類動物 (附停車資訊)",
     "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9740",
     "asset_url": "https://www.typl.gov.tw/Content/images/ic_nav-login.png",
@@ -2730,24 +2742,6 @@
     "reason": "too_small: 108x108"
   },
   {
-    "title": "【總館活動】情緒悅讀力系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9726",
-    "asset_url": "https://www.typl.gov.tw/Content/images/ic_nav-login.png",
-    "reason": "too_small: 54x54"
-  },
-  {
-    "title": "【總館活動】情緒悅讀力系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9726",
-    "asset_url": "https://www.typl.gov.tw/Content/images/ic_fb-s.png",
-    "reason": "too_small: 28x64"
-  },
-  {
-    "title": "【總館活動】情緒悅讀力系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9726",
-    "asset_url": "https://www.typl.gov.tw/Content/images/side-top.png",
-    "reason": "too_small: 108x108"
-  },
-  {
     "title": "[平鎮活動]7/26(日) 繪出閱讀的色彩系列活動-年年有魚.鋁箔彩畫",
     "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9710",
     "asset_url": "https://www.typl.gov.tw/Content/images/ic_nav-login.png",
@@ -2834,42 +2828,6 @@
   {
     "title": "[平鎮活動]7/4(六) 繪出閱讀的色彩系列活動-⟪南瓜車車⟫ 繪本手作課",
     "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9705",
-    "asset_url": "https://www.typl.gov.tw/Content/images/side-top.png",
-    "reason": "too_small: 108x108"
-  },
-  {
-    "title": "【2026亮點漫讀】《微光沙龍悄悄話》系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9722",
-    "asset_url": "https://www.typl.gov.tw/Content/images/ic_nav-login.png",
-    "reason": "too_small: 54x54"
-  },
-  {
-    "title": "【2026亮點漫讀】《微光沙龍悄悄話》系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9722",
-    "asset_url": "https://www.typl.gov.tw/Content/images/ic_fb-s.png",
-    "reason": "too_small: 28x64"
-  },
-  {
-    "title": "【2026亮點漫讀】《微光沙龍悄悄話》系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9722",
-    "asset_url": "https://www.typl.gov.tw/Content/images/side-top.png",
-    "reason": "too_small: 108x108"
-  },
-  {
-    "title": "【2026亮點漫讀】《雲端亮點調頻室》系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9721",
-    "asset_url": "https://www.typl.gov.tw/Content/images/ic_nav-login.png",
-    "reason": "too_small: 54x54"
-  },
-  {
-    "title": "【2026亮點漫讀】《雲端亮點調頻室》系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9721",
-    "asset_url": "https://www.typl.gov.tw/Content/images/ic_fb-s.png",
-    "reason": "too_small: 28x64"
-  },
-  {
-    "title": "【2026亮點漫讀】《雲端亮點調頻室》系列活動",
-    "source_url": "https://www.typl.gov.tw/zh-tw/Activity/Content/9721",
     "asset_url": "https://www.typl.gov.tw/Content/images/side-top.png",
     "reason": "too_small: 108x108"
   },

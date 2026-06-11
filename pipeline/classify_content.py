@@ -1,5 +1,6 @@
 import yaml
 import os
+from pipeline.public_exclusion import apply_public_exclusion, public_exclusion_for_text
 
 # Load keywords
 with open(os.path.join("config", "keywords.yaml"), "r", encoding="utf-8") as f:
@@ -19,6 +20,16 @@ def classify_content(event):
     enriched = event.get("enriched_metadata_text", "") or ""
     text_to_search = title + " " + enriched + " " + desc
     warnings = event.setdefault("quality_warnings", [])
+    exclusion_type, exclusion_reason = public_exclusion_for_text(title, desc, enriched)
+    if exclusion_type:
+        event["content_type"] = exclusion_type
+        event["is_event_candidate"] = False
+        event["event_confidence"] = 0.0
+        event["exclude_reason"] = exclusion_reason
+        warnings.append("strong_non_activity_keyword")
+        event["item_type"] = event["content_type"]
+        event["is_activity"] = False
+        return apply_public_exclusion(event)
     
     activity_score = 0
     non_event_score = 0
@@ -128,4 +139,4 @@ def classify_content(event):
 
     event["item_type"] = event["content_type"]
     event["is_activity"] = event["content_type"] == "activity"
-    return event
+    return apply_public_exclusion(event)

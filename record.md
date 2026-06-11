@@ -50,14 +50,14 @@ admin 註冊是為了資料庫的註冊因為大家都是令建專案導致有3�
   
   
 2. 特約商店
-   尚未爬取，功能尚未完成
+   展示用資料已固定為中原附近 4 筆市民卡特約優惠，不做爬蟲
 
    - `Store` 資料模型已建好（`events/models.py`，有 name, district, address, latitude, longitude, discount_info, start/end_date）
-   - LINE 位置訊息處理已寫好（`myapp/views.py handle_location`），5公里內搜尋並回覆 Flex 卡片
-   - 後台管理介面（新增/編輯商店）**尚未建立**
-   - 爬蟲 / 資料匯入**尚未建立**
-   - 資料庫目前 **0 筆**，使用者分享位置永遠回覆「附近目前沒有有效的特約商店」
-   - 待辦：① 從政府開放資料（data.gov.tw）爬取桃園市民卡特約商店，或手動 CSV 匯入 ② 後台加商店管理頁面
+   - 固定資料放在 `events/citizen_stores.py`
+   - 匯入指令：`python manage.py seed_zhongyuan_citizen_stores --apply --skip-checks`
+   - LINE 使用者傳「附近的市民卡特約商店」時，直接回覆固定 4 張 Flex 卡片，不要求分享位置
+   - 4 筆資料：大魯閣遊戲愛樂園－中壢中原萌獸公園店、養鍋－中壢中原店、必勝客－中壢新中北店、肯德基－中壢環中東二店
+   - 位置訊息的 5 公里搜尋保留，但展示主流程不依賴位置
 
 3. ai chat&活動爬蟲
    chat發現 *平鎮* 的活動沒辦法被抓到，但資料庫裡確實有
@@ -199,5 +199,52 @@ admin 註冊是為了資料庫的註冊因為大家都是令建專案導致有3�
    `smoke_extreme_line_flow` 目前會被 `barcode` 套件擋住，因為 `myapp/views.py` 會 import `barcode`。
    `requirements.txt` 裡已經有 `python-barcode>=0.15`，但目前本機 Python 環境看起來尚未安裝。
 
+#### 6/11 市民卡特約優惠展示資料
 
+市民卡特約商店這輪不做爬蟲，也不做 CSV 擴充；直接使用固定 4 筆中原附近優惠作為正式展示資料。
+
+匯入或更新資料庫：
+
+```powershell
+python manage.py seed_zhongyuan_citizen_stores --apply --skip-checks
+```
+
+LINE 行為：
+
+- 使用者傳「附近的市民卡特約商店」會直接收到固定 4 張優惠卡片。
+- 不要求使用者分享位置。
+- 卡片包含店名、地址、優惠內容、優惠期限、導航按鈕。
+
+固定店家：
+
+| 店家 | 優惠期限 | 優惠重點 |
+| --- | --- | --- |
+| 大魯閣遊戲愛樂園－中壢中原萌獸公園店 | 2025/07/15－2026/07/14 | 憑桃園市民卡或桃園數位碼購票入園，贈送手作童玩區。 |
+| 養鍋－中壢中原店 | 2024/08/29－2026/07/14 | 內用消費免費兌換「好養禮」一份，肉品或海鮮擇一。 |
+| 必勝客－中壢新中北店 | 2026/03/10－2026/11/30 | 使用優惠代碼 26705，可享指定人氣饗宴餐 399 元。 |
+| 肯德基－中壢環中東二店 | 2026/03/10－2026/11/30 | 使用優惠代碼 26763，可享指定雙料冠軍爭霸戰套餐 299 元。 |
+
+
+#### 6/12 OCR → AI Repair+Tag → Readiness 閉環與資料補救
+
+後台完整更新流程改成：
+
+```text
+crawler/import → OCR → AI repair+tag → apply safe repairs → recompute readiness → public/search/recommend
+```
+
+重點：
+
+- OCR 候選不再要求 `recommendation_ready=True` 或 `quality_level=high`，避免缺日期/地點的活動永遠進不了 OCR。
+- AI tag 擴充成 repair+tag，除了標籤，也會嘗試補 `start_date`、`end_date`、`location`、`district`、`registration_info`、`registration_url`、`fee_type`。
+- repair 自動套用只補空欄位，不覆蓋既有值；門檻為 `confidence >= 0.65`。
+- repair evidence 與套用/拒絕結果寫在 `AIProcessingLog.output_json`；實際欄位異動寫入 `ActivityChangeLog`。
+- 後台「一鍵完整更新」會跑同一套補救流程，且 `--repair-gaps-only` 只處理剛好缺漏核心資訊的活動。
+
+本次資料庫補救：
+
+- 套用最新 dry-run 判定可用的 12 筆 AI repair 結果。
+- 平鎮圖書館活動 544-548 由 raw HTML 人工補齊活動時間、精確地點、報名資訊與費用類型。
+- 平鎮 544-548 補完後已重算 readiness，`line_ready=True`、`recommendation_ready=True`，`quality_warnings=[]`。
+- 平鎮這批 OCR 內容誤指向大溪活動，因此本輪人工修補明確不採用 OCR，只採 raw HTML 的「活動時間 / 活動地點 / 報名期限 / 活動費用」欄位。
 

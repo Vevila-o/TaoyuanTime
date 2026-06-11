@@ -67,25 +67,55 @@
         </div>
       </div>
 
-      <div class="chart-card mt-4">
-        <h6>命中活動</h6>
-        <table class="table table-sm align-middle">
-          <thead><tr><th>活動</th><th>日期</th><th>地區</th><th>狀態</th><th>搜尋語意</th><th>官方連結</th></tr></thead>
-          <tbody>
-            {% for activity in result.activities %}
-              <tr>
-                <td><a href="{% url 'activityEdit' activity.id %}">{{ activity.title|truncatechars:42 }}</a></td>
-                <td>{{ activity.start_date|date:"Y/m/d"|default:"-" }}</td>
-                <td>{{ activity.district|default:"-" }}</td>
-                <td>{{ activity.status }}</td>
-                <td>{{ activity.search_profile.status|default:"缺" }}</td>
-                <td>{{ activity.official_link_status|default:"unknown" }}</td>
-              </tr>
-            {% empty %}
-              <tr><td colspan="6">沒有命中活動；正式 LINE 回覆不應硬塞卡片。</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <h6>資料庫候選結果</h6>
+            <table class="table table-sm align-middle">
+              <thead><tr><th>活動</th><th>地區</th><th>Tags</th><th>SearchProfile</th></tr></thead>
+              <tbody>
+                {% for activity in result.db_candidates %}
+                  <tr>
+                    <td><a href="{% url 'activityEdit' activity.id %}">{{ activity.title|truncatechars:34 }}</a></td>
+                    <td>{{ activity.district|default:"-" }}</td>
+                    <td>
+                      {% for tag in activity.tags.all %}
+                        <span class="badge text-bg-light border">{{ tag.name }}</span>
+                      {% empty %}
+                        <span class="text-muted">-</span>
+                      {% endfor %}
+                    </td>
+                    <td>{{ activity.search_profile.status|default:"缺" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr><td colspan="4">資料庫層沒有候選結果。</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <h6>命中活動</h6>
+            <table class="table table-sm align-middle">
+              <thead><tr><th>活動</th><th>日期</th><th>地區</th><th>狀態</th><th>搜尋語意</th><th>官方連結</th></tr></thead>
+              <tbody>
+                {% for activity in result.activities %}
+                  <tr>
+                    <td><a href="{% url 'activityEdit' activity.id %}">{{ activity.title|truncatechars:34 }}</a></td>
+                    <td>{{ activity.start_date|date:"Y/m/d"|default:"-" }}</td>
+                    <td>{{ activity.district|default:"-" }}</td>
+                    <td>{{ activity.status }}</td>
+                    <td>{{ activity.search_profile.status|default:"缺" }}</td>
+                    <td>{{ activity.official_link_status|default:"unknown" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr><td colspan="6">沒有命中活動；正式 LINE 回覆不應硬塞卡片。</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     {% endif %}
   </div>

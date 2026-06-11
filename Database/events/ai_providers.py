@@ -222,6 +222,23 @@ def call_json_with_fallback(messages: list[dict[str, Any]]) -> AIProviderRespons
     raise RuntimeError("; ".join(errors))
 
 
+def call_json_text_with_fallback(messages: list[dict[str, Any]]) -> AIProviderResponse:
+    errors = []
+    callers = {
+        "local": lambda: call_local_text(messages, response_format={"type": "json_object"}),
+        "openai": lambda: call_openai_text(messages, response_format={"type": "json_object"}),
+    }
+    providers = provider_order()
+    if not providers:
+        raise RuntimeError("No AI provider is enabled. Configure AI_BASE_URL for local AI.")
+    for provider_name in providers:
+        try:
+            return callers[provider_name]()
+        except Exception as exc:
+            errors.append(f"{provider_name}: {exc}")
+    raise RuntimeError("; ".join(errors))
+
+
 def call_text_with_fallback(messages: list[dict[str, Any]]) -> AIProviderResponse:
     errors = []
     callers = {

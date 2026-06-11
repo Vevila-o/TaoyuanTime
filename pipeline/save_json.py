@@ -5,6 +5,7 @@ from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from pipeline.dedupe import apply_stable_ids
+from pipeline.public_exclusion import apply_public_exclusion, final_state_for_event
 
 
 def _today():
@@ -39,19 +40,23 @@ def _sort_events(events):
 
 def _normalize_output_contract(event):
     apply_stable_ids(event)
-    for key in ("manual_review_required", "line_card_ready", "line_ready", "search_ready", "ai_ready", "recommendation_ready", "is_public_item", "is_searchable", "published", "front_ready", "ocr_ready"):
+    for key in ("manual_review_required", "line_card_ready", "line_ready", "search_ready", "ai_ready", "recommendation_ready", "is_public_item", "is_searchable", "published", "front_ready", "ocr_ready", "excluded_from_public"):
         event[key] = bool(event.get(key))
     event.setdefault("quality_warnings", [])
     event.setdefault("parse_warnings", [])
     event.setdefault("ocr_warnings", [])
     event.setdefault("missing_fields", [])
     event.setdefault("status_reason", "")
+    event.setdefault("exclude_reason", "")
+    event.setdefault("final_state", final_state_for_event(event))
     return event
 
 
 def _front_exclusion_reason(event):
     if event.get("quality_level") != "usable":
         return "not_usable"
+    if event.get("excluded_from_public"):
+        return event.get("exclude_reason") or "excluded_from_public"
     if not (event.get("is_activity") or event.get("content_type") == "activity"):
         return "not_activity"
     if event.get("manual_review_required"):
@@ -94,6 +99,7 @@ def save_to_json(events, output_dir="scraping/data/output"):
     source_buckets = {} # For manual audit sample
     
     for event in events:
+        apply_public_exclusion(event)
         _normalize_output_contract(event)
         source_key = event.get("source_key", "unknown")
         if source_key not in source_buckets:
@@ -114,6 +120,7 @@ def save_to_json(events, output_dir="scraping/data/output"):
         event.setdefault("quality_warnings", [])
 
         front_ready = _sync_front_facing_flags(event)
+        event["final_state"] = final_state_for_event(event)
         has_ocr_candidate = any(
             asset.get("ocr_candidate") and asset.get("image_role") in {"poster", "main_visual"}
             for asset in event.get("extracted_assets") or []

@@ -58,6 +58,12 @@ def extract_fee(event, debug_log=None):
         event["fee_text"] = paid_evidence
         event["fee_evidence_text"] = paid_evidence
         event["fee_parse_status"] = "success"
+    elif has_non_activity_fee_context(event, desc):
+        event["is_free"] = None
+        event["fee_type"] = "unknown"
+        event["fee_text"] = ""
+        event["fee_evidence_text"] = ""
+        event["fee_parse_status"] = "not_found"
     else:
         # 沒有明確提到收費 → 推定為免費
         event["is_free"] = True
@@ -148,3 +154,26 @@ def has_fee_amount_near_paid_context(text):
         if any(term in context for term in paid_context):
             return True
     return False
+
+
+def has_non_activity_fee_context(event, text):
+    joined = " ".join([
+        str(event.get("title") or ""),
+        str(event.get("content_type") or ""),
+        str(text or ""),
+    ])
+    blocked_context = (
+        "罰",
+        "罰鍰",
+        "裁罰",
+        "補助",
+        "預算",
+        "決算",
+        "財報",
+        "違規",
+        "採購",
+        "招標",
+        "公示送達",
+        "錄取名單",
+    )
+    return any(term in joined for term in blocked_context)

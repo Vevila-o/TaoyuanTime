@@ -2,15 +2,107 @@ import json
 import os
 import re
 from dataclasses import dataclass
+from datetime import datetime, time
+from pathlib import Path
 from typing import Any
 
 import requests
+from bs4 import BeautifulSoup
+from django.conf import settings
+from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
 
-from .ai_providers import call_json_with_fallback
-from .models import Activity, Tag
+from .ai_providers import call_json_text_with_fallback
+from .models import Activity, ActivityChangeLog, Tag
 
 
 TAG_TYPES = ("region", "activity_type", "audience", "cost", "discount", "time")
+PROMPT_VERSION = "tag-repair-v1"
+REPAIR_CONFIDENCE_THRESHOLD = 0.65
+REPAIRABLE_FIELDS = {
+    "start_date",
+    "end_date",
+    "location",
+    "district",
+    "registration_info",
+    "registration_url",
+    "fee_type",
+}
+REPAIR_EVIDENCE_SOURCES = {"existing_field", "html_meta", "html_main", "html_text", "ocr"}
+DATE_REPAIR_FIELDS = {"start_date", "end_date"}
+TEXT_REPAIR_FIELDS = {"location", "district", "registration_info", "registration_url"}
+FEE_TYPE_VALUES = {"free", "ticket_free", "paid", "mixed", "unknown"}
+TAOYUAN_DISTRICTS = {
+    "桃園區",
+    "中壢區",
+    "平鎮區",
+    "八德區",
+    "楊梅區",
+    "蘆竹區",
+    "大溪區",
+    "龍潭區",
+    "龜山區",
+    "大園區",
+    "觀音區",
+    "新屋區",
+    "復興區",
+}
+TAOYUAN_DISTRICT_ALIASES = {
+    district.removesuffix("區"): district
+    for district in TAOYUAN_DISTRICTS
+    if district != "桃園區"
+}
+NON_TAOYUAN_PLACE_MARKERS = (
+    "日本",
+    "神戶",
+    "東京",
+    "大阪",
+    "韓國",
+    "首爾",
+    "美國",
+    "中國",
+    "香港",
+    "澳門",
+    "台北市",
+    "臺北市",
+    "新北市",
+    "基隆市",
+    "新竹縣",
+    "新竹市",
+    "苗栗縣",
+    "台中市",
+    "臺中市",
+    "彰化縣",
+    "南投縣",
+    "雲林縣",
+    "嘉義縣",
+    "嘉義市",
+    "台南市",
+    "臺南市",
+    "高雄市",
+    "屏東縣",
+    "宜蘭縣",
+    "花蓮縣",
+    "台東縣",
+    "臺東縣",
+    "澎湖縣",
+    "金門縣",
+    "連江縣",
+)
+MAX_REPAIR_TEXT_LENGTHS = {
+    "location": 120,
+    "district": 20,
+    "registration_info": 500,
+    "registration_url": 1000,
+}
+REPAIR_LABEL_PATTERN = re.compile(
+    r"(活動日期|活動時間|展覽期間|日期|時間|活動地點|活動地址|地點|地址|報名|預約|費用|票價|免費|自由入場)",
+    re.IGNORECASE,
+)
+DATE_PATTERN = re.compile(r"(\d{3,4}[/-]\d{1,2}[/-]\d{1,2}|\d{1,2}[/-]\d{1,2})")
+REGISTRATION_DEADLINE_PATTERN = re.compile(r"(報名期限|報名期間|報名時間|報名日期|截止報名|報名截止)")
+HTML_META_LIMIT = 12
+HTML_SNIPPET_LIMIT = 8
 COST_VALUE_TAGS = {"免費", "付費", "金額未提供"}
 REGISTRATION_COST_TAGS = {"需報名", "免預約"}
 STRICT_DISCOUNT_TAGS = {"無優惠"}
@@ -196,6 +288,8 @@ def serialize_activity(activity: Any) -> dict[str, Any]:
         "id": getattr(activity, "id", None),
         "title": getattr(activity, "title", "") or "",
         "description": getattr(activity, "description", "") or "",
+        "start_date": str(getattr(activity, "start_date", "") or ""),
+        "end_date": str(getattr(activity, "end_date", "") or ""),
         "district": getattr(activity, "district", "") or "",
         "location": getattr(activity, "location", "") or "",
         "is_free": getattr(activity, "is_free", False),
@@ -203,23 +297,145 @@ def serialize_activity(activity: Any) -> dict[str, Any]:
         "fee_type": getattr(activity, "fee_type", "") or "",
         "fee_description": getattr(activity, "fee_description", "") or "",
         "registration_info": getattr(activity, "registration_info", "") or "",
+        "registration_url": getattr(activity, "registration_url", "") or "",
         "ocr_text": getattr(activity, "ocr_text", "") or "",
         "ocr_summary": getattr(activity, "ocr_summary", "") or "",
+        "raw_content": truncate_text(getattr(activity, "raw_content", "") or "", 2000),
+        "repair_context": build_repair_context(activity),
         "activity_uid": getattr(activity, "activity_uid", "") or "",
         "source_key": getattr(activity, "source_key", "") or "",
         "current_tags": get_current_tag_dicts(activity, get_active_tag_map()),
     }
 
 
+def build_repair_context(activity: Any) -> dict[str, Any]:
+    missing_fields = []
+    if not getattr(activity, "start_date", None):
+        missing_fields.append("start_date")
+    if not getattr(activity, "end_date", None):
+        missing_fields.append("end_date")
+    if not (getattr(activity, "location", "") or "").strip():
+        missing_fields.append("location")
+    if not (getattr(activity, "district", "") or "").strip():
+        missing_fields.append("district")
+    if not (getattr(activity, "registration_info", "") or "").strip():
+        missing_fields.append("registration_info")
+    if not (getattr(activity, "registration_url", "") or "").strip():
+        missing_fields.append("registration_url")
+    if (getattr(activity, "fee_type", "") or "unknown") == "unknown":
+        missing_fields.append("fee_type")
+    return {
+        "missing_fields": missing_fields,
+        "ocr": {
+            "summary": truncate_text(getattr(activity, "ocr_summary", "") or "", 1200),
+            "text": truncate_text(getattr(activity, "ocr_text", "") or "", 2500),
+        },
+        "html": compact_html_repair_context(activity),
+    }
+
+
+def compact_html_repair_context(activity: Any) -> dict[str, list[str]]:
+    html = read_activity_html(activity)
+    if not html:
+        return {"meta": [], "main": [], "labels": []}
+    soup = BeautifulSoup(html, "html.parser")
+    meta = html_meta_snippets(soup)
+    main_text = cleaned_html_main_text(soup)
+    return {
+        "meta": meta,
+        "main": split_repair_snippets(main_text, limit=HTML_SNIPPET_LIMIT),
+        "labels": label_snippets(main_text, limit=HTML_SNIPPET_LIMIT),
+    }
+
+
+def read_activity_html(activity: Any) -> str:
+    raw_path = (getattr(activity, "raw_html_path", "") or "").strip()
+    if not raw_path:
+        return ""
+    path = Path(raw_path)
+    if not path.is_absolute():
+        path = Path(settings.BASE_DIR) / path
+    try:
+        if not path.exists() or not path.is_file():
+            return ""
+        return path.read_text(encoding="utf-8", errors="ignore")[:200000]
+    except OSError:
+        return ""
+
+
+def html_meta_snippets(soup: BeautifulSoup) -> list[str]:
+    snippets = []
+    title = soup.find("title")
+    if title and title.get_text(strip=True):
+        snippets.append(f"title: {title.get_text(' ', strip=True)}")
+    for node in soup.find_all("meta"):
+        key = node.get("name") or node.get("property") or node.get("itemprop") or ""
+        content = node.get("content") or ""
+        if key and content:
+            snippets.append(truncate_text(f"{key}: {content}", 240))
+        if len(snippets) >= HTML_META_LIMIT:
+            break
+    return snippets
+
+
+def cleaned_html_main_text(soup: BeautifulSoup) -> str:
+    for selector in "script,style,noscript,svg,header,nav,footer,aside,form,button".split(","):
+        for node in soup.select(selector):
+            node.decompose()
+    for selector in (".page-content", "main", "article", "[role=main]", "#content", ".content"):
+        node = soup.select_one(selector)
+        if node:
+            return compact_whitespace(node.get_text(" "))
+    return compact_whitespace((soup.body or soup).get_text(" "))
+
+
+def label_snippets(text: str, *, limit: int) -> list[str]:
+    snippets = []
+    for match in list(REPAIR_LABEL_PATTERN.finditer(text)) + list(DATE_PATTERN.finditer(text)):
+        start = max(0, match.start() - 80)
+        end = min(len(text), match.end() + 160)
+        snippet = truncate_text(text[start:end], 260)
+        if snippet and snippet not in snippets:
+            snippets.append(snippet)
+        if len(snippets) >= limit:
+            break
+    return snippets
+
+
+def split_repair_snippets(text: str, *, limit: int) -> list[str]:
+    if not text:
+        return []
+    chunks = []
+    for part in re.split(r"[。；;\n]+", text):
+        part = truncate_text(part, 220)
+        if len(part) >= 12 and part not in chunks:
+            chunks.append(part)
+        if len(chunks) >= limit:
+            break
+    return chunks
+
+
+def truncate_text(value: str, limit: int) -> str:
+    text = compact_whitespace(value)
+    return text[:limit]
+
+
+def compact_whitespace(value: str) -> str:
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
 def build_ai_tag_messages(activity: Any, tag_map: dict[tuple[str, str], Tag]) -> list[dict[str, str]]:
     whitelist = build_tag_whitelist(tag_map)
     system_prompt = (
-        "你是活動分類助手。只能從白名單選 tag，不可創造新 tag。"
+        "你是活動分類與缺漏欄位修復助手。只能從白名單選 tag，不可創造新 tag。"
         "不可使用外部常識，只能依輸入欄位判斷。"
         "回傳 JSON object，不要 markdown。"
         'schema: {"tags":[{"name":string,"tag_type":string,"confidence":number,"reason":string}],'
+        '"repairs":[{"field":"start_date|end_date|location|district|registration_info|registration_url|fee_type",'
+        '"value":string,"confidence":number,"evidence_text":string,'
+        '"evidence_source":"existing_field|html_meta|html_main|html_text|ocr"}],'
         '"search_keywords":[string],"search_topics":[string],"search_synonyms":[string],"warnings":[string]}。'
-        "若資料互相矛盾，請在 warnings 說明，不要自行修正活動資料。"
+        "若資料互相矛盾，請在 warnings 說明；repairs 只提出可由證據支持的缺漏欄位建議。"
     )
     user_payload = {
         "tag_whitelist": whitelist,
@@ -240,7 +456,13 @@ def build_ai_tag_messages(activity: Any, tag_map: dict[tuple[str, str], Tag]) ->
             "需報名、免預約只依 registration_info、registration_url、registration_method 或明確報名/預約文字判斷",
             "無優惠只有在文字明確寫無優惠或不適用優惠時才可輸出；缺資訊時選優惠未提供或不選 discount",
             "audience tag 必須有明確對象證據；不要把公務人員或一般民眾弱推成青年",
-            "ocr_text 與 ocr_summary 只能作為摘要與 tag 輔助證據，不可覆蓋日期、地點、費用或報名 URL",
+            "repairs 只能修補 activity.repair_context.missing_fields 內的欄位；既有非空欄位不要提出修補",
+            "start_date/end_date value 請用 ISO 日期或 datetime，例如 2026-05-17 或 2026-05-17T09:00:00+08:00",
+            "location 必須是短地點或地址，不要輸出整段導覽、公告內文或多個活動清單",
+            "district 請只輸出桃園行政區名稱，例如 大溪區 或 大溪",
+            "registration_url 必須是明確 URL；registration_info 可為短報名文字",
+            "fee_type 只能輸出 free、ticket_free、paid、mixed、unknown",
+            "OCR 文字可作為 repairs 證據，但 evidence_source 必須標為 ocr，且 evidence_text 必須貼出短證據",
             "若 OCR 與頁面欄位互相衝突，列入 warnings 並保守選 tag",
             "不要因 current_tags 已存在就照抄；請依活動內容重新判斷",
         ],
@@ -263,7 +485,7 @@ def call_chat_completion(
     config: AiTaggerConfig | None = None,
     session: requests.Session | None = None,
 ) -> dict[str, Any]:
-    response = call_json_with_fallback(messages)
+    response = call_json_text_with_fallback(messages)
     return {"choices": [{"message": {"content": response.raw_text}}]}
 
 
@@ -286,10 +508,26 @@ def parse_json_object(raw_content: str) -> dict[str, Any]:
         match = re.search(r"\{.*\}", text, flags=re.DOTALL)
         if not match:
             raise
-        parsed = json.loads(match.group(0))
+        candidate = match.group(0)
+        try:
+            parsed = json.loads(candidate)
+        except json.JSONDecodeError:
+            parsed = json.loads(repair_common_json_commas(candidate))
     if not isinstance(parsed, dict):
         raise ValueError("AI response JSON must be an object.")
     return parsed
+
+
+def repair_common_json_commas(text: str) -> str:
+    repaired = text
+    for _ in range(3):
+        previous = repaired
+        repaired = re.sub(r"(\})\s*(\{)", r"\1,\2", repaired)
+        repaired = re.sub(r"(\])\s*(\")", r"\1,\2", repaired)
+        repaired = re.sub(r"(\})\s*(\")", r"\1,\2", repaired)
+        if repaired == previous:
+            break
+    return repaired
 
 
 def build_repair_messages(
@@ -392,10 +630,13 @@ def normalize_ai_result(
     warning_groups = classify_warnings(warnings)
     confidence_values = [tag["confidence"] for tag in accepted if tag["confidence"] is not None]
     confidence = round(sum(confidence_values) / len(confidence_values), 3) if confidence_values else None
+    repair_suggestions, rejected_repairs = normalize_ai_repairs(parsed)
     result = {
         "accepted_tags": accepted,
         "missing_tags": missing,
         "rejected_tags": rejected,
+        "repair_suggestions": repair_suggestions,
+        "rejected_repairs": rejected_repairs,
         "warnings": warnings,
         "blocking_warnings": warning_groups["blocking_warnings"],
         "info_warnings": warning_groups["info_warnings"],
@@ -404,10 +645,247 @@ def normalize_ai_result(
     return result
 
 
+def normalize_ai_repairs(
+    parsed: dict[str, Any],
+    *,
+    min_confidence: float = REPAIR_CONFIDENCE_THRESHOLD,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    raw_repairs = parsed.get("repairs") or []
+    if isinstance(raw_repairs, dict):
+        raw_repairs = [raw_repairs]
+    if not isinstance(raw_repairs, list):
+        raw_repairs = []
+
+    accepted = []
+    rejected = []
+    seen: set[str] = set()
+    for item in raw_repairs:
+        if not isinstance(item, dict):
+            continue
+        field = str(item.get("field") or "").strip()
+        value = compact_whitespace(item.get("value") or "")
+        if field == "district":
+            value = normalize_repair_district(value) or value
+        evidence_text = truncate_text(item.get("evidence_text") or "", 300)
+        evidence_source = str(item.get("evidence_source") or "").strip()
+        confidence = _as_float(item.get("confidence"))
+        repair = {
+            "field": field,
+            "value": value,
+            "confidence": confidence,
+            "evidence_text": evidence_text,
+            "evidence_source": evidence_source,
+        }
+        reject_reason = repair_validation_error(repair, min_confidence=min_confidence)
+        if reject_reason:
+            rejected.append({**repair, "reject_reason": reject_reason})
+            continue
+        if field in seen:
+            rejected.append({**repair, "reject_reason": "duplicate_field"})
+            continue
+        seen.add(field)
+        if field in DATE_REPAIR_FIELDS:
+            parsed_date = parse_repair_datetime(value)
+            accepted.append({**repair, "normalized_value": parsed_date.isoformat()})
+        else:
+            accepted.append(repair)
+    return accepted, rejected
+
+
+def repair_validation_error(repair: dict[str, Any], *, min_confidence: float) -> str:
+    field = repair.get("field")
+    value = repair.get("value")
+    confidence = repair.get("confidence")
+    evidence_text = repair.get("evidence_text")
+    evidence_source = repair.get("evidence_source")
+    if field not in REPAIRABLE_FIELDS:
+        return "unknown_field"
+    if confidence is None or confidence < min_confidence:
+        return f"confidence below {min_confidence}"
+    if not evidence_text:
+        return "missing_evidence"
+    if evidence_source not in REPAIR_EVIDENCE_SOURCES:
+        return "unknown_evidence_source"
+    if not value:
+        return "missing_value"
+    if field in DATE_REPAIR_FIELDS and not parse_repair_datetime(value):
+        return "invalid_date"
+    if field in DATE_REPAIR_FIELDS and is_registration_deadline_evidence(evidence_text):
+        return "registration_deadline_not_activity_date"
+    if field in DATE_REPAIR_FIELDS and parse_repair_datetime(value).date() < timezone.localdate():
+        return "past_activity_date"
+    if field == "district" and value not in TAOYUAN_DISTRICTS:
+        return "invalid_taoyuan_district"
+    if field == "location" and has_non_taoyuan_place_marker(value, evidence_text):
+        return "non_taoyuan_location"
+    if field == "registration_url" and not re.match(r"^https?://", value, flags=re.IGNORECASE):
+        return "invalid_url"
+    if field == "registration_url" and value not in evidence_text:
+        return "weak_url_evidence"
+    if field == "registration_info" and evidence_source == "existing_field":
+        return "existing_field_not_repair_evidence"
+    if field == "fee_type" and value not in FEE_TYPE_VALUES:
+        return "invalid_fee_type"
+    max_length = MAX_REPAIR_TEXT_LENGTHS.get(field)
+    if max_length and len(value) > max_length:
+        return f"{field}_too_long"
+    return ""
+
+
+def normalize_repair_district(value: Any) -> str:
+    text = compact_whitespace(value).replace("桃園市", "").strip()
+    if text in TAOYUAN_DISTRICTS:
+        return text
+    return TAOYUAN_DISTRICT_ALIASES.get(text, "")
+
+
+def has_non_taoyuan_place_marker(*values: Any) -> bool:
+    text = " ".join(compact_whitespace(value) for value in values if value)
+    return any(marker in text for marker in NON_TAOYUAN_PLACE_MARKERS)
+
+
+def is_registration_deadline_evidence(value: Any) -> bool:
+    text = compact_whitespace(value)
+    if not REGISTRATION_DEADLINE_PATTERN.search(text):
+        return False
+    return not any(marker in text for marker in ("活動時間", "活動日期", "展覽期間", "演出時間"))
+
+
+def parse_repair_datetime(value: Any):
+    raw = compact_whitespace(value)
+    if not raw:
+        return None
+    parsed_dt = parse_datetime(raw)
+    if parsed_dt:
+        return timezone.make_aware(parsed_dt) if timezone.is_naive(parsed_dt) else parsed_dt
+    parsed_date = parse_date(raw)
+    if parsed_date:
+        return timezone.make_aware(datetime.combine(parsed_date, time.min))
+    roc_match = re.match(r"^(?P<year>\d{3})[/-](?P<month>\d{1,2})[/-](?P<day>\d{1,2})$", raw)
+    if roc_match:
+        western_year = int(roc_match.group("year")) + 1911
+        try:
+            parsed_date = datetime(
+                western_year,
+                int(roc_match.group("month")),
+                int(roc_match.group("day")),
+            )
+        except ValueError:
+            return None
+        return timezone.make_aware(parsed_date)
+    return None
+
+
+def apply_safe_repairs(
+    activity: Activity,
+    result: dict[str, Any],
+    *,
+    dry_run: bool = False,
+) -> dict[str, list[dict[str, Any]]]:
+    applied = []
+    rejected = list(result.get("rejected_repairs") or [])
+    pending_dates = {}
+
+    for repair in result.get("repair_suggestions") or []:
+        field = repair.get("field")
+        if field in DATE_REPAIR_FIELDS:
+            new_value = parse_repair_datetime(repair.get("normalized_value") or repair.get("value"))
+        else:
+            new_value = compact_whitespace(repair.get("value") or "")
+
+        reject_reason = safe_repair_rejection(activity, field, new_value)
+        if reject_reason:
+            rejected.append({**repair, "reject_reason": reject_reason})
+            continue
+        if field in DATE_REPAIR_FIELDS:
+            pending_dates[field] = new_value
+        applied.append(
+            {
+                **repair,
+                "old_value": serialize_repair_value(getattr(activity, field, "")),
+                "new_value": serialize_repair_value(new_value),
+                "dry_run": dry_run,
+            }
+        )
+
+    start_candidate = pending_dates.get("start_date") or getattr(activity, "start_date", None)
+    end_candidate = pending_dates.get("end_date") or getattr(activity, "end_date", None)
+    if start_candidate and end_candidate and end_candidate < start_candidate:
+        valid_applied = []
+        for item in applied:
+            if item.get("field") in DATE_REPAIR_FIELDS:
+                rejected.append({**item, "reject_reason": "date_range_invalid"})
+            else:
+                valid_applied.append(item)
+        applied = valid_applied
+
+    if not dry_run and applied:
+        changed_fields = []
+        for item in applied:
+            field = item["field"]
+            value = parse_repair_datetime(item["new_value"]) if field in DATE_REPAIR_FIELDS else item["new_value"]
+            setattr(activity, field, value)
+            changed_fields.append(field)
+            ActivityChangeLog.objects.create(
+                activity=activity,
+                field_name=field,
+                old_value=item.get("old_value") or "",
+                new_value=item.get("new_value") or "",
+                source="ai_repair",
+                metadata={
+                    "confidence": item.get("confidence"),
+                    "evidence_text": item.get("evidence_text"),
+                    "evidence_source": item.get("evidence_source"),
+                },
+            )
+        activity.save(update_fields=sorted(set(changed_fields + ["updated_at"])))
+        from admin_app.diagnostics import recompute_activity_readiness
+
+        recompute_activity_readiness(activity, save=True)
+
+    outcome = {"applied_repairs": applied, "rejected_repairs": rejected}
+    result.update(outcome)
+    return outcome
+
+
+def safe_repair_rejection(activity: Activity, field: str, new_value: Any) -> str:
+    if field not in REPAIRABLE_FIELDS:
+        return "unknown_field"
+    current_value = getattr(activity, field, None)
+    if field == "fee_type":
+        if (current_value or "unknown") != "unknown":
+            return "existing_value_present"
+        return ""
+    if current_value not in (None, ""):
+        return "existing_value_present"
+    if field in DATE_REPAIR_FIELDS and not new_value:
+        return "invalid_date"
+    if field in DATE_REPAIR_FIELDS and new_value.date() < timezone.localdate():
+        return "past_activity_date"
+    if field in TEXT_REPAIR_FIELDS and not compact_whitespace(new_value):
+        return "missing_value"
+    if field == "district" and new_value not in TAOYUAN_DISTRICTS:
+        return "invalid_taoyuan_district"
+    if field == "location" and has_non_taoyuan_place_marker(new_value):
+        return "non_taoyuan_location"
+    max_length = MAX_REPAIR_TEXT_LENGTHS.get(field)
+    if max_length and len(str(new_value)) > max_length:
+        return f"{field}_too_long"
+    return ""
+
+
+def serialize_repair_value(value: Any) -> str:
+    if value is None:
+        return ""
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    return str(value)
+
+
 def tag_activity_with_ai(activity: Any) -> dict[str, Any]:
     tag_map = get_active_tag_map()
     messages = build_ai_tag_messages(activity, tag_map)
-    provider_response = call_json_with_fallback(messages)
+    provider_response = call_json_text_with_fallback(messages)
     raw_content = provider_response.raw_text
     try:
         parsed = provider_response.parsed or parse_json_object(raw_content)

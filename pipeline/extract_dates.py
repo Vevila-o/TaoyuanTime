@@ -5,6 +5,36 @@ FULL_DATE_RE = r'\d{3,4}[-/年\.]\s*\d{1,2}[-/月\.]\s*\d{1,2}日?'
 MONTH_DAY_RE = r'\d{1,2}[-/月\.]\s*\d{1,2}日?'
 DATE_RANGE_SEP_RE = r'(?:至|到|－|-|~|～)'
 
+ROC_DATE_PATTERN = re.compile(r"(?P<year>1\d{2})[/-](?P<month>\d{1,2})[/-](?P<day>\d{1,2})")
+
+def _parse_roc_date_to_string(value):
+    if not value:
+        return None
+    match = ROC_DATE_PATTERN.search(str(value))
+    if not match:
+        return None
+    year = int(match.group("year")) + 1911
+    month = int(match.group("month"))
+    day = int(match.group("day"))
+    return f"{year:04d}-{month:02d}-{day:02d}"
+
+def infer_roc_datetimes_from_text(*texts):
+    text = " ".join(str(item or "") for item in texts if item)
+    start = None
+    end = None
+    start_match = re.search(r"(?:展覽期間起|活動期間起|期間起|起)[:：\s]*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
+    end_match = re.search(r"(?:展覽期間訖|活動期間訖|期間訖|訖|至)[:：\s]*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
+    range_match = re.search(r"((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})\s*[~～至]\s*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
+    
+    if start_match:
+        start = _parse_roc_date_to_string(start_match.group(1))
+    if end_match:
+        end = _parse_roc_date_to_string(end_match.group(1))
+    if range_match:
+        start = start or _parse_roc_date_to_string(range_match.group(1))
+        end = end or _parse_roc_date_to_string(range_match.group(2))
+    return start, end
+
 def parse_date_string(date_str, default_year=None):
     """
     Parses a single date string and returns YYYY-MM-DD.
@@ -135,6 +165,14 @@ def extract_dates(event, debug_log=None):
         prose_match = re.search(r'(?:活動|比賽|展覽|說明會|工作坊|市集|講座|課程|將於|於)\D{0,12}(\d{3,4}年\d{1,2}月\d{1,2}日)', text)
         if prose_match:
             event["date_start"] = parse_date_string(prose_match.group(1))
+
+    if not event.get("date_start"):
+        # New advanced ROC date inference from text
+        start, end = infer_roc_datetimes_from_text(text)
+        if start:
+            event["date_start"] = start
+        if end:
+            event["date_end"] = end
             
     if not event.get("date_start") and event.get("content_type") != "activity":
         published = event.get("published_date_text")

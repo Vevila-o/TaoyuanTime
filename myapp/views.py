@@ -16,6 +16,7 @@ from linebot.models import (
     PostbackEvent, TextMessage, TextSendMessage,
 )
 
+from events.citizen_stores import get_zhongyuan_citizen_stores
 from events.models import Activity, CitizenCardData, Store, UserProfile
 from .line_services import (
     build_preference_message,
@@ -159,7 +160,7 @@ def handle_citizen_card_postback(event, action, params):
     elif action == 'request_location':
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="請點選下方選單的「＋」或「位置」按鈕，分享您的位置給我們，我將立刻為您搜尋附近的特約商店！")
+            build_citizen_store_message()
         )
 
 
@@ -194,7 +195,7 @@ def handle_citizen_card_text(event, text):
     if text == "附近的市民卡特約商店":
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="請點選下方選單的「＋」或「位置」按鈕，分享您的位置給我們，我將立刻為您搜尋附近的特約商店！")
+            build_citizen_store_message()
         )
         return True
 
@@ -236,6 +237,60 @@ def handle_citizen_card_text(event, text):
     return False
 
 
+def build_citizen_store_message():
+    return FlexSendMessage(
+        alt_text="中原附近市民卡特約優惠",
+        contents=build_citizen_store_carousel(get_zhongyuan_citizen_stores())
+    )
+
+
+def build_citizen_store_carousel(stores, *, distances=None):
+    bubbles = []
+    distances = distances or {}
+    for store in stores[:9]:
+        distance = distances.get(getattr(store, 'name', ''))
+        bubbles.append(build_citizen_store_bubble(store, distance=distance))
+    return {"type": "carousel", "contents": bubbles}
+
+
+def build_citizen_store_bubble(store, *, distance=None):
+    map_url = f"https://www.google.com/maps/search/?api=1&query={store.latitude},{store.longitude}"
+    display_date = f"優惠至 {store.end_date.strftime('%Y/%m/%d')}" if store.end_date else "常駐優惠"
+    distance_text = f"距離 {distance} 公里" if distance is not None else "中原附近特約優惠"
+    return {
+        "type": "bubble",
+        "size": "mega",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "backgroundColor": "#1DB446",
+            "contents": [
+                {"type": "text", "text": "市民卡特約優惠", "color": "#FFFFFF", "weight": "bold", "size": "sm"}
+            ]
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+                {"type": "text", "text": store.name[:40], "weight": "bold", "size": "lg", "wrap": True},
+                {"type": "text", "text": f"地址：{store.address}", "wrap": True, "size": "xs", "color": "#777777", "margin": "sm"},
+                {"type": "text", "text": distance_text, "color": "#FF6347", "size": "sm", "margin": "sm"},
+                {"type": "separator", "margin": "md"},
+                {"type": "text", "text": store.discount_info[:120], "wrap": True, "size": "sm", "color": "#555555", "margin": "md"},
+                {"type": "text", "text": display_date, "size": "xs", "color": "#888888", "margin": "sm"},
+            ]
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+                {"type": "button", "style": "primary", "color": "#4285F4",
+                 "action": {"type": "uri", "label": "導航前往", "uri": map_url}}
+            ]
+        }
+    }
+
+
 # 取得 LINE 使用者顯示名稱，失敗時回傳預設值
 def fetch_display_name(line_user_id):
     if not line_user_id or line_bot_api is None:
@@ -264,49 +319,15 @@ def handle_location(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="附近目前沒有有效的特約商店。"))
         return
 
-    bubbles = []
+    distances = {}
     for s, dist in nearby_stores[:9]:
-        map_url = f"https://www.google.com/maps/search/?api=1&query={s.latitude},{s.longitude}"
-        display_address = s.address if s.address else "地址未提供"
-        display_date = f"📅 優惠至 {s.end_date.strftime('%Y/%m/%d')}" if s.end_date else "📅 常駐優惠"
-        bubbles.append({
-            "type": "bubble",
-            "size": "mega",
-            "header": {
-                "type": "box",
-                "layout": "vertical",
-                "backgroundColor": "#1DB446",
-                "contents": [
-                    {"type": "text", "text": "💳 特約商店", "color": "#FFFFFF", "weight": "bold", "size": "sm"}
-                ]
-            },
-            "body": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                    {"type": "text", "text": s.name[:30], "weight": "bold", "size": "lg"},
-                    {"type": "text", "text": f"📍 {display_address}", "wrap": True, "size": "xs", "color": "#999999", "margin": "sm"},
-                    {"type": "text", "text": f"距離 {dist} 公里", "color": "#FF6347", "size": "sm", "margin": "sm"},
-                    {"type": "separator", "margin": "md"},
-                    {"type": "text", "text": s.discount_info[:50], "wrap": True, "size": "sm", "color": "#555555", "margin": "md"},
-                    {"type": "text", "text": display_date, "size": "xs", "color": "#888888", "margin": "sm"},
-                ]
-            },
-            "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                    {"type": "button", "style": "primary", "color": "#4285F4",
-                     "action": {"type": "uri", "label": "🚗 導航前往", "uri": map_url}}
-                ]
-            }
-        })
+        distances[s.name] = dist
 
     line_bot_api.reply_message(
         event.reply_token,
         FlexSendMessage(
             alt_text="附近優惠商店",
-            contents={"type": "carousel", "contents": bubbles}
+            contents=build_citizen_store_carousel([s for s, _ in nearby_stores[:9]], distances=distances)
         )
     )
 

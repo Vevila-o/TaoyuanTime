@@ -97,9 +97,17 @@ class Activity(models.Model):
     # Data quality / classification fields (新增欄位)
     ITEM_TYPE_CHOICES = [
         ('activity', 'activity'),
+        ('news', 'news'),
         ('announcement', 'announcement'),
+        ('admin_notice', 'admin_notice'),
+        ('penalty_list', 'penalty_list'),
+        ('venue_notice', 'venue_notice'),
+        ('policy', 'policy'),
+        ('procurement', 'procurement'),
+        ('recruitment', 'recruitment'),
         ('recap', 'recap'),
         ('place_or_resource', 'place_or_resource'),
+        ('unknown', 'unknown'),
     ]
     item_type = models.CharField(max_length=32, choices=ITEM_TYPE_CHOICES, default='activity')
 
@@ -108,6 +116,19 @@ class Activity(models.Model):
     line_ready = models.BooleanField(default=True)
     ai_ready = models.BooleanField(default=True)
     recommendation_ready = models.BooleanField(default=True)
+    excluded_from_public = models.BooleanField(default=False)
+    exclude_reason = models.CharField(max_length=100, blank=True)
+
+    FINAL_STATE_CHOICES = [
+        ('published', '可上架'),
+        ('needs_data', '待補資料'),
+        ('needs_review', '待審核'),
+        ('inactive', '已下架'),
+        ('non_activity', '非活動'),
+        ('system_excluded', '系統排除'),
+        ('expired', '過期'),
+    ]
+    final_state = models.CharField(max_length=32, choices=FINAL_STATE_CHOICES, default='needs_review')
 
     official_detail_url = models.URLField(max_length=1000, blank=True)
     source_key = models.CharField(max_length=100, blank=True)

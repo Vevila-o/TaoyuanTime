@@ -1,11 +1,13 @@
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 import re
 from urllib.parse import parse_qs, urlparse
 
+from bs4 import BeautifulSoup
 from django.db.models import Count, Q
 from django.utils import timezone
 
 from .models import Activity, ActivityAsset, UserProfile, Subscription, ActionLog, Tag
+from pipeline.extract_location import extract_location
 
 
 SOURCE_PRIORITY = {
@@ -80,7 +82,7 @@ def get_public_items():
     now = timezone.now()
     qs = Activity.objects.filter(status='active').filter(
         Q(end_date__isnull=True) | Q(end_date__gte=now)
-    ).filter(is_public_item=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='').exclude(official_link_status='dead')
+    ).filter(excluded_from_public=False, is_activity=True, is_public_item=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='').exclude(official_link_status='dead')
     return qs
 
 
@@ -89,7 +91,7 @@ def get_ai_ready_activities():
     now = timezone.now()
     qs = Activity.objects.filter(status='active').filter(
         Q(end_date__isnull=True) | Q(end_date__gte=now)
-    ).filter(is_activity=True, ai_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='').exclude(official_link_status='dead')
+    ).filter(excluded_from_public=False, is_activity=True, ai_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='').exclude(official_link_status='dead')
     return qs
 
 
@@ -98,8 +100,12 @@ def get_recommendation_ready_activities():
     now = timezone.now()
     qs = Activity.objects.filter(status='active').filter(
         Q(end_date__isnull=True) | Q(end_date__gte=now)
-    ).filter(is_activity=True, recommendation_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='').exclude(official_link_status='dead')
+    ).filter(excluded_from_public=False, is_activity=True, recommendation_ready=True).exclude(official_detail_url__isnull=True).exclude(official_detail_url='').exclude(official_link_status='dead')
     return qs
+
+
+def is_publicly_excluded(activity):
+    return bool(getattr(activity, "excluded_from_public", False))
 
 
 def normalize_activity_title(title):
@@ -255,6 +261,106 @@ def infer_taoyuan_district_from_text(*texts, raw_html_path=""):
     if len(set(soft_matches)) == 1:
         return f"{soft_matches[0]}區"
     return ""
+
+
+ROC_DATE_PATTERN = re.compile(r"(?P<year>1\d{2})[/-](?P<month>\d{1,2})[/-](?P<day>\d{1,2})")
+
+
+def parse_roc_date(value, *, end_of_day=False):
+    if not value:
+        return None
+    match = ROC_DATE_PATTERN.search(str(value))
+    if not match:
+        return None
+    year = int(match.group("year")) + 1911
+    month = int(match.group("month"))
+    day = int(match.group("day"))
+    dt = datetime.combine(datetime(year, month, day).date(), time.max if end_of_day else time.min)
+    return timezone.make_aware(dt, timezone.get_current_timezone())
+
+
+def infer_roc_datetimes_from_text(*texts):
+    text = " ".join(str(item or "") for item in texts if item)
+    start = None
+    end = None
+    start_match = re.search(r"(?:展覽期間起|活動期間起|期間起|起)[:：\s]*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
+    end_match = re.search(r"(?:展覽期間訖|活動期間訖|期間訖|訖|至)[:：\s]*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
+    range_match = re.search(r"((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})\s*[~～至]\s*((?:1\d{2})[/-]\d{1,2}[/-]\d{1,2})", text)
+    if start_match:
+        start = parse_roc_date(start_match.group(1))
+    if end_match:
+        end = parse_roc_date(end_match.group(1), end_of_day=True)
+    if range_match:
+        start = start or parse_roc_date(range_match.group(1))
+        end = end or parse_roc_date(range_match.group(2), end_of_day=True)
+    return start, end
+
+
+def backfill_missing_fields(activity):
+    """
+    Attempts to backfill missing start_date or location using OCR data and raw HTML.
+    Returns True if any field was updated (does not call .save()).
+    """
+    if activity.start_date and activity.location:
+        return False
+
+    texts_to_search = []
+    
+    # 1. Add OCR text
+    if getattr(activity, "ocr_summary", ""):
+        texts_to_search.append(activity.ocr_summary)
+    if getattr(activity, "ocr_text", ""):
+        texts_to_search.append(activity.ocr_text)
+
+    # 2. Add raw HTML text
+    html_path = getattr(activity, "raw_html_path", "")
+    if html_path:
+        import os
+        from pathlib import Path
+        path = Path(html_path)
+        if not path.is_absolute():
+            from django.conf import settings
+            try:
+                base = settings.BASE_DIR
+            except Exception:
+                base = "."
+            path = Path(os.path.join(base, path))
+        try:
+            if path.exists() and path.is_file():
+                html_content = path.read_text(encoding="utf-8")
+                soup = BeautifulSoup(html_content, "html.parser")
+                # Remove scripts and styles
+                for script in soup(["script", "style"]):
+                    script.extract()
+                texts_to_search.append(soup.get_text(separator=" ", strip=True))
+        except Exception:
+            pass
+            
+    if not texts_to_search:
+        return False
+
+    updated = False
+    full_text = " ".join(texts_to_search)
+
+    if not activity.start_date:
+        inferred_start, inferred_end = infer_roc_datetimes_from_text(full_text)
+        if inferred_start:
+            activity.start_date = inferred_start
+            updated = True
+        if inferred_end and not activity.end_date:
+            activity.end_date = inferred_end
+            updated = True
+
+    if not activity.location:
+        res = extract_location({"clean_description": full_text})
+        loc = res.get("location")
+        if loc:
+            activity.location = loc
+            updated = True
+            if not activity.district and res.get("district"):
+                activity.district = res.get("district")
+
+    return updated
 
 
 def is_test_line_user(user):

@@ -8,17 +8,21 @@ from django.utils import timezone
 
 from events.models import Activity, ActionLog
 from events.services import activity_business_key, is_seed_activity
+from pipeline.public_exclusion import final_state_for_event
 
 
 REASON_LABELS = {
     "inactive": "已下架",
     "expired": "已過期",
     "not_activity": "不是活動",
+    "excluded_from_public": "已排除前台",
     "not_public": "未開放前台",
     "missing_official_detail": "缺官方詳細頁",
     "line_not_ready": "未標記 LINE ready",
     "recommendation_not_ready": "未標記推薦 ready",
     "ai_not_ready": "未標記 AI ready",
+    "missing_activity_date": "缺活動日期",
+    "missing_location": "缺地點",
     "ai_summary_exists": "已有 AI 摘要",
     "seed_sample": "疑似假資料",
     "quality_rejected": "品質為 rejected",
@@ -84,15 +88,31 @@ def parse_listish(value):
 
 
 def translated_quality_warnings(activity):
+    ignored = set()
+    if activity.start_date:
+        ignored.add("missing_activity_date")
+    if (activity.location or activity.district or "").strip():
+        ignored.add("missing_location")
     return [
         QUALITY_WARNING_LABELS.get(item, item)
         for item in parse_listish(activity.quality_warnings)
-        if item and item != "[]"
+        if item and item != "[]" and item not in ignored
     ]
+
+
+def missing_core_field_reasons(activity):
+    reasons = []
+    if not activity.start_date:
+        reasons.append("missing_activity_date")
+    if not (activity.location or activity.district or "").strip():
+        reasons.append("missing_location")
+    return reasons
 
 
 def line_visibility_reasons(activity, now=None):
     reasons = []
+    if activity.excluded_from_public:
+        reasons.append("excluded_from_public")
     if activity.status != "active":
         reasons.append("inactive")
     if is_expired(activity, now):
@@ -103,6 +123,7 @@ def line_visibility_reasons(activity, now=None):
         reasons.append("not_public")
     if not has_official_detail(activity):
         reasons.append("missing_official_detail")
+    reasons.extend(missing_core_field_reasons(activity))
     if not activity.line_ready:
         reasons.append("line_not_ready")
     if activity.quality_level == "rejected":
@@ -112,6 +133,8 @@ def line_visibility_reasons(activity, now=None):
 
 def recommendation_reasons(activity, now=None):
     reasons = []
+    if activity.excluded_from_public:
+        reasons.append("excluded_from_public")
     if activity.status != "active":
         reasons.append("inactive")
     if is_expired(activity, now):
@@ -120,6 +143,7 @@ def recommendation_reasons(activity, now=None):
         reasons.append("not_activity")
     if not has_official_detail(activity):
         reasons.append("missing_official_detail")
+    reasons.extend(missing_core_field_reasons(activity))
     if not activity.recommendation_ready:
         reasons.append("recommendation_not_ready")
     if activity.quality_level == "rejected":
@@ -131,6 +155,8 @@ def recommendation_reasons(activity, now=None):
 
 def ai_summary_reasons(activity, now=None, force=False):
     reasons = []
+    if activity.excluded_from_public:
+        reasons.append("excluded_from_public")
     if activity.status != "active":
         reasons.append("inactive")
     if is_expired(activity, now):
@@ -198,6 +224,83 @@ def activity_exposure_diagnostic(activity, now=None):
     }
 
 
+def recompute_activity_readiness(activity, save=True):
+    """
+    Re-evaluates activity readiness flags and quality warnings based on current DB fields.
+    This should be called after an activity's fields are updated (e.g. via OCR, HTML backfill, or admin edit).
+    """
+    now = timezone.now()
+    
+    is_activity = bool(activity.is_activity)
+    excluded = bool(activity.excluded_from_public)
+    official_url = bool((activity.official_detail_url or activity.source_url or "").strip())
+    has_location = bool((activity.location or activity.district or "").strip())
+    has_date = bool(activity.start_date)
+    date_expired = is_expired(activity, now)
+    inactive = activity.status == "inactive"
+    
+    invalid_date_range = False
+    if activity.start_date and activity.end_date and activity.end_date < activity.start_date:
+        invalid_date_range = True
+
+    line_ready = bool(
+        is_activity and activity.title and official_url and
+        activity.description and has_date and has_location and not excluded and not invalid_date_range and not date_expired and not inactive
+    )
+    
+    search_ready = bool(
+        is_activity and activity.title and official_url and has_date and has_location and not excluded and not invalid_date_range and not date_expired and not inactive
+    )
+    
+    recommendation_ready = bool(line_ready and search_ready) # We can ignore manual_review_required here if we want or check it if exists
+
+    # Update quality warnings
+    warnings = parse_listish(activity.quality_warnings)
+    if has_date and "missing_activity_date" in warnings:
+        warnings.remove("missing_activity_date")
+    if has_location and "missing_location" in warnings:
+        warnings.remove("missing_location")
+    if not invalid_date_range and "date_range_invalid" in warnings:
+        warnings.remove("date_range_invalid")
+        
+    if not has_date and "missing_activity_date" not in warnings:
+        warnings.append("missing_activity_date")
+    if not has_location and "missing_location" not in warnings:
+        warnings.append("missing_location")
+        
+    activity.quality_warnings = json.dumps(sorted(set(warnings)), ensure_ascii=False)
+    
+    # Update flags
+    activity.line_ready = line_ready
+    activity.recommendation_ready = recommendation_ready
+    activity.is_public_item = line_ready
+    
+    # AI Ready is usually line_ready + has description + has official URL, which is already line_ready
+    activity.ai_ready = line_ready
+    activity.final_state = final_state_for_event({
+        "excluded_from_public": excluded,
+        "is_activity": is_activity,
+        "freshness_status": "expired" if date_expired else "",
+        "status": activity.status,
+        "line_ready": line_ready,
+        "recommendation_ready": recommendation_ready,
+        "manual_review_required": False,
+        "missing_fields": [
+            *([] if has_date else ["missing_date"]),
+            *([] if has_location else ["missing_location"]),
+        ],
+    })
+
+    if save:
+        activity.save(update_fields=[
+            "start_date", "end_date", "location", "district",
+            "line_ready", "recommendation_ready", 
+            "is_public_item", "ai_ready", "final_state", "quality_warnings", "updated_at"
+        ])
+        
+    return activity
+
+
 def exposure_summary():
     now = timezone.now()
     qs = Activity.objects.all()
@@ -238,6 +341,7 @@ def apply_readiness_filter(qs, readiness):
     now = timezone.now()
     if readiness == "line_blocked":
         return qs.filter(
+            Q(excluded_from_public=True) |
             ~Q(status="active") |
             Q(end_date__lt=now) |
             Q(is_activity=False) |
@@ -249,6 +353,7 @@ def apply_readiness_filter(qs, readiness):
         )
     if readiness == "recommendation_blocked":
         return qs.filter(
+            Q(excluded_from_public=True) |
             ~Q(status="active") |
             Q(end_date__lt=now) |
             Q(is_activity=False) |
@@ -260,6 +365,7 @@ def apply_readiness_filter(qs, readiness):
         )
     if readiness == "ai_summary_blocked":
         return qs.filter(
+            Q(excluded_from_public=True) |
             ~Q(status="active") |
             Q(end_date__lt=now) |
             Q(is_activity=False) |

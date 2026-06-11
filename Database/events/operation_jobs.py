@@ -297,6 +297,7 @@ def run_link_check_job(job):
 def link_check_candidates(limit):
     qs = Activity.objects.filter(
         status='active',
+        excluded_from_public=False,
         is_activity=True,
     ).filter(
         Q(end_date__isnull=True) | Q(end_date__gte=timezone.now())
@@ -333,6 +334,7 @@ def check_activity_official_link(activity, session=None):
 def ocr_candidates(limit):
     qs = Activity.objects.filter(
         status='active',
+        excluded_from_public=False,
         is_activity=True,
         recommendation_ready=True,
         quality_level='high',
@@ -353,6 +355,7 @@ def summary_candidates(limit, force=False):
     qs = Activity.objects.filter(
         is_activity=True,
         status='active',
+        excluded_from_public=False,
     ).filter(
         Q(end_date__isnull=True) | Q(end_date__gte=timezone.now())
     ).filter(

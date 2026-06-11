@@ -86,6 +86,33 @@
   <textarea name="manual_note" class="form-input mt-2" rows="2" placeholder="人工修正備註">{{ activity.manual_note|default:'' }}</textarea>
 </div>
 <div class="form-group full-width">
+  <label>資料性質與公開排除</label>
+  <div class="form-row">
+    <div class="form-group">
+      <label>資料類型</label>
+      <select name="item_type" class="form-input">
+        {% for value, label in item_type_choices %}
+          <option value="{{ value }}" {% if activity.item_type == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>最終狀態</label>
+      <select name="final_state" class="form-input">
+        {% for value, label in final_state_choices %}
+          <option value="{{ value }}" {% if activity.final_state == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="row small">
+    <label class="col-12 col-md-3"><input type="checkbox" name="is_activity" {% if not activity or activity.is_activity %}checked{% endif %}> 是活動</label>
+    <label class="col-12 col-md-3"><input type="checkbox" name="is_public_item" {% if not activity or activity.is_public_item %}checked{% endif %}> 可進前台</label>
+    <label class="col-12 col-md-3"><input type="checkbox" name="excluded_from_public" {% if activity.excluded_from_public %}checked{% endif %}> 排除前台/LINE/推薦</label>
+  </div>
+  <input name="exclude_reason" type="text" class="form-input mt-2" placeholder="排除原因，例如 penalty_list / admin_notice / manual_excluded" value="{{ activity.exclude_reason|default:'' }}">
+</div>
+<div class="form-group full-width">
   <label>Tag</label>
   <div class="row">
     {% for tag in tags %}
