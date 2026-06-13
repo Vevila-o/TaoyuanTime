@@ -312,7 +312,7 @@ def handle_location(event):
 
 
 # 產生偏好設定 Flex Message（全版標籤選擇面板）>>在line_service.py
-# def get_preference_flex_message(user_profile, show_only=None):
+def get_preference_flex_message(user_profile, show_only=None):
     current_tags = list(user_profile.preferred_tags.values_list('name', flat=True))
 
     all_sections = [
@@ -515,7 +515,7 @@ def generate_barcode_image(card_number):
     
     # ⚠️ 重要：設定您的 ngrok 網址或公開網址
     # 若在本地測試，這裡必須是 https://xxxx.ngrok-free.app/media/barcodes/xxxx.png
-    base_url = "https://4a78-211-23-197-194.ngrok-free.app" 
+    base_url = "https://06e1-2001-b011-6c06-9d61-21ec-df73-6a44-e9f0.ngrok-free.app" 
     return f"{base_url}{settings.MEDIA_URL}barcodes/{filename}"
 
 
