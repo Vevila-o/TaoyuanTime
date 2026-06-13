@@ -42,15 +42,23 @@ def recommend_activities_for_user(user: UserProfile, limit: int = 3):
     排序以符合標籤數與開始時間優先。
     """
     base_qs = get_recommendation_ready_activities()
+    candidate_limit = max(limit * 6, limit)
     tags = user.preferred_tags.filter(is_active=True)
     if not tags.exists():
-        candidates = list(base_qs.order_by('start_date', 'id')[:max(limit * 6, limit)])
+        candidates = list(base_qs.order_by('start_date', 'id')[:candidate_limit])
         return dedupe_activities_by_business_key(candidates, limit=limit)
-    qs = (base_qs.filter(tags__in=tags)
-          .annotate(match_count=Count('tags'))
-          .order_by('-match_count', 'start_date')
-          .distinct()[:max(limit * 6, limit)])
-    return dedupe_activities_by_business_key(list(qs), limit=limit)
+    preferred = list(
+        base_qs.filter(tags__in=tags)
+        .annotate(match_count=Count('tags'))
+        .order_by('-match_count', 'start_date', 'id')
+        .distinct()[:candidate_limit]
+    )
+    preferred_ids = [activity.id for activity in preferred]
+    exploration = list(
+        base_qs.exclude(id__in=preferred_ids)
+        .order_by('start_date', 'id')[:candidate_limit]
+    )
+    return dedupe_activities_by_business_key(preferred + exploration, limit=limit)
 
 
 def search_activities_by_conditions(district=None, tag_names=None, is_free=None, start_date=None, end_date=None, limit=3, ai_mode: bool = False):

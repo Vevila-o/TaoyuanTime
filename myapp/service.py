@@ -14,14 +14,22 @@ def recommend_activities_for_user(user: UserProfile, limit: int = 3):
     """
     # use recommendation-ready queryset
     base_qs = get_recommendation_ready_activities()
+    candidate_limit = max(limit * 6, limit)
     tags = user.preferred_tags.filter(is_active=True)
     if not tags.exists():
-        return list(base_qs.order_by('start_date')[:limit])
-    qs = (base_qs.filter(tags__in=tags)
-          .annotate(match_count=Count('tags'))
-          .order_by('-match_count', 'start_date')
-          .distinct()[:limit])
-    return list(qs)
+        return list(base_qs.order_by('start_date', 'id')[:limit])
+    preferred = list(
+        base_qs.filter(tags__in=tags)
+        .annotate(match_count=Count('tags'))
+        .order_by('-match_count', 'start_date', 'id')
+        .distinct()[:candidate_limit]
+    )
+    preferred_ids = [activity.id for activity in preferred]
+    exploration = list(
+        base_qs.exclude(id__in=preferred_ids)
+        .order_by('start_date', 'id')[:candidate_limit]
+    )
+    return (preferred + exploration)[:limit]
 
 
 # 多條件搜尋活動（地區、標籤、費用、時間），只回傳上架且未過期的活動

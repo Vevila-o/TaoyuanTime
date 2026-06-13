@@ -12,6 +12,7 @@ from myapp.line_services import (
     build_activity_intro_text,
     classify_line_intent,
     db_search_terms_from_conditions,
+    handle_activity_postback,
     handle_line_text_message,
     normalize_ai_conditions,
     query_activities_by_conditions,
@@ -19,6 +20,7 @@ from myapp.line_services import (
     rule_extract_conditions,
     search_activities_for_line,
 )
+from events.services import recommend_activities_for_user
 
 
 class LineSemanticQueryTests(TestCase):
@@ -433,6 +435,67 @@ class LineSemanticQueryTests(TestCase):
         self.assertEqual(first_state.last_activity_ids, [activity.id for activity in activities[:3]])
         self.assertEqual(second_state.last_activity_ids, [activity.id for activity in activities[3:6]])
         self.assertTrue(set(first_state.last_activity_ids).isdisjoint(second_state.last_activity_ids))
+
+    def test_repeated_recommendation_command_rotates_to_next_cards(self):
+        activities = [
+            self.make_activity(f'連按推薦活動{i}', tags=[self.art], start_offset=i)
+            for i in range(1, 7)
+        ]
+        user = UserProfile.objects.create(line_user_id='repeat-recommendation-command-test')
+
+        def fake_recommend(_user, limit=3, offset=0, **_kwargs):
+            return activities[offset:offset + limit]
+
+        with patch('myapp.line_services.recommend_activities_for_user', side_effect=fake_recommend), \
+             patch('myapp.line_services.rerank_activities_with_ai', side_effect=lambda _user, _query, items, limit=3: items[:limit]):
+            first_message = handle_line_text_message(user, '推薦活動')
+            first_ids = list(LineConversationState.objects.get(user=user).last_activity_ids)
+            second_message = handle_line_text_message(user, '推薦活動')
+            second_ids = list(LineConversationState.objects.get(user=user).last_activity_ids)
+
+        first_items = first_message if isinstance(first_message, list) else [first_message]
+        second_items = second_message if isinstance(second_message, list) else [second_message]
+        self.assertTrue(any(item.__class__.__name__ == 'FlexSendMessage' for item in first_items))
+        self.assertTrue(any(item.__class__.__name__ == 'FlexSendMessage' for item in second_items))
+        self.assertEqual(first_ids, [activity.id for activity in activities[:3]])
+        self.assertEqual(second_ids, [activity.id for activity in activities[3:6]])
+        self.assertTrue(set(first_ids).isdisjoint(second_ids))
+
+    def test_recommendation_candidates_expand_beyond_repeated_user_tags(self):
+        preferred = Tag.objects.create(name='手作', tag_type='activity_type')
+        preferred_activity = self.make_activity('偏好手作活動', tags=[preferred], start_offset=1)
+        exploration_activity = self.make_activity('探索型活動', tags=[self.art], start_offset=2)
+        user = UserProfile.objects.create(line_user_id='recommendation-expanded-tags-test')
+        user.preferred_tags.add(preferred)
+
+        results = recommend_activities_for_user(user, limit=3)
+
+        self.assertIn(preferred_activity.id, [activity.id for activity in results])
+        self.assertIn(exploration_activity.id, [activity.id for activity in results])
+
+    def test_view_more_postback_updates_context_for_followup(self):
+        activities = [
+            self.make_activity(f'推薦活動{i}', tags=[self.art], start_offset=i)
+            for i in range(1, 7)
+        ]
+        user = UserProfile.objects.create(line_user_id='view-more-postback-context-test')
+        LineConversationState.objects.create(
+            user=user,
+            intent='recommendation',
+            last_query='推薦活動',
+            conditions={'mode': 'recommendation'},
+            last_activity_ids=[activity.id for activity in activities[:3]],
+            offset=3,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+
+        with patch('myapp.line_services.get_recommended_activities', return_value=activities[3:6]):
+            handle_activity_postback(user, 'view_more', {'query': '推薦活動', 'offset': '3'})
+
+        state = LineConversationState.objects.get(user=user)
+        self.assertEqual(state.last_query, '推薦活動')
+        self.assertEqual(state.last_activity_ids, [activity.id for activity in activities[3:6]])
+        self.assertEqual(state.offset, 6)
 
     def test_large_activity_query_is_search_not_recommendation_mode(self):
         activity = self.make_activity('大型親子市集活動', tags=[self.art], search_text='大型 大活動 市集 熱鬧')

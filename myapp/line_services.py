@@ -1058,6 +1058,10 @@ def handle_line_text_message(user, text):
     return build_preference_message(user)
 
   if text in RECOMMENDATION_COMMANDS:
+    recommendation_state = get_valid_conversation_state(user)
+    recommendation_conditions = deserialize_conditions(recommendation_state.conditions or {}) if recommendation_state else {}
+    if recommendation_state and (recommendation_state.intent == 'recommendation' or recommendation_conditions.get('mode') == 'recommendation'):
+      return handle_more_results_text(user, text, recommendation_state)
     activities = get_recommended_activities(user, limit=3, exclude_subscribed=True)
     log_card_views(user, activities, source='line_recommendation', query=text)
     save_conversation_state(user, 'recommendation', text, {'mode': 'recommendation'}, activities, offset=len(activities))
@@ -1964,11 +1968,28 @@ def handle_activity_postback(user, action, params):
     query = params.get('query') or '推薦活動'
     offset = parse_positive_int(params.get('offset'), default=3)
     if query == '推薦活動':
-      activities = get_recommended_activities(user, limit=3, offset=offset)
+      activities = get_recommended_activities(user, limit=3, offset=offset, exclude_subscribed=True, exclude_recently_seen=True)
+      next_conditions = {'mode': 'recommendation'}
+      next_intent = 'recommendation'
     else:
-      activities = search_activities_for_line(user, query, limit=3, offset=offset)
+      current_state = get_valid_conversation_state(user)
+      current_conditions = deserialize_conditions(current_state.conditions or {}) if current_state and current_state.last_query == query else None
+      if current_conditions:
+        activities, next_conditions = search_activities_for_line(
+          user,
+          query,
+          limit=3,
+          offset=offset,
+          conditions=current_conditions,
+          return_conditions=True,
+        )
+      else:
+        activities, next_conditions = search_activities_for_line(user, query, limit=3, offset=offset, return_conditions=True)
+      next_intent = 'activity_search'
     record_action(user, None, 'view_more', {'source': 'line_postback', 'query': query, 'offset': offset})
     log_card_views(user, activities, source='line_view_more', query=query)
+    if activities:
+      save_conversation_state(user, next_intent, query, next_conditions, activities, offset=offset + len(activities))
     return build_activity_carousel_message(
       activities,
       alt_text='更多桃園活動',
