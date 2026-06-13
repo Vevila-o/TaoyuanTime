@@ -11,7 +11,8 @@ from django.utils.dateparse import parse_datetime
 from events.ai_tagger import PROMPT_VERSION
 from events.management.commands.ai_tag_activities import repair_gap_filter
 from events.models import AIProcessingLog, Activity, CrawlJob, CrawlTask, ImportRun
-from events.search_profiles import update_activity_search_profile
+from events.operation_jobs import check_activity_official_link, link_check_candidates
+from events.search_profiles import set_link_health, update_activity_search_profile
 from events.services import is_seed_activity
 
 
@@ -167,15 +168,17 @@ def run_full_pipeline_job(job, command):
     priority_ids = imported_activity_ids(output_path)
     limit = int(options.get('post_process_limit') or options.get('primary_limit') or 1)
     cooldown_hours = int(options.get('failure_cooldown_hours') or 24)
-    for stage_key, label, runner in (
-        ('ocr', 'OCR', run_ocr_stage),
-        ('tagging', 'AI Repair+Tag', run_ai_tag_stage),
-        ('search_profile', '搜尋語意', run_search_profile_stage),
-        ('summary', 'AI 摘要', run_summary_stage),
+    link_check_limit = int(options.get('link_check_limit') or 100)
+    for stage_key, label, runner, stage_limit in (
+        ('ocr', 'OCR', run_ocr_stage, limit),
+        ('tagging', 'AI Repair+Tag', run_ai_tag_stage, limit),
+        ('search_profile', '搜尋語意', run_search_profile_stage, limit),
+        ('summary', 'AI 摘要', run_summary_stage, limit),
+        ('link_check', '官方連結檢查', run_link_check_stage, link_check_limit),
     ):
         task = start_stage(job, label, f'正在準備 {label} 候選。')
         try:
-            result = runner(task, priority_ids, limit, cooldown_hours)
+            result = runner(task, priority_ids, stage_limit, cooldown_hours)
             failed_stages += 1 if result.get('failed') else 0
             status = 'partial' if result.get('failed') and result.get('success') else ('failed' if result.get('failed') else 'success')
             finish_stage(task, status, result)
@@ -344,6 +347,26 @@ def run_ocr_stage(task, priority_ids, limit, cooldown_hours):
         'process_activity_ocr',
         limit=1,
     ))
+
+
+def run_link_check_stage(task, priority_ids, limit, cooldown_hours):
+    session = None
+
+    def process(activity):
+        nonlocal session
+        if session is None:
+            import requests
+            session = requests.Session()
+            session.trust_env = False
+        status, error = check_activity_official_link(activity, session=session)
+        set_link_health(activity, status, error)
+        if status == 'dead':
+            raise RuntimeError(f'官方連結疑似失效：{error[:120]}')
+        if status == 'error':
+            return f'官方連結無法確認：{error[:120]}'
+        return '官方連結正常。'
+
+    return run_activity_stage(task, link_check_candidates(limit), '官方連結檢查', process)
 
 
 def run_command_and_check_ai_log(activity, task_type, command_name, **kwargs):

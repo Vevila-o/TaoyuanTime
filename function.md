@@ -63,7 +63,7 @@
 ### 活動推薦
 | 函數 | 說明 |
 |------|------|
-| `get_recommended_activities` | 取得推薦活動（含去重、輪替、AI 重排序） |
+| `get_recommended_activities` | 取得推薦活動（含去重、輪替、AI 重排序，可排除近期看過的推薦卡片） |
 | `get_active_subscribed_activities` | 取得使用者有效且尚未結束的訂閱活動 |
 | `equivalent_subscription_for_activity` | 查找使用者對相同業務活動的訂閱 |
 | `subscribed_business_keys` | 取得使用者已訂閱活動的業務鍵集合 |
@@ -86,6 +86,18 @@
 | `handle_line_text_message` | 處理 LINE 文字訊息的主流程（含指令偵測與搜尋） |
 | `handle_more_results_text` | 處理使用者要求「查看更多」的文字指令 |
 | `handle_refined_search_text` | 處理使用者搜尋精煉的文字指令 |
+| `route_line_context_with_ai` | 使用 AI 判斷本輪訊息是追問上一輪卡片、精煉搜尋、重開搜尋、查看更多或不支援聊天 |
+| `context_activity_payload` | 將上一輪活動整理成 context router 可讀的精簡資料 |
+| `answer_activity_followup` | 回答上一輪活動卡片的追問，支援內容、費用、報名、地點、距離、時間與適合對象 |
+| `build_ai_activity_detail_reply` | 用活動欄位、OCR 與本機 HTML 內容回答單一活動細節追問 |
+| `build_activity_description_reply` | 建立單一活動的 fallback 描述回覆 |
+| `pick_routed_activity` | 依 AI 回傳的 activity id 或卡片序號選出上一輪目標活動 |
+| `choose_context_activity` | 依使用者文字中的活動名稱、這個/那個或序號選出上一輪活動 |
+| `ordinal_context_index` | 解析「第一個」「第2張」「2個」等上一輪卡片序號 |
+| `is_activity_followup_question` | 判斷是否為活動卡片追問 |
+| `is_activity_attribute_followup_question` | 判斷是否為費用、報名、地點、距離、時間、親子適合等屬性追問 |
+| `out_of_taoyuan_query` | 判斷查詢是否明確指向桃園以外地區 |
+| `build_scope_limit_message` | 建立目前僅支援桃園活動資料的提示訊息 |
 | `classify_line_intent` | 用 AI 分類使用者訊息意圖 |
 | `normalize_line_intent` | 驗證並標準化意圖字串 |
 | `rule_classify_line_intent` | 用規則快速分類使用者意圖（不呼叫 AI） |
@@ -114,6 +126,9 @@
 | `force_no_result_query` | 判斷是否為不可能在本地找到結果的查詢（如「潛水」） |
 | `merge_search_conditions` | 合併基底查詢條件與新的精煉條件 |
 | `combine_context_query` | 合併上一輪和本輪查詢字串 |
+| `should_replace_context_query` | 判斷短新主題是否應丟掉上一輪髒掉的 keyword context |
+| `exact_keyword_title_matches` | 找出 keyword 明確命中活動標題的候選活動 |
+| `promote_exact_keyword_title_matches` | 在 AI rerank 後保護精準標題命中活動，避免被擠出前三張 |
 | `apply_nearby_preference` | 若使用者要求附近且有偏好地區，套用到條件 |
 | `semantic_terms_from_conditions` | 從條件中提取所有語意詞彙 |
 | `activity_search_blob` | 產生活動搜尋用的全文本（標題＋摘要＋標籤＋Profile） |

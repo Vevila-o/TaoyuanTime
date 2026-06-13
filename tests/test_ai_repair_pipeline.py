@@ -9,6 +9,8 @@ from events.management.commands.ai_tag_activities import Command as AiTagCommand
 from events.management.commands.run_full_pipeline import Command as FullPipelineCommand
 from events.management.commands import run_queued_crawl_jobs
 from events.models import AIProcessingLog, Activity, ActivityChangeLog, CrawlJob
+from events.operation_jobs import link_check_candidates
+from events.search_profiles import set_link_health
 
 
 class AiRepairPipelineTests(TestCase):
@@ -170,6 +172,47 @@ class AiRepairPipelineTests(TestCase):
         self.assertIn(incomplete, activities)
         self.assertNotIn(complete, activities)
 
+    def test_dead_official_link_is_publicly_excluded_but_keeps_readiness_for_repair(self):
+        activity = Activity.objects.create(
+            title="失效官方連結活動",
+            description="活動內容",
+            status="active",
+            is_activity=True,
+            source_url="https://example.com/dead",
+            official_detail_url="https://example.com/dead",
+            line_ready=True,
+            recommendation_ready=True,
+            excluded_from_public=False,
+        )
+
+        set_link_health(activity, "dead", "HTTP 404")
+        activity.refresh_from_db()
+
+        self.assertTrue(activity.line_ready)
+        self.assertTrue(activity.recommendation_ready)
+        self.assertTrue(activity.excluded_from_public)
+        self.assertEqual(activity.exclude_reason, "dead_official_link")
+        self.assertIn(activity, link_check_candidates(10))
+
+    def test_repaired_official_link_clears_dead_link_public_exclusion(self):
+        activity = Activity.objects.create(
+            title="修復官方連結活動",
+            description="活動內容",
+            status="active",
+            is_activity=True,
+            source_url="https://example.com/fixed",
+            official_detail_url="https://example.com/fixed",
+            excluded_from_public=True,
+            exclude_reason="dead_official_link",
+            official_link_status="dead",
+        )
+
+        set_link_health(activity, "ok", "")
+        activity.refresh_from_db()
+
+        self.assertFalse(activity.excluded_from_public)
+        self.assertEqual(activity.exclude_reason, "")
+
     def test_full_pipeline_runs_ocr_before_ai_repair_tag(self):
         command = FullPipelineCommand()
         calls = []
@@ -205,6 +248,7 @@ class AiRepairPipelineTests(TestCase):
         original_tag = run_queued_crawl_jobs.run_ai_tag_stage
         original_search = run_queued_crawl_jobs.run_search_profile_stage
         original_summary = run_queued_crawl_jobs.run_summary_stage
+        original_link_check = run_queued_crawl_jobs.run_link_check_stage
         try:
             run_queued_crawl_jobs.call_command = lambda *args, **kwargs: None
             run_queued_crawl_jobs.expire_active_activities = lambda: {"message": "ok"}
@@ -213,6 +257,7 @@ class AiRepairPipelineTests(TestCase):
             run_queued_crawl_jobs.run_ai_tag_stage = lambda task, ids, limit, cooldown: calls.append("tag") or {"success": 1, "failed": 0}
             run_queued_crawl_jobs.run_search_profile_stage = lambda task, ids, limit, cooldown: calls.append("search") or {"success": 1, "failed": 0}
             run_queued_crawl_jobs.run_summary_stage = lambda task, ids, limit, cooldown: calls.append("summary") or {"success": 1, "failed": 0}
+            run_queued_crawl_jobs.run_link_check_stage = lambda task, ids, limit, cooldown: calls.append("link_check") or {"success": 1, "failed": 0}
 
             run_queued_crawl_jobs.run_full_pipeline_job(job, command=type("C", (), {"stderr": type("S", (), {"write": lambda self, msg: None})()})())
         finally:
@@ -223,5 +268,6 @@ class AiRepairPipelineTests(TestCase):
             run_queued_crawl_jobs.run_ai_tag_stage = original_tag
             run_queued_crawl_jobs.run_search_profile_stage = original_search
             run_queued_crawl_jobs.run_summary_stage = original_summary
+            run_queued_crawl_jobs.run_link_check_stage = original_link_check
 
-        self.assertEqual(calls, ["ocr", "tag", "search", "summary"])
+        self.assertEqual(calls, ["ocr", "tag", "search", "summary", "link_check"])

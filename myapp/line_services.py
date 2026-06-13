@@ -15,6 +15,7 @@ from linebot.models import FlexSendMessage, TextSendMessage
 
 from events.models import AIProcessingLog, ActionLog, Activity, ActivitySearchProfile, LineConversationState, PushDeliveryLog, Subscription, Tag, UserProfile
 from events.ai_providers import call_json_with_fallback, call_text_with_fallback, payload_messages
+from events.search_profiles import raw_html_text_for_activity
 from events.services import (
   activity_business_key,
   activity_business_keys,
@@ -39,7 +40,11 @@ SMALLTALK_WORDS = ('你好', '嗨', 'hello', 'hi', '謝謝', '你是誰', '幫�
 PREFERENCE_COMMANDS = {'偏好設定', '設定偏好', '喜好設定'}
 RECOMMENDATION_COMMANDS = {'推薦活動', '猜你喜歡', '今日推薦'}
 SUBSCRIPTION_COMMANDS = {'已訂閱活動', '我的訂閱', '已訂閱'}
-MORE_RESULT_WORDS = {'還有嗎', '還有沒有', '換一批', '再給我', '更多', '查看更多', '下一批'}
+MORE_RESULT_WORDS = {
+  '還有嗎', '還有沒有', '還有別的', '別的嗎',
+  '換一批', '換一些', '再換', '再給我',
+  '更多', '查看更多', '下一批',
+}
 CLEAR_CONTEXT_COMMANDS = {'清除搜尋', '清除我的搜尋', '重新搜尋', '重設', '清除', '重來', '重新開始'}
 LINE_CONTEXT_TTL_MINUTES = 30
 SEMANTIC_QUERY_EXPANSIONS = {
@@ -72,6 +77,12 @@ WEAK_SEMANTIC_TERMS = {'體驗', '自然', '旅遊', '旅行', '休閒', '公園
 FEE_SEMANTIC_TERMS = {'免費', '免門票', '不用錢', '免費入場'}
 INFERRED_GENERIC_TAGS = {'一般', '青年', '長輩'}
 IMPOSSIBLE_LOCAL_TERMS = {'火星', '月球', '外太空'}
+OUT_OF_TAOYUAN_TERMS = {
+  '台北', '臺北', '新北', '基隆', '新竹', '苗栗', '台中', '臺中', '彰化',
+  '南投', '雲林', '嘉義', '台南', '臺南', '高雄', '屏東', '宜蘭',
+  '花蓮', '台東', '臺東', '澎湖', '金門', '馬祖', '日本', '韓國',
+  '東京', '大阪', '京都',
+}
 STRICT_SEARCH_TOPICS = {'美食', '餐廳', '餐飲', '小吃', '夜市', '料理', '腳踏車', '自行車', '單車', '騎車', '運動', '路跑', '健走', '潛水'}
 FALLBACK_IMAGE_BY_TAG = {
   '藝文': (
@@ -321,7 +332,7 @@ def toggle_preference_tag(user, tag_name):
 
 
 # 取得推薦活動（含去重、輪替已看活動、AI 重排序）
-def get_recommended_activities(user, limit=3, use_ai=True, offset=0, exclude_subscribed=False, exclude_recently_pushed=False):
+def get_recommended_activities(user, limit=3, use_ai=True, offset=0, exclude_subscribed=False, exclude_recently_pushed=False, exclude_recently_seen=False):
   pool_size = max(50, limit + offset + 20)
   candidates = recommend_activities_for_user(user, limit=pool_size)
   if not candidates:
@@ -331,6 +342,12 @@ def get_recommended_activities(user, limit=3, use_ai=True, offset=0, exclude_sub
     candidates = exclude_subscribed_equivalent_activities(user, candidates)
   if exclude_recently_pushed:
     candidates = exclude_recently_pushed_activities(user, candidates)
+  if exclude_recently_seen:
+    seen_keys = recent_seen_business_keys(user)
+    fresh_candidates = [activity for activity in candidates if not seen_keys.intersection(activity_business_keys(activity))]
+    if fresh_candidates:
+      candidates = fresh_candidates
+      offset = 0
   ranked = rank_activities_for_user(user, candidates)
   ranked = blend_exploration_activity(user, rotate_recently_seen_activities(user, ranked), limit=max(limit + offset, limit))
   target_size = limit + offset
@@ -536,6 +553,26 @@ def high_confidence_activity_query(text):
   return False
 
 
+def is_generic_activity_restart_request(text):
+  compact = re.sub(r'\s+', '', text or '')
+  if not compact:
+    return False
+  if any(district in compact for district in DISTRICTS) or contains_known_tag(compact):
+    return False
+  if is_lifestyle_activity_query(compact):
+    return False
+  return compact in {
+    '找活動',
+    '幫我找活動',
+    '幫我找一下活動',
+    '推薦活動',
+    '推薦一下活動',
+    '有活動嗎',
+    '有什麼活動',
+    '看看活動',
+  }
+
+
 # 判斷是否為生活情境活動查詢（帶小孩/雨天/約會）
 def is_lifestyle_activity_query(text):
   compact = re.sub(r'\s+', '', text or '')
@@ -582,6 +619,17 @@ def build_query_help_message():
   )
 
 
+def out_of_taoyuan_query(text):
+  compact = re.sub(r'\s+', '', text or '')
+  if not compact or any(term in compact for term in ('桃園', '桃市')):
+    return False
+  return any(term in compact for term in OUT_OF_TAOYUAN_TERMS)
+
+
+def build_scope_limit_message():
+  return TextSendMessage(text='目前我只查得到桃園活動資料。你可以改問「桃園展覽」「中壢週末活動」或「親子活動」。')
+
+
 def is_activity_followup_question(text):
   compact = re.sub(r'\s+', '', text or '')
   if not compact:
@@ -590,10 +638,28 @@ def is_activity_followup_question(text):
     '這個', '這些', '剛剛', '那個', '那些', '要錢', '免費', '費用', '票價',
     '門票', '票錢', '多少錢', '收費', '要付費', '要購票', '要買票',
     '需要報名', '要報名', '報名', '在哪', '哪裡', '地點', '地址',
-    '什麼時候', '時間', '幾點', '適合小孩', '適合親子', '小孩適合',
+    '什麼時候', '時間', '幾點', '遠不遠', '會不會很遠', '很遠', '距離',
+    '適合小孩', '適合親子', '小孩適合',
     '在幹嘛', '在幹麻', '幹嘛', '幹麻', '做什麼', '玩什麼', '內容', '介紹', '是什麼',
   )
   return any(term in compact for term in followup_terms)
+
+
+def is_activity_attribute_followup_question(text):
+  compact = re.sub(r'\s+', '', text or '')
+  if not compact:
+    return False
+  attribute_terms = (
+    '免費', '要錢', '費用', '票價', '門票', '票錢', '多少錢', '收費', '要付費', '要購票', '要買票',
+    '需要報名', '要報名', '報名', '在哪', '哪裡', '地點', '地址',
+    '什麼時候', '時間', '幾點', '哪天', '遠不遠', '會不會很遠', '很遠', '距離',
+    '適合小孩', '適合親子', '小孩適合', '親子適合',
+  )
+  return any(term in compact for term in attribute_terms)
+
+
+def ordinal_out_of_range_message(index, activities):
+  return TextSendMessage(text=f'上一輪只有 {len(activities)} 個活動，沒有第 {index + 1} 個。你可以說「更多」看下一批。')
 
 
 def context_activities(state):
@@ -604,15 +670,258 @@ def context_activities(state):
   return [by_id[activity_id] for activity_id in ids if activity_id in by_id]
 
 
+def ordinal_context_index(text):
+  compact = re.sub(r'\s+', '', text or '')
+  if not compact:
+    return None
+  ordinal_words = {
+    '一': 0, '1': 0, '壹': 0,
+    '二': 1, '兩': 1, '2': 1, '貳': 1,
+    '三': 2, '3': 2, '參': 2,
+    '四': 3, '4': 3, '肆': 3,
+    '五': 4, '5': 4, '伍': 4,
+  }
+  match = re.search(r'第([一二兩三四五壹貳參肆伍1-5])(?:個|張|項|則|筆)?', compact)
+  if match:
+    return ordinal_words.get(match.group(1))
+  match = re.search(r'([1-5])(?:個|張|項|則|筆)', compact)
+  if match:
+    return ordinal_words.get(match.group(1))
+  return None
+
+
 def choose_context_activity(text, activities):
   if not activities:
     return None
   compact = re.sub(r'\s+', '', text or '')
+  ordinal_index = ordinal_context_index(compact)
+  if ordinal_index is not None and 0 <= ordinal_index < len(activities):
+    return activities[ordinal_index]
   for activity in activities:
     title = re.sub(r'\s+', '', activity.title or '')
     if title and (title in compact or any(len(part) >= 4 and part in compact for part in re.split(r'[：:「」（）()\\-－]', title))):
       return activity
+  if has_new_subject_with_description_phrase(compact):
+    return None
   return activities[0] if len(activities) == 1 or any(term in compact for term in ('這個', '那個')) else None
+
+
+def has_new_subject_with_description_phrase(text):
+  compact = re.sub(r'\s+', '', text or '')
+  if not compact or any(term in compact for term in ('這個', '那個', '剛剛', '上一個', '上一張')):
+    return False
+  description_terms = ('在幹嘛', '在幹麻', '幹嘛', '幹麻', '做什麼', '玩什麼', '內容', '介紹', '是什麼')
+  if not any(term in compact for term in description_terms):
+    return False
+  subject = compact
+  for term in description_terms:
+    subject = subject.replace(term, '')
+  subject = subject.replace('活動', '').strip()
+  return len(subject) >= 2
+
+
+def context_activity_payload(activity):
+  return {
+    'id': activity.id,
+    'title': activity.title,
+    'district': activity.district,
+    'time': format_time_range(activity),
+    'tags': [tag.name for tag in activity.tags.all()[:5]],
+    'summary': (activity.ai_summary or activity.description or '')[:120],
+  }
+
+
+def route_line_context_with_ai(user, text, state, activities):
+  if not state or not activities:
+    return None
+  fallback_intent = 'refine_search' if looks_like_refinement(text) else ('activity_followup' if is_activity_followup_question(text) else None)
+  started_at = time.monotonic()
+  try:
+    response = call_json_with_fallback(
+      payload_messages(
+        '你是桃園活動 LINE 助手的上下文路由器，只輸出 JSON，不要解釋。'
+        '你的任務是判斷使用者本輪訊息是在追問上一輪活動卡片、延續上一輪條件重新搜尋、開始新搜尋、查看更多，或不支援。'
+        'activity_followup 只能用於使用者明確問上一輪某個活動的時間、地點、費用、報名、內容、適合對象等細節。'
+        'refine_search 用於「大園的呢」「免費的呢」「週末的呢」這類把上一輪查詢加上新條件的句子。'
+        '「不要親子」「不是展覽」這種負面條件放進 exclude_tag_names，不要放進 tag_names。'
+        '「第二個呢」這種追問用 target_activity_index 指向上一輪第幾張卡片。'
+        '如果使用者改問明顯不同的新活動或新主題，回 new_search 並設定 replace_previous_query=true。'
+        '不要把整段對話合併成 keyword；只回結構化 refine_patch。',
+        {
+          'message': text,
+          'previous_query': state.last_query,
+          'previous_conditions': deserialize_conditions(state.conditions or {}),
+          'previous_activities': [context_activity_payload(activity) for activity in activities[:5]],
+          'allowed_intents': ['activity_followup', 'refine_search', 'new_search', 'more_results', 'unsupported_chat'],
+          'output_schema': {
+            'intent': 'one allowed intent',
+            'target_activity_id': 'integer id from previous_activities when intent is activity_followup, otherwise null',
+            'target_activity_index': '1-based card index from previous_activities when user says 第一個/第二個/etc, otherwise null',
+            'followup_field': 'one of time, location, distance, fee, registration, description, suitability, or none',
+            'replace_previous_query': 'true when new_search should ignore previous query and conditions',
+            'refine_patch': {
+              'district': 'one Taoyuan district without 區, or empty string',
+              'tag_names': 'array of existing tag names',
+              'exclude_tag_names': 'array of existing tag names the user explicitly does not want',
+              'is_free': 'true, false, or null',
+              'keyword': 'short keyword only if needed',
+              'soft_topics': 'array',
+              'related_terms': 'array',
+            },
+          },
+        },
+      )
+    )
+    parsed = response.parsed or {}
+    intent = str(parsed.get('intent') or '').strip()
+    if intent not in {'activity_followup', 'refine_search', 'new_search', 'more_results', 'unsupported_chat'}:
+      intent = fallback_intent or ''
+    if fallback_intent == 'activity_followup' and intent in {'unsupported_chat', 'new_search'}:
+      intent = 'activity_followup'
+    refine_patch = normalize_ai_conditions(parsed.get('refine_patch') or {}, fallback={}, user=user, query=text)
+    raw_excluded = (parsed.get('refine_patch') or {}).get('exclude_tag_names') or []
+    if isinstance(raw_excluded, str):
+      raw_excluded = [raw_excluded]
+    allowed_tags = set(Tag.objects.filter(is_active=True).values_list('name', flat=True))
+    exclude_tag_names = []
+    for name in raw_excluded:
+      tag_name = str(name).strip().lstrip('#')
+      if tag_name in allowed_tags and tag_name not in exclude_tag_names:
+        exclude_tag_names.append(tag_name)
+    if exclude_tag_names:
+      refine_patch['exclude_tag_names'] = exclude_tag_names
+    route = {
+      'intent': intent,
+      'target_activity_id': parsed.get('target_activity_id'),
+      'target_activity_index': parsed.get('target_activity_index'),
+      'followup_field': str(parsed.get('followup_field') or '').strip(),
+      'replace_previous_query': bool(parsed.get('replace_previous_query')),
+      'refine_patch': refine_patch,
+    }
+    log_ai_processing(
+      task_type='condition_extract',
+      user=user,
+      input_summary=f'context-route:{text}',
+      output_json={'route': route, 'provider': response.provider},
+      latency_ms=elapsed_ms(started_at),
+      status='success',
+      model=f'{response.provider}:{response.model}',
+      prompt_version='line-context-route-v1',
+    )
+    return route
+  except Exception as exc:
+    log_ai_processing(
+      task_type='condition_extract',
+      user=user,
+      input_summary=f'context-route:{text}',
+      output_json={'intent': fallback_intent or 'fallback'},
+      latency_ms=elapsed_ms(started_at),
+      status='failed',
+      error=str(exc),
+      model='rule',
+      prompt_version='line-context-route-v1',
+    )
+    return {'intent': fallback_intent} if fallback_intent else None
+
+
+def pick_routed_activity(route, text, activities):
+  target_index = (route or {}).get('target_activity_index')
+  if target_index:
+    try:
+      index = int(target_index) - 1
+    except (TypeError, ValueError):
+      index = None
+    if index is not None and 0 <= index < len(activities):
+      return activities[index]
+  target_id = (route or {}).get('target_activity_id')
+  if target_id:
+    for activity in activities:
+      if str(activity.id) == str(target_id):
+        return activity
+  return choose_context_activity(text, activities)
+
+
+def build_ai_activity_detail_reply(user, text, activity):
+  html_text = raw_html_text_for_activity(activity, limit=3500)
+  if not html_text and not (activity.ocr_summary or activity.ocr_text):
+    return None
+  source_text = re.sub(
+    r'\s+',
+    ' ',
+    ' '.join(
+      part
+      for part in (
+        activity.description,
+        activity.ai_summary,
+        activity.ocr_summary,
+        activity.ocr_text,
+        html_text,
+      )
+      if part
+    ),
+  ).strip()
+  if not source_text:
+    return None
+  started_at = time.monotonic()
+  try:
+    response = call_text_with_fallback([
+      {
+        'role': 'system',
+        'content': (
+          '你是桃園活動 LINE 助手。請用繁體中文回答使用者對單一活動的追問，最多 120 字。'
+          '只能根據提供的 Activity 欄位、OCR 與本機 HTML 文字回答；不知道就說目前資料沒有寫清楚。'
+          '不要編造日期、地點、費用、報名方式。'
+        ),
+      },
+      {
+        'role': 'user',
+        'content': json.dumps(
+          {
+            'question': text,
+            'activity': context_activity_payload(activity),
+            'known_fields': {
+              'time': format_time_range(activity),
+              'location': f'{activity.district or "桃園"} {activity.location or ""}'.strip(),
+              'fee': activity.fee_description or '',
+              'registration': activity.registration_info or '',
+              'detail_url': safe_detail_url(activity),
+            },
+            'source_text': source_text[:4000],
+          },
+          ensure_ascii=False,
+          default=str,
+        ),
+      },
+    ])
+    answer = re.sub(r'\s+', ' ', (response.raw_text or '').strip())
+    if not answer:
+      return None
+    if len(answer) > 160:
+      answer = answer[:160].rstrip('，,。 ') + '。'
+    log_ai_processing(
+      task_type='rerank',
+      user=user,
+      input_summary=f'activity-followup:{activity.id}:{text}',
+      output_json={'text': answer, 'provider': response.provider, 'used_html': bool(html_text)},
+      latency_ms=elapsed_ms(started_at),
+      status='success',
+      model=f'{response.provider}:{response.model}',
+      prompt_version='line-activity-followup-v1',
+    )
+    return TextSendMessage(text=answer)
+  except Exception as exc:
+    log_ai_processing(
+      task_type='rerank',
+      user=user,
+      input_summary=f'activity-followup:{activity.id}:{text}',
+      output_json={'fallback': True, 'used_html': bool(html_text)},
+      latency_ms=elapsed_ms(started_at),
+      status='failed',
+      error=str(exc),
+      model='rule',
+      prompt_version='line-activity-followup-v1',
+    )
+    return None
 
 
 def build_activity_description_reply(activity):
@@ -634,28 +943,76 @@ def build_activity_description_reply(activity):
   return TextSendMessage(text=f'{title}：目前資料庫沒有更完整的活動內容摘要，我先列出已知資訊。\n' + '\n'.join(known_parts))
 
 
-def answer_activity_followup(user, text, state):
-  activities = context_activities(state) if state else []
+def answer_activity_followup(user, text, state, route=None, activities=None):
+  activities = activities if activities is not None else (context_activities(state) if state else [])
   if not activities:
     return None
   compact = re.sub(r'\s+', '', text or '')
-  activity = choose_context_activity(text, activities)
+  activity = pick_routed_activity(route, text, activities) if route else choose_context_activity(text, activities)
+  followup_field = str((route or {}).get('followup_field') or '').strip()
+  target = activity or activities[0]
+
+  if followup_field in {'description', 'content'}:
+    ai_reply = build_ai_activity_detail_reply(user, text, target)
+    if ai_reply:
+      return ai_reply
+    return build_activity_description_reply(target)
+
+  if followup_field == 'fee':
+    fee = target.fee_description or ('免費' if target.is_free else '費用未明確標示')
+    return TextSendMessage(text=f'{target.title}：{fee}。實際費用以官方頁為準。')
+
+  if followup_field == 'registration':
+    if target.requires_registration:
+      info = target.registration_info or '需要報名'
+      return TextSendMessage(text=f'{target.title}：{info}。')
+    return TextSendMessage(text=f'{target.title}：目前資料沒有顯示必須報名，建議出發前再看官方頁確認。')
+
+  if followup_field == 'location':
+    location = f'{target.district or "桃園"} {target.location or "地點請見官方頁"}'.strip()
+    return TextSendMessage(text=f'{target.title}：地點是 {location}。')
+
+  if followup_field == 'distance':
+    location = f'{target.district or "桃園"} {target.location or "地點請見官方頁"}'.strip()
+    return TextSendMessage(text=f'{target.title} 在 {location}。目前沒有你的出發地，距離建議點卡片的「導航前往地點」確認。')
+
+  if followup_field == 'time':
+    return TextSendMessage(text=f'{target.title}：{format_time_range(target)}。')
+
+  if followup_field == 'suitability':
+    tag_names = {tag.name for tag in target.tags.all()}
+    text_blob = f'{target.title} {target.description} {target.ai_summary}'
+    suitable = bool({'親子', '兒童'}.intersection(tag_names) or any(term in text_blob for term in CHILD_AUDIENCE_TERMS))
+    if suitable:
+      return TextSendMessage(text=f'{target.title}：目前資料看起來適合親子或小孩參加，仍建議看官方頁確認年齡限制。')
+    return TextSendMessage(text=f'{target.title}：目前資料沒有明確標示親子或兒童適合，建議先看官方頁確認。')
 
   if any(term in compact for term in ('在幹嘛', '在幹麻', '幹嘛', '幹麻', '做什麼', '玩什麼', '內容', '介紹', '是什麼')):
-    target = activity or activities[0]
+    ai_reply = build_ai_activity_detail_reply(user, text, target)
+    if ai_reply:
+      return ai_reply
     return build_activity_description_reply(target)
 
   if any(term in compact for term in ('免費', '要錢', '費用', '票價')):
     targets = [activity] if activity else activities
     free_items = [item for item in targets if item.is_free]
-    paid_or_unknown = [item for item in targets if not item.is_free]
+    unknown_items = [item for item in targets if not item.is_free and (item.fee_type or 'unknown') == 'unknown' and not item.fee_description]
     if '這些' in compact or not activity:
+      parts = []
       if free_items:
-        names = '、'.join(item.title for item in free_items[:3])
-        return TextSendMessage(text=f'上一輪結果裡，這些看起來是免費或未標示收費：{names}。實際費用仍以官方頁為準。')
+        parts.append(f'明確標示免費：{"、".join(item.title for item in free_items[:3])}')
+      if unknown_items:
+        parts.append(f'費用未明確標示：{"、".join(item.title for item in unknown_items[:3])}')
+      if parts:
+        return TextSendMessage(text=f'上一輪結果裡，{"；".join(parts)}。實際費用仍以官方頁為準。')
       return TextSendMessage(text='上一輪結果裡目前沒有明確標示免費的活動，費用請以官方頁為準。')
-    fee = activity.fee_description or ('免費或未標示收費' if activity.is_free else '費用未明確標示')
+    fee = activity.fee_description or ('免費' if activity.is_free else '費用未明確標示')
     return TextSendMessage(text=f'{activity.title}：{fee}。實際費用以官方頁為準。')
+
+  if any(term in compact for term in ('門票', '票錢', '多少錢', '收費', '要付費', '要購票', '要買票', '買票')):
+    target = activity or activities[0]
+    fee = target.fee_description or ('免費' if target.is_free else '費用未明確標示')
+    return TextSendMessage(text=f'{target.title}：{fee}。實際費用以官方頁為準。')
 
   if any(term in compact for term in ('需要報名', '要報名', '報名')):
     target = activity or activities[0]
@@ -668,6 +1025,11 @@ def answer_activity_followup(user, text, state):
     target = activity or activities[0]
     location = f'{target.district or "桃園"} {target.location or "地點請見官方頁"}'.strip()
     return TextSendMessage(text=f'{target.title}：地點是 {location}。')
+
+  if any(term in compact for term in ('遠不遠', '會不會很遠', '很遠', '距離')):
+    target = activity or activities[0]
+    location = f'{target.district or "桃園"} {target.location or "地點請見官方頁"}'.strip()
+    return TextSendMessage(text=f'{target.title} 在 {location}。目前沒有你的出發地，距離建議點卡片的「導航前往地點」確認。')
 
   if any(term in compact for term in ('什麼時候', '時間', '幾點', '哪天')):
     target = activity or activities[0]
@@ -721,8 +1083,66 @@ def handle_line_text_message(user, text):
       include_intro=True,
     )
 
+  if out_of_taoyuan_query(text):
+    return build_scope_limit_message()
+
   state = get_valid_conversation_state(user)
-  if state and is_activity_followup_question(text):
+  context_items = context_activities(state) if state else []
+  if state and is_generic_activity_restart_request(text):
+    state = None
+    context_items = []
+  if context_items:
+    ordinal_index = ordinal_context_index(text)
+    if ordinal_index is not None:
+      if ordinal_index >= len(context_items):
+        return ordinal_out_of_range_message(ordinal_index, context_items)
+      if is_activity_attribute_followup_question(text) or is_activity_followup_question(text):
+        followup_message = answer_activity_followup(user, text, state, activities=context_items)
+      else:
+        followup_message = answer_activity_followup(
+          user,
+          text,
+          state,
+          route={'target_activity_index': ordinal_index + 1, 'followup_field': 'description'},
+          activities=context_items,
+        )
+      if followup_message:
+        return followup_message
+  if state and rule_classify_line_intent(text, state=state) == 'more_results':
+    return handle_more_results_text(user, text, state)
+  if context_items:
+    if is_activity_attribute_followup_question(text) or (is_activity_followup_question(text) and choose_context_activity(text, context_items)):
+      followup_message = answer_activity_followup(user, text, state, activities=context_items)
+      if followup_message:
+        return followup_message
+    route = route_line_context_with_ai(user, text, state, context_items)
+    route_intent = (route or {}).get('intent')
+    if route_intent == 'activity_followup':
+      followup_message = answer_activity_followup(user, text, state, route=route, activities=context_items)
+      if followup_message:
+        return followup_message
+    if route_intent == 'refine_search':
+      return handle_refined_search_text(user, text, state, patch=(route or {}).get('refine_patch') or {})
+    if route_intent == 'more_results':
+      return handle_more_results_text(user, text, state)
+    if route_intent == 'new_search':
+      patch = (route or {}).get('refine_patch') or {}
+      if (route or {}).get('replace_previous_query') and patch:
+        activities, conditions = search_activities_for_line(user, text, limit=3, conditions=patch, return_conditions=True)
+        log_card_views(user, activities, source='line_new_query', query=text)
+        if activities:
+          save_conversation_state(user, 'activity_search', text, conditions, activities, offset=len(activities))
+        return build_activity_carousel_message(
+          activities,
+          alt_text='桃園活動查詢結果',
+          user=user,
+          query_context=text,
+          include_intro=True,
+        )
+      state = None
+    elif route_intent == 'unsupported_chat' and not is_activity_query(text):
+      return build_query_help_message()
+  elif state and is_activity_followup_question(text):
     followup_message = answer_activity_followup(user, text, state)
     if followup_message:
       return followup_message
@@ -766,7 +1186,7 @@ def handle_more_results_text(user, text, state):
   offset = state.offset or len(state.last_activity_ids or []) or 3
   conditions = deserialize_conditions(state.conditions or {})
   if conditions.get('mode') == 'recommendation' or state.intent == 'recommendation':
-    activities = get_recommended_activities(user, limit=3, offset=offset, exclude_subscribed=True)
+    activities = get_recommended_activities(user, limit=3, offset=offset, exclude_subscribed=True, exclude_recently_seen=True)
     query = '推薦活動'
     next_conditions = {'mode': 'recommendation'}
   else:
@@ -787,12 +1207,15 @@ def handle_more_results_text(user, text, state):
 
 
 # 處理搜尋精煉文字（在上一輪查詢基礎上加入新條件）
-def handle_refined_search_text(user, text, state):
+def handle_refined_search_text(user, text, state, patch=None):
   base_conditions = deserialize_conditions(state.conditions or {}) if state else {}
-  if base_conditions.get('mode'):
+  effective_patch = patch if patch is not None else extract_conditions_from_message(user, text)
+  effective_patch = supplement_refine_patch_from_text(text, base_conditions, effective_patch)
+  reset_query_context = bool(base_conditions.get('mode')) or should_replace_context_query(text, base_conditions, effective_patch)
+  if reset_query_context:
     base_conditions = {}
-  refined = merge_search_conditions(base_conditions, extract_conditions_from_message(user, text))
-  query = combine_context_query(state.last_query if state else '', text)
+  refined = merge_search_conditions(base_conditions, effective_patch)
+  query = text if reset_query_context else combine_context_query(state.last_query if state else '', text)
   activities, conditions = search_activities_for_line(
     user,
     query,
@@ -922,6 +1345,48 @@ def combine_context_query(previous, current):
   return f'{previous}，{current}'
 
 
+def should_replace_context_query(text, base_conditions, patch):
+  keyword = str((patch or {}).get('keyword') or '').strip()
+  previous_keyword = str((base_conditions or {}).get('keyword') or '').strip()
+  compact = re.sub(r'\s+', '', text or '')
+  patch_tags = set((patch or {}).get('tag_names') or [])
+  base_tags = set((base_conditions or {}).get('tag_names') or [])
+  if patch_tags and not patch_tags.issubset(base_tags):
+    if compact.startswith(('那', '那個', '不然', '換', '改', '算了')) or compact.endswith(('呢', '勒', '咧')):
+      return True
+  if not keyword or not previous_keyword or keyword == previous_keyword:
+    return False
+  if keyword not in compact:
+    return False
+  if has_new_subject_with_description_phrase(compact):
+    return True
+  if compact.startswith(('那', '那個', '不然', '換', '改')) or compact.endswith(('呢', '勒', '咧')):
+    return True
+  return False
+
+
+def supplement_refine_patch_from_text(text, base_conditions, patch):
+  patch = dict(patch or {})
+  compact = re.sub(r'\s+', '', text or '')
+  has_negative_tag_intent = any(term in compact for term in ('不要', '不想', '不看', '不是', '也不要'))
+  rule_patch = rule_extract_conditions(text)
+  rule_tags = rule_patch.get('tag_names') or []
+  base_tags = set((base_conditions or {}).get('tag_names') or [])
+  rule_has_new_tags = bool(rule_tags and not set(rule_tags).issubset(base_tags))
+  if rule_has_new_tags and not patch.get('exclude_tag_names') and not has_negative_tag_intent:
+    patch['tag_names'] = rule_tags
+    patch['keyword'] = ''
+    patch['soft_topics'] = rule_patch.get('soft_topics') or []
+    patch['related_terms'] = rule_patch.get('related_terms') or []
+  elif rule_tags and not patch.get('tag_names') and not patch.get('exclude_tag_names') and not has_negative_tag_intent:
+    patch['tag_names'] = rule_tags
+    if rule_patch.get('soft_topics'):
+      patch['soft_topics'] = rule_patch.get('soft_topics')
+    if rule_patch.get('related_terms'):
+      patch['related_terms'] = rule_patch.get('related_terms')
+  return patch
+
+
 # 合併基底查詢條件與新的精煉條件（patch 優先覆蓋）
 def merge_search_conditions(base, patch):
   merged = dict(base or {})
@@ -946,7 +1411,15 @@ def merge_search_conditions(base, patch):
   for name in patch.get('tag_names') or []:
     if name not in tag_names:
       tag_names.append(name)
-  merged['tag_names'] = tag_names
+  exclude_tag_names = []
+  for name in (base or {}).get('exclude_tag_names') or []:
+    if name not in exclude_tag_names:
+      exclude_tag_names.append(name)
+  for name in patch.get('exclude_tag_names') or []:
+    if name not in exclude_tag_names:
+      exclude_tag_names.append(name)
+  merged['exclude_tag_names'] = exclude_tag_names
+  merged['tag_names'] = [name for name in tag_names if name not in exclude_tag_names]
   return apply_nearby_preference(None, merged)
 
 
@@ -1038,15 +1511,66 @@ def search_activities_for_line(user, query, limit=3, offset=0, conditions=None, 
     for activity in ranked:
       activity._line_notice = notice
   target_size = limit + offset
+  exact_keyword_matches = exact_keyword_title_matches(ranked, conditions)
   if len(ranked) > target_size:
     ai_limit = min(len(ranked), target_size + 10)
     ranked = rerank_activities_with_ai(user, query, ranked, limit=ai_limit) or ranked
     ranked = rotate_recently_seen_activities(user, ranked)
+  if has_new_subject_with_description_phrase(query):
+    strict_ranked = [activity for activity in ranked if activity_matches_keyword_subject(activity, conditions)]
+    if strict_ranked:
+      ranked = strict_ranked
+  ranked = promote_exact_keyword_title_matches(ranked, conditions, exact_keyword_matches)
   if strict_district_requested(query, conditions):
     district = conditions.get('district') or ''
     ranked = [activity for activity in ranked if district in (activity.district or '')]
   result = ranked[offset:offset + limit]
   return (result, conditions) if return_conditions else result
+
+
+def activity_matches_keyword_subject(activity, conditions):
+  keyword = re.sub(r'\s+', '', str((conditions or {}).get('keyword') or ''))
+  if len(keyword) < 2:
+    return True
+  terms = [keyword]
+  if keyword.endswith('展') and len(keyword) > 2:
+    terms.append(keyword[:-1])
+  blob = re.sub(r'\s+', '', activity_search_blob(activity))
+  return any(term and term in blob for term in terms)
+
+
+def exact_keyword_title_matches(activities, conditions):
+  keyword = re.sub(r'\s+', '', str((conditions or {}).get('keyword') or ''))
+  if len(keyword) < 2:
+    return []
+  exact = []
+  for activity in activities:
+    title = re.sub(r'\s+', '', activity.title or '')
+    if title and (keyword in title or title in keyword):
+      exact.append(activity)
+  return exact
+
+
+def promote_exact_keyword_title_matches(activities, conditions, promoted=None):
+  exact = []
+  seen_exact_ids = set()
+  for activity in (promoted or []):
+    activity_id = getattr(activity, 'id', None)
+    if activity_id not in seen_exact_ids:
+      exact.append(activity)
+      seen_exact_ids.add(activity_id)
+  for activity in exact_keyword_title_matches(activities, conditions):
+    activity_id = getattr(activity, 'id', None)
+    if activity_id not in seen_exact_ids:
+      exact.append(activity)
+      seen_exact_ids.add(activity_id)
+  if not exact:
+    return activities
+  others = []
+  for activity in activities:
+    if getattr(activity, 'id', None) not in seen_exact_ids:
+      others.append(activity)
+  return exact + others
 
 
 # 建立活動輪播 LINE 訊息（可選含引言文字）
@@ -1861,6 +2385,10 @@ def query_activities_by_conditions(conditions, limit=10):
   if district:
     qs = qs.filter(district__icontains=district.replace('區', ''))
 
+  exclude_tag_names = (conditions or {}).get('exclude_tag_names') or []
+  if exclude_tag_names:
+    qs = qs.exclude(tags__name__in=exclude_tag_names)
+
   is_free = (conditions or {}).get('is_free')
   if is_free is not None:
     qs = qs.filter(is_free=bool(is_free))
@@ -2098,6 +2626,17 @@ def normalize_ai_conditions(result, fallback=None, user=None, query=''):
     if tag_name in allowed_tags and tag_name not in tag_names:
       tag_names.append(tag_name)
 
+  raw_excluded_tags = result.get('exclude_tag_names') or fallback.get('exclude_tag_names') or []
+  if isinstance(raw_excluded_tags, str):
+    raw_excluded_tags = [raw_excluded_tags]
+  exclude_tag_names = []
+  for name in raw_excluded_tags:
+    tag_name = str(name).strip().lstrip('#')
+    if tag_name in allowed_tags and tag_name not in exclude_tag_names:
+      exclude_tag_names.append(tag_name)
+  if exclude_tag_names:
+    tag_names = [name for name in tag_names if name not in exclude_tag_names]
+
   keyword = clean_query_keyword(str(result.get('keyword') or fallback.get('keyword') or '').strip(), query)[:30]
   soft_topics = clean_semantic_terms(merge_query_terms(fallback.get('soft_topics'), result.get('soft_topics') or result.get('topics'), limit=16), query=query)
   related_terms = clean_semantic_terms(merge_query_terms(fallback.get('related_terms'), result.get('related_terms') or result.get('synonyms'), limit=24), query=query)
@@ -2118,6 +2657,7 @@ def normalize_ai_conditions(result, fallback=None, user=None, query=''):
     'is_free': is_free,
     'keyword': keyword,
     'tag_names': tag_names,
+    'exclude_tag_names': exclude_tag_names,
     'soft_topics': soft_topics,
     'related_terms': related_terms,
   }
@@ -2128,12 +2668,14 @@ def normalize_ai_conditions(result, fallback=None, user=None, query=''):
     'is_free': is_free,
     'keyword': keyword,
     'tag_names': tag_names,
+    'exclude_tag_names': exclude_tag_names,
     'soft_topics': soft_topics,
     'related_terms': related_terms,
   })
   conditions = {
     'district': district,
     'tag_names': tag_names,
+    'exclude_tag_names': exclude_tag_names,
     'is_free': is_free,
     'keyword': keyword,
     'soft_topics': soft_topics,

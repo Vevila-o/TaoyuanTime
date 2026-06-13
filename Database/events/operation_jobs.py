@@ -297,8 +297,9 @@ def run_link_check_job(job):
 def link_check_candidates(limit):
     qs = Activity.objects.filter(
         status='active',
-        excluded_from_public=False,
         is_activity=True,
+    ).filter(
+        Q(excluded_from_public=False) | Q(exclude_reason='dead_official_link') | Q(official_link_status='dead')
     ).filter(
         Q(end_date__isnull=True) | Q(end_date__gte=timezone.now())
     ).exclude(

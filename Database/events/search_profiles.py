@@ -304,4 +304,13 @@ def set_link_health(activity: Activity, status: str, error: str = '') -> None:
     activity.official_link_status = status
     activity.official_link_checked_at = timezone.now()
     activity.official_link_error = error[:1000]
-    activity.save(update_fields=['official_link_status', 'official_link_checked_at', 'official_link_error', 'updated_at'])
+    update_fields = ['official_link_status', 'official_link_checked_at', 'official_link_error', 'updated_at']
+    if status == 'dead':
+        activity.excluded_from_public = True
+        activity.exclude_reason = 'dead_official_link'
+        update_fields.extend(['excluded_from_public', 'exclude_reason'])
+    elif status == 'ok' and activity.exclude_reason == 'dead_official_link':
+        activity.excluded_from_public = False
+        activity.exclude_reason = ''
+        update_fields.extend(['excluded_from_public', 'exclude_reason'])
+    activity.save(update_fields=update_fields)

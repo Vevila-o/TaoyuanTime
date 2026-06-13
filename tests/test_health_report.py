@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from scripts import build_health_report
+from scraping.scripts import build_health_report
 
 
 OFFICIAL_URL = "https://culture.tycg.gov.tw/home.jsp?id=93&parentpath=0,16&mcustomize=activity_view.jsp&dataserno=1"

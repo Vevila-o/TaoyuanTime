@@ -73,6 +73,7 @@ python manage.py migrate
 
 ```powershell
 python manage.py runserver 127.0.0.1:8000
+https://bc0f-211-23-197-194.ngrok-free.app/callback
 ```
 
 瀏覽器開：

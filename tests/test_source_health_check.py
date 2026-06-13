@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from scripts import build_source_health_check
+from scraping.scripts import build_source_health_check
 
 
 def build(events, source_summary, health_report=None):
