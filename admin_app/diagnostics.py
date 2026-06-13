@@ -232,12 +232,23 @@ def recompute_activity_readiness(activity, save=True):
     now = timezone.now()
     
     is_activity = bool(activity.is_activity)
+    if activity.official_link_status == "dead":
+        activity.excluded_from_public = True
+        activity.exclude_reason = "dead_official_link"
+    elif activity.official_link_status == "ok" and activity.exclude_reason == "dead_official_link":
+        activity.excluded_from_public = False
+        activity.exclude_reason = ""
     excluded = bool(activity.excluded_from_public)
     official_url = bool((activity.official_detail_url or activity.source_url or "").strip())
     has_location = bool((activity.location or activity.district or "").strip())
     has_date = bool(activity.start_date)
     date_expired = is_expired(activity, now)
+    if date_expired and activity.status == "active":
+        activity.status = "inactive"
     inactive = activity.status == "inactive"
+    recommendation_reason = (activity.exclude_from_recommendation_reason or "").strip()
+    recommendation_blocked = bool(recommendation_reason)
+    manual_review_required = recommendation_reason == "manual_review_required"
     
     invalid_date_range = False
     if activity.start_date and activity.end_date and activity.end_date < activity.start_date:
@@ -252,7 +263,7 @@ def recompute_activity_readiness(activity, save=True):
         is_activity and activity.title and official_url and has_date and has_location and not excluded and not invalid_date_range and not date_expired and not inactive
     )
     
-    recommendation_ready = bool(line_ready and search_ready) # We can ignore manual_review_required here if we want or check it if exists
+    recommendation_ready = bool(line_ready and search_ready and not recommendation_blocked)
 
     # Update quality warnings
     warnings = parse_listish(activity.quality_warnings)
@@ -284,7 +295,7 @@ def recompute_activity_readiness(activity, save=True):
         "status": activity.status,
         "line_ready": line_ready,
         "recommendation_ready": recommendation_ready,
-        "manual_review_required": False,
+        "manual_review_required": manual_review_required,
         "missing_fields": [
             *([] if has_date else ["missing_date"]),
             *([] if has_location else ["missing_location"]),
@@ -294,8 +305,10 @@ def recompute_activity_readiness(activity, save=True):
     if save:
         activity.save(update_fields=[
             "start_date", "end_date", "location", "district",
+            "status",
             "line_ready", "recommendation_ready", 
-            "is_public_item", "ai_ready", "final_state", "quality_warnings", "updated_at"
+            "is_public_item", "ai_ready", "final_state", "quality_warnings",
+            "excluded_from_public", "exclude_reason", "updated_at"
         ])
         
     return activity

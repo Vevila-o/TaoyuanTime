@@ -19,7 +19,7 @@
     {% endif %}
     <div class="row g-3 mb-3">
       <div class="col-md-6"><div class="stat-card"><div class="label">AI Tag 候選活動</div><div class="number">{{ recommendation_ready_count }}</div><div class="trend muted">active、未過期、推薦 ready、有官方頁</div></div></div>
-      <div class="col-md-6"><div class="stat-card orange"><div class="label">目前待審</div><div class="number">{{ suggestions|length }}</div><div class="trend muted">AI 或規則建議需人工核准</div></div></div>
+      <div class="col-md-6"><div class="stat-card orange"><div class="label">目前待審</div><div class="number">{{ pending_suggestions_count }}</div><div class="trend muted">AI 或規則建議需人工核准</div></div></div>
     </div>
     <div class="table-card">
       <table class="activity-table">

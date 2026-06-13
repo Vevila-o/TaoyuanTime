@@ -62,6 +62,103 @@ class AdminDiagnosticsTests(TestCase):
         self.assertNotIn("missing_activity_date", activity.quality_warnings)
         self.assertNotIn("missing_location", activity.quality_warnings)
 
+    def test_dead_official_link_stays_publicly_excluded_after_recompute(self):
+        activity = Activity.objects.create(
+            title="失效連結活動",
+            description="活動內容",
+            status="active",
+            is_activity=True,
+            source_url="https://example.com/dead",
+            official_detail_url="https://example.com/dead",
+            start_date=timezone.now() + timedelta(days=7),
+            end_date=timezone.now() + timedelta(days=8),
+            district="中壢區",
+            location="中壢藝術館",
+            line_ready=True,
+            recommendation_ready=True,
+            official_link_status="dead",
+            excluded_from_public=False,
+            exclude_reason="",
+        )
+
+        recompute_activity_readiness(activity, save=True)
+        activity.refresh_from_db()
+
+        self.assertTrue(activity.excluded_from_public)
+        self.assertEqual(activity.exclude_reason, "dead_official_link")
+        self.assertFalse(activity.line_ready)
+        self.assertFalse(activity.recommendation_ready)
+
+    def test_manual_review_reason_blocks_recommendation_after_recompute(self):
+        activity = Activity.objects.create(
+            title="待人工審核活動",
+            description="活動內容",
+            status="active",
+            is_activity=True,
+            source_url="https://example.com/manual-review",
+            official_detail_url="https://example.com/manual-review",
+            start_date=timezone.now() + timedelta(days=7),
+            end_date=timezone.now() + timedelta(days=8),
+            district="中壢區",
+            location="中壢藝術館",
+            line_ready=True,
+            recommendation_ready=True,
+            exclude_from_recommendation_reason="manual_review_required",
+        )
+
+        recompute_activity_readiness(activity, save=True)
+        activity.refresh_from_db()
+
+        self.assertTrue(activity.line_ready)
+        self.assertFalse(activity.recommendation_ready)
+        self.assertEqual(activity.final_state, "needs_review")
+
+    def test_missing_data_reason_keeps_needs_data_after_recompute(self):
+        activity = Activity.objects.create(
+            title="缺日期活動",
+            description="活動內容",
+            status="active",
+            is_activity=True,
+            source_url="https://example.com/missing-date",
+            official_detail_url="https://example.com/missing-date",
+            district="中壢區",
+            location="中壢藝術館",
+            line_ready=True,
+            recommendation_ready=True,
+            exclude_from_recommendation_reason="missing_date",
+        )
+
+        recompute_activity_readiness(activity, save=True)
+        activity.refresh_from_db()
+
+        self.assertFalse(activity.line_ready)
+        self.assertFalse(activity.recommendation_ready)
+        self.assertEqual(activity.final_state, "needs_data")
+
+    def test_recompute_auto_inactivates_expired_active_activity(self):
+        activity = Activity.objects.create(
+            title="已過期仍 active",
+            description="活動內容",
+            status="active",
+            is_activity=True,
+            source_url="https://example.com/expired-active",
+            official_detail_url="https://example.com/expired-active",
+            start_date=timezone.now() - timedelta(days=10),
+            end_date=timezone.now() - timedelta(days=1),
+            district="中壢區",
+            location="中壢藝術館",
+            line_ready=True,
+            recommendation_ready=True,
+        )
+
+        recompute_activity_readiness(activity, save=True)
+        activity.refresh_from_db()
+
+        self.assertEqual(activity.status, "inactive")
+        self.assertFalse(activity.line_ready)
+        self.assertFalse(activity.recommendation_ready)
+        self.assertEqual(activity.final_state, "expired")
+
     def test_recompute_keeps_manual_inactive_separate_from_expired(self):
         activity = Activity.objects.create(
             title="已下架活動",

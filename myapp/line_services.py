@@ -553,6 +553,26 @@ def high_confidence_activity_query(text):
   return False
 
 
+def is_explicit_activity_search_request(text):
+  compact = re.sub(r'\s+', '', text or '')
+  if not compact or ordinal_context_index(compact) is not None:
+    return False
+  if compact.startswith(('這個', '這些', '那個', '那些', '剛剛', '上一個', '上一輪')):
+    return False
+  if compact in {'免費嗎', '要錢嗎', '收費嗎', '要買票嗎', '要報名嗎', '在哪裡', '在哪'}:
+    return False
+  search_verbs = ('幫我找', '找', '想找', '我想找', '想看', '我想看', '有沒有', '有什麼', '我要', '推薦')
+  if any(term in compact for term in search_verbs) and is_activity_query(compact):
+    return True
+  if '活動' in compact and (
+    any(district in compact for district in DISTRICTS)
+    or any(term in compact for term in ('免費', '不用錢', '免門票', '親子', '週末', '周末', '今天', '明天'))
+    or contains_known_tag(compact)
+  ):
+    return True
+  return False
+
+
 def is_generic_activity_restart_request(text):
   compact = re.sub(r'\s+', '', text or '')
   if not compact:
@@ -1087,6 +1107,9 @@ def handle_line_text_message(user, text):
       include_intro=True,
     )
 
+  if text.lower() in SMALLTALK_WORDS:
+    return build_query_help_message()
+
   if out_of_taoyuan_query(text):
     return build_scope_limit_message()
 
@@ -1095,6 +1118,9 @@ def handle_line_text_message(user, text):
   if state and is_generic_activity_restart_request(text):
     state = None
     context_items = []
+  explicit_activity_search = bool(context_items) and is_explicit_activity_search_request(text)
+  if explicit_activity_search:
+    return handle_refined_search_text(user, text, state)
   if context_items:
     ordinal_index = ordinal_context_index(text)
     if ordinal_index is not None:
@@ -1355,6 +1381,8 @@ def should_replace_context_query(text, base_conditions, patch):
   compact = re.sub(r'\s+', '', text or '')
   patch_tags = set((patch or {}).get('tag_names') or [])
   base_tags = set((base_conditions or {}).get('tag_names') or [])
+  if is_explicit_activity_search_request(compact) and any(term in compact for term in ('幫我找', '找', '想找', '我想找', '有沒有', '有什麼', '我要', '推薦')):
+    return True
   if patch_tags and not patch_tags.issubset(base_tags):
     if compact.startswith(('那', '那個', '不然', '換', '改', '算了')) or compact.endswith(('呢', '勒', '咧')):
       return True
@@ -2615,7 +2643,7 @@ def rule_extract_conditions(query):
     conditions['start_date'] = timezone.make_aware(datetime.combine(saturday, datetime_time.min))
     conditions['end_date'] = timezone.make_aware(datetime.combine(sunday, datetime_time.max))
 
-  keyword = re.sub(r'(桃園市?|區|免費|免門票|不用錢|小資|今天|今日|明天|週末|周末|活動|有沒有|想看|我要|我想|不要太遠|附近|近一點|離我近|的|我|看)', ' ', text)
+  keyword = re.sub(r'(桃園市?|區|免費|免門票|不用錢|小資|今天|今日|明天|週末|周末|活動|有沒有|幫我找|我想找|想找|想看|我要|我想|幫|找|不要太遠|附近|近一點|離我近|的|我|看)', ' ', text)
   for district in DISTRICTS:
     keyword = keyword.replace(district, ' ')
   for tag_name in conditions['tag_names']:
@@ -2729,14 +2757,14 @@ def normalize_ai_conditions(result, fallback=None, user=None, query=''):
 
 def clean_query_keyword(keyword, query=''):
   text = keyword or ''
-  text = re.sub(r'(桃園市?|區|免費|免門票|不用錢|小資|今天|今日|明天|週末|周末|活動|有沒有|想看|我要|我想|不要太遠|附近|近一點|離我近|的|我|看)', ' ', text)
+  text = re.sub(r'(桃園市?|區|免費|免門票|不用錢|小資|今天|今日|明天|週末|周末|活動|有沒有|幫我找|我想找|想找|想看|我要|我想|幫|找|不要太遠|附近|近一點|離我近|的|我|看)', ' ', text)
   for district in DISTRICTS:
     text = text.replace(district, ' ')
   if is_lifestyle_activity_query(query):
     for term in LIFESTYLE_KEYWORD_STOPWORDS:
       text = text.replace(term, ' ')
   text = re.sub(r'\s+', ' ', text).strip()
-  if text in {'有', '沒有', '想', '看'}:
+  if text in {'有', '沒有', '想', '看', '幫', '找', '幫 找'}:
     return ''
   if query and text == query.strip():
     simplified = re.sub(r'(桃園市?|區|活動|有沒有|想看|我要|我想|的)', ' ', text)

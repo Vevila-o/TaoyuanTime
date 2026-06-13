@@ -55,6 +55,24 @@ from .diagnostics import (
 DISTRICTS = ['桃園', '中壢', '平鎮', '八德', '楊梅', '蘆竹', '大溪', '龍潭', '龜山', '大園', '觀音', '新屋', '復興']
 
 
+def serviceable_tag_suggestions(now=None):
+  now = now or timezone.now()
+  return (
+    ActivityTagSuggestion.objects.select_related('activity', 'tag')
+    .filter(
+      status='pending',
+      activity__status='active',
+      activity__excluded_from_public=False,
+      activity__is_activity=True,
+      activity__recommendation_ready=True,
+    )
+    .filter(Q(activity__end_date__isnull=True) | Q(activity__end_date__gte=now))
+    .exclude(activity__official_detail_url='')
+    .exclude(activity__official_detail_url__isnull=True)
+    .exclude(activity__official_link_status='dead')
+  )
+
+
 def login(request):
   return render(request, 'login.html')
 
@@ -299,32 +317,55 @@ def activityList(request):
     qs = qs.filter(search_profile__status='failed')
   elif readiness == 'link_dead':
     qs = qs.filter(official_link_status='dead')
+  elif readiness == 'link_error':
+    qs = qs.filter(official_link_status='error')
   elif readiness in {'line_blocked', 'recommendation_blocked', 'ai_summary_blocked', 'ocr_blocked', 'quality_warning'}:
     qs = apply_readiness_filter(qs, readiness)
   now_dt = timezone.now()
   qs = qs.annotate(
+    link_attention_rank=Case(
+      When(official_link_status='error', then=Value(1)),
+      default=Value(0),
+      output_field=IntegerField()
+    ),
     is_available=Case(
       When(
         Q(status='active') &
         Q(excluded_from_public=False) &
+        Q(is_activity=True) &
         Q(line_ready=True) &
         Q(recommendation_ready=True) &
         Q(is_public_item=True) &
+        Q(start_date__isnull=False) &
+        (Q(location__gt='') | Q(district__gt='')) &
+        Q(official_detail_url__gt='') &
+        ~Q(official_link_status='dead') &
+        (Q(exclude_from_recommendation_reason='') | Q(exclude_from_recommendation_reason__isnull=True)) &
         (Q(end_date__isnull=True) | Q(end_date__gte=now_dt)),
         then=Value(1)
       ),
       default=Value(0),
       output_field=IntegerField()
+    ),
+    has_start_date=Case(
+      When(start_date__isnull=False, then=Value(1)),
+      default=Value(0),
+      output_field=IntegerField()
+    ),
+    is_upcoming=Case(
+      When(start_date__gte=now_dt, then=Value(1)),
+      default=Value(0),
+      output_field=IntegerField()
     )
   )
-  activities = list(qs.order_by('-is_available', '-updated_at')[:200])
+  activities = list(qs.order_by('-link_attention_rank', '-is_available', '-is_upcoming', '-has_start_date', 'start_date', '-updated_at')[:200])
   for activity in activities:
     activity.exposure_diagnostic = activity_exposure_diagnostic(activity, now=timezone.now())
   context = {
     'activities': activities,
     'districts': DISTRICTS,
     'filters': {'q': keyword, 'status': status, 'district': district, 'readiness': readiness},
-    'pending_tag_suggestions': ActivityTagSuggestion.objects.filter(status='pending').count(),
+    'pending_tag_suggestions': serviceable_tag_suggestions(now_dt).count(),
     'filter_summary': exposure_summary()[0],
   }
   return render(request, 'activityList.html', context)
@@ -429,11 +470,14 @@ def activityApplyAiTags(request, id):
 
 
 def tagReview(request):
-  suggestions = ActivityTagSuggestion.objects.select_related('activity', 'tag').filter(status='pending')[:200]
+  now = timezone.now()
+  suggestions_qs = serviceable_tag_suggestions(now)
+  suggestions = suggestions_qs[:200]
   return render(request, 'tagReview.html', {
     'suggestions': suggestions,
     'ai_tag_target_count': apply_readiness_filter(Activity.objects.all(), 'recommendation_blocked').count(),
-    'recommendation_ready_count': Activity.objects.filter(status='active', excluded_from_public=False, recommendation_ready=True).filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.now())).exclude(official_detail_url='').count(),
+    'recommendation_ready_count': Activity.objects.filter(status='active', excluded_from_public=False, recommendation_ready=True).filter(Q(end_date__isnull=True) | Q(end_date__gte=now)).exclude(official_detail_url='').exclude(official_link_status='dead').count(),
+    'pending_suggestions_count': suggestions_qs.count(),
   })
 
 

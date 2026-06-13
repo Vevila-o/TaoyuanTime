@@ -112,6 +112,22 @@ class LineSemanticQueryTests(TestCase):
         self.assertIn('體驗', conditions['soft_topics'])
         self.assertIn('兒童', conditions['related_terms'])
 
+    def test_normalize_ai_conditions_removes_search_verbs_from_keyword(self):
+        conditions = normalize_ai_conditions(
+            {
+                'district': '中壢',
+                'is_free': True,
+                'keyword': '幫 找',
+                'soft_topics': ['免費活動'],
+                'related_terms': [],
+            },
+            query='幫我找中壢的免費活動',
+        )
+
+        self.assertEqual(conditions['district'], '中壢')
+        self.assertTrue(conditions['is_free'])
+        self.assertEqual(conditions['keyword'], '')
+
     def test_search_profile_can_supply_semantic_matches_when_tag_is_missing(self):
         self.make_activity('一般藝文活動', tags=[self.art], start_offset=20)
         semantic_match = self.make_activity(
@@ -410,6 +426,55 @@ class LineSemanticQueryTests(TestCase):
         self.assertNotIn('免費或未標示收費', text)
         self.assertEqual(state.last_query, '中壢活動')
         self.assertEqual(state.last_activity_ids, [free_activity.id, unknown_fee_activity.id])
+
+    def test_explicit_free_activity_search_is_not_treated_as_fee_followup(self):
+        previous = self.make_activity('上一輪推薦活動', tags=[self.art], start_offset=4)
+        target = self.make_activity('中壢新的免費活動', tags=[self.art], start_offset=5)
+        previous.district = '桃園'
+        target.district = '中壢'
+        target.location = '中壢'
+        target.is_free = True
+        target.fee_type = 'free'
+        previous.save(update_fields=['district'])
+        target.save(update_fields=['district', 'location', 'is_free', 'fee_type'])
+        user = UserProfile.objects.create(line_user_id='explicit-free-activity-search-test')
+        LineConversationState.objects.create(
+            user=user,
+            intent='recommendation',
+            last_query='推薦活動',
+            conditions={'mode': 'recommendation'},
+            last_activity_ids=[previous.id],
+            offset=1,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+        extract_response = SimpleNamespace(
+            parsed={
+                'district': '中壢',
+                'tag_names': [],
+                'exclude_tag_names': [],
+                'is_free': True,
+                'keyword': '',
+                'soft_topics': [],
+                'related_terms': [],
+                'relax_order': ['district', 'is_free'],
+            },
+            provider='test',
+            model='mock',
+        )
+
+        with patch('myapp.line_services.call_json_with_fallback', return_value=extract_response):
+            message = handle_line_text_message(user, '幫我找中壢的免費活動')
+
+        items = message if isinstance(message, list) else [message]
+        intro = getattr(items[0], 'text', '')
+        state = LineConversationState.objects.get(user=user)
+        self.assertTrue(any(item.__class__.__name__ == 'FlexSendMessage' for item in items))
+        self.assertNotIn('上一輪結果', intro)
+        self.assertEqual(state.last_query, '幫我找中壢的免費活動')
+        self.assertTrue(state.conditions.get('is_free'))
+        self.assertEqual(state.conditions.get('district'), '中壢')
+        self.assertIn(target.id, state.last_activity_ids)
+        self.assertNotIn(previous.id, state.last_activity_ids)
 
     def test_more_after_fee_followup_returns_new_cards_without_repeating_previous_cards(self):
         first = self.make_activity('中壢第一個活動', tags=[self.art], start_offset=5)
@@ -944,6 +1009,26 @@ class LineSemanticQueryTests(TestCase):
         self.assertNotIn('中原', state.last_query)
         self.assertNotEqual(state.conditions.get('district'), '中壢')
         self.assertIn(general.id, state.last_activity_ids)
+
+    def test_smalltalk_with_previous_activity_context_stays_text_only(self):
+        activity = self.make_activity('上一輪活動', tags=[self.art], start_offset=5)
+        user = UserProfile.objects.create(line_user_id='smalltalk-context-test')
+        LineConversationState.objects.create(
+            user=user,
+            intent='activity_search',
+            last_query='藝文活動',
+            conditions={'tag_names': ['藝文']},
+            last_activity_ids=[activity.id],
+            offset=1,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+
+        message = handle_line_text_message(user, '你是誰')
+        items = message if isinstance(message, list) else [message]
+
+        self.assertTrue(all(item.__class__.__name__ == 'TextSendMessage' for item in items))
+        state = LineConversationState.objects.get(user=user)
+        self.assertEqual(state.last_activity_ids, [activity.id])
 
     def test_new_subject_with_description_phrase_replaces_previous_context(self):
         old = self.make_activity('中原文創園區《即刻救原3-珍綜再見》', search_text='中原 戶外 節慶')

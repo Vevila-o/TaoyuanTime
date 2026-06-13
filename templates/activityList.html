@@ -61,6 +61,7 @@
         <option value="missing_search_profile" {% if filters.readiness == "missing_search_profile" %}selected{% endif %}>缺搜尋語意</option>
         <option value="search_profile_failed" {% if filters.readiness == "search_profile_failed" %}selected{% endif %}>搜尋語意失敗</option>
         <option value="link_dead" {% if filters.readiness == "link_dead" %}selected{% endif %}>官方連結疑似失效</option>
+        <option value="link_error" {% if filters.readiness == "link_error" %}selected{% endif %}>官方連結待確認</option>
       </select>
       <button class="btn btn-sm btn-primary" type="submit">篩選</button>
       <a class="btn btn-sm btn-outline-secondary" href="{% url 'tagReview' %}">Tag 待審 {{ pending_tag_suggestions }}</a>
@@ -101,7 +102,7 @@
                 <span class="badge inactive">已下架</span>
               {% elif activity.status == "draft" %}
                 <span class="badge draft">草稿</span>
-              {% elif activity.line_ready and activity.recommendation_ready and activity.is_public_item %}
+              {% elif activity.is_available %}
                 <span class="badge active">上架中</span>
               {% else %}
                 <span class="badge draft">待補資料</span>
