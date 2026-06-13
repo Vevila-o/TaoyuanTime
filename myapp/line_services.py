@@ -40,6 +40,7 @@ PREFERENCE_COMMANDS = {'偏好設定', '設定偏好', '喜好設定'}
 RECOMMENDATION_COMMANDS = {'推薦活動', '猜你喜歡', '今日推薦'}
 SUBSCRIPTION_COMMANDS = {'已訂閱活動', '我的訂閱', '已訂閱'}
 MORE_RESULT_WORDS = {'還有嗎', '還有沒有', '換一批', '再給我', '更多', '查看更多', '下一批'}
+CLEAR_CONTEXT_COMMANDS = {'清除搜尋', '清除我的搜尋', '重新搜尋', '重設', '清除', '重來', '重新開始'}
 LINE_CONTEXT_TTL_MINUTES = 30
 SEMANTIC_QUERY_EXPANSIONS = {
   '腳踏車': ['自行車', '單車', '騎車', '運動', '戶外'],
@@ -587,6 +588,7 @@ def is_activity_followup_question(text):
     return False
   followup_terms = (
     '這個', '這些', '剛剛', '那個', '那些', '要錢', '免費', '費用', '票價',
+    '門票', '票錢', '多少錢', '收費', '要付費', '要購票', '要買票',
     '需要報名', '要報名', '報名', '在哪', '哪裡', '地點', '地址',
     '什麼時候', '時間', '幾點', '適合小孩', '適合親子', '小孩適合',
     '在幹嘛', '在幹麻', '幹嘛', '幹麻', '做什麼', '玩什麼', '內容', '介紹', '是什麼',
@@ -686,6 +688,10 @@ def answer_activity_followup(user, text, state):
 # 處理 LINE 文字訊息主流程（含指令偵測、意圖分類、活動搜尋）
 def handle_line_text_message(user, text):
   text = (text or '').strip()
+  if text in CLEAR_CONTEXT_COMMANDS:
+    LineConversationState.objects.filter(user=user).delete()
+    return TextSendMessage(text='已清除搜尋記錄，請重新輸入你想找的活動。')
+
   if text in PREFERENCE_COMMANDS:
     return build_preference_message(user)
 
@@ -1520,7 +1526,7 @@ def cancel_subscription(user, activity_id):
 
 # 建立訂閱成功 Flex Message（含提醒天數設定與 Google Calendar 按鈕）
 def build_subscription_success_message(activity, subscription, created):
-  title = f'訂閱成功！{subscription.remind_before_days} 天後活動開始，提醒您' if created else '您先前已訂閱過此活動'
+  title = f'訂閱成功！您希望提醒的時間:' if created else '您先前已訂閱過此活動'
   color = '#1DB446' if created else '#4A4A4A'
   contents = {
     'type': 'bubble',

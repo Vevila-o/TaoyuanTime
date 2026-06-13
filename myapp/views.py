@@ -536,7 +536,7 @@ def generate_barcode_image(card_number):
     
     # ⚠️ 重要：設定您的 ngrok 網址或公開網址
     # 若在本地測試，這裡必須是 https://xxxx.ngrok-free.app/media/barcodes/xxxx.png
-    base_url = "https://4a78-211-23-197-194.ngrok-free.app" 
+    base_url = "https://bc0f-211-23-197-194.ngrok-free.app" 
     return f"{base_url}{settings.MEDIA_URL}barcodes/{filename}"
 
 
