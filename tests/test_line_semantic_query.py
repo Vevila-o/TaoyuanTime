@@ -184,6 +184,39 @@ class LineSemanticQueryTests(TestCase):
         self.assertEqual(line_results[0], title_match)
         self.assertIn('1 個符合', build_activity_intro_text(line_results, '我想要文化幣的活動', user=user))
 
+    def test_relaxed_keyword_result_intro_denies_exact_match_before_recommending(self):
+        activity = self.make_activity('戶外親子活動', tags=[self.art], start_offset=5)
+        activity._line_notice = '先推薦相近活動。'
+        user = UserProfile.objects.create(line_user_id='relaxed-intro-denial-test')
+
+        text = build_activity_intro_text([activity], '有沒有腳踏車活動', user=user)
+
+        self.assertIn('沒有', text)
+        self.assertIn('有沒有腳踏車活動', text)
+        self.assertIn('相似或其他活動', text)
+        self.assertNotIn('找到 1 個符合', text)
+
+    def test_keyword_search_without_title_match_is_marked_as_alternative(self):
+        outdoor = Tag.objects.create(name='戶外', tag_type='activity_type')
+        activity = self.make_activity('戶外親子活動', tags=[outdoor], start_offset=5)
+        user = UserProfile.objects.create(line_user_id='keyword-alternative-notice-test')
+        conditions = {
+            'district': '',
+            'tag_names': ['戶外'],
+            'is_free': None,
+            'keyword': '腳踏車',
+            'soft_topics': [],
+            'related_terms': ['戶外'],
+        }
+
+        results = search_activities_for_line(user, '有沒有腳踏車活動', limit=1, conditions=conditions)
+        text = build_activity_intro_text(results, '有沒有腳踏車活動', user=user)
+
+        self.assertEqual(results, [activity])
+        self.assertIn('沒有', text)
+        self.assertIn('相似或其他活動', text)
+        self.assertNotIn('目前找到', text)
+
     def test_named_activity_followup_describes_previous_result_instead_of_searching(self):
         activity = self.make_activity('桃園珍珠海岸主題遊程', tags=[self.art])
         activity.description = activity.title

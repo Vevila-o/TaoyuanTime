@@ -1529,6 +1529,10 @@ def search_activities_for_line(user, query, limit=3, offset=0, conditions=None, 
     district = conditions.get('district') or ''
     ranked = [activity for activity in ranked if district in (activity.district or '')]
   result = ranked[offset:offset + limit]
+  if should_mark_keyword_results_as_alternatives(result, conditions):
+    notice = f'目前沒有找到明確符合「{query}」的活動，先推薦相似或其他活動給你。'
+    for activity in result:
+      activity._line_notice = notice
   return (result, conditions) if return_conditions else result
 
 
@@ -1547,12 +1551,24 @@ def exact_keyword_title_matches(activities, conditions):
   keyword = re.sub(r'\s+', '', str((conditions or {}).get('keyword') or ''))
   if len(keyword) < 2:
     return []
+  keyword_terms = [
+    re.sub(r'\s+', '', term)
+    for term in expand_terms_with_search_vocabulary([keyword])
+    if len(re.sub(r'\s+', '', term)) >= 2
+  ]
   exact = []
   for activity in activities:
     title = re.sub(r'\s+', '', activity.title or '')
-    if title and (keyword in title or title in keyword):
+    if title and any(term in title or title in term for term in keyword_terms):
       exact.append(activity)
   return exact
+
+
+def should_mark_keyword_results_as_alternatives(activities, conditions):
+  keyword = re.sub(r'\s+', '', str((conditions or {}).get('keyword') or ''))
+  if len(keyword) < 2 or not activities:
+    return False
+  return not exact_keyword_title_matches(activities, conditions)
 
 
 def promote_exact_keyword_title_matches(activities, conditions, promoted=None):
@@ -1615,7 +1631,10 @@ def build_activity_intro_text(activities, query_context='推薦活動', user=Non
   count = len(activities)
   notice = next((getattr(activity, '_line_notice', '') for activity in activities if getattr(activity, '_line_notice', '')), '')
   if notice:
-    return f'{notice}\n我先整理 {count} 個相近活動給你參考，詳細時間地點請以官方頁為準。'
+    if '沒有' not in notice:
+      query = f'「{query_context}」' if query_context and query_context != '推薦活動' else '這個條件'
+      notice = f'目前沒有找到明確符合{query}的活動，先推薦相似或其他活動給你。'
+    return f'{notice}\n我先整理 {count} 個活動給你參考，詳細時間地點請以官方頁為準。'
   if any(getattr(activity, '_search_plan_score', 0) for activity in activities):
     return f'目前找到 {count} 個符合「{query_context}」的活動，詳細時間地點請以官方頁為準。'
   ai_intro = build_activity_intro_text_with_ai(activities, query_context, user=user)
