@@ -139,7 +139,7 @@ https://你的-ngrok-domain.ngrok-free.app/callback
 3. 按「一鍵完整更新」或建立完整更新任務。
 4. 進任務詳情看進度與結果。
 
-完整更新會做：爬蟲、匯入、過期活動自動下架、OCR、AI repair+tag、安全補欄位、readiness 重算、搜尋語意與 AI 摘要。它不會定時自己跑；要更新時手動按後台即可。
+完整更新會做：爬蟲、匯入、過期活動自動下架、OCR、AI repair+tag、安全補欄位、readiness 重算、搜尋語意、AI 摘要與官方連結檢查。它不會定時自己跑；要更新時手動按後台即可。
 
 資料保存原則：
 
@@ -192,7 +192,7 @@ python manage.py run_crawler_pipeline --activate --skip-dynamic --primary-limit 
 python manage.py run_queued_crawl_jobs --limit 1
 ```
 
-完整更新流程會做：爬蟲、匯入、過期活動自動下架、OCR、AI repair+tag、安全補欄位、readiness 重算、搜尋語意與 AI 摘要。它不會定時自己跑；需要你手動按後台或手動執行 command。
+完整更新流程會做：爬蟲、匯入、過期活動自動下架、OCR、AI repair+tag、安全補欄位、readiness 重算、搜尋語意、AI 摘要與官方連結檢查。它不會定時自己跑；需要你手動按後台或手動執行 command。
 
 缺漏補救原則：
 
@@ -200,6 +200,7 @@ python manage.py run_queued_crawl_jobs --limit 1
 - AI repair+tag 不只上標籤，也會嘗試補活動日期、地點、地區、報名資訊、報名網址與費用類型。
 - 自動補欄位只補空欄位，不覆蓋既有值；人工確認要覆蓋時，從後台編輯或用專案指令處理。
 - 後台完整更新會優先處理 active、未排除、未過期、且有缺漏欄位的活動；已經直接爬到完整資料的活動不會被重複 repair。
+- 官方連結檢查會把 HTTP 404/410 等失效活動標成 `dead_official_link` 並排除公開推薦；若之後修正官方連結，再跑檢查可清掉這個系統排除原因。
 
 只建立/處理 queued job 的情況：
 
@@ -217,6 +218,43 @@ python manage.py run_queued_crawl_jobs --job-id <job_id>
 
 ```powershell
 python manage.py archive_expired_activities
+```
+
+## 9. LINE AI 對話測試重點
+
+測試活動對話時，不要只看第幾輪，要看本句是否切換狀態。
+
+必測案例：
+
+```text
+幫我找中原的活動
+中壢的
+幫我找活動
+```
+
+正確行為：最後一句是泛用重新搜尋或一般推薦，不應沿用中原 / 中壢，不應把 `last_query` 串成「幫我找中原的活動，中壢的，幫我找活動」。
+
+```text
+上一輪看到：中原文創園區《即刻救原3-珍綜再見》
+書法展在幹嘛
+```
+
+正確行為：`書法展` 是新主體，不能因為有「在幹嘛」就追問上一輪卡片；搜尋結果應以書法展核心詞過濾，避免舊卡片混入。
+
+仍應維持的追問案例：
+
+- `這個活動在幹嘛`
+- `第二個在哪裡`
+- `免費嗎`
+- `要買票嗎`
+- `還有嗎`
+
+相關驗證：
+
+```powershell
+python manage.py test tests.test_line_semantic_query
+python manage.py test tests
+python manage.py check
 ```
 
 先確認 dry-run 列表沒問題，再執行：
@@ -264,7 +302,7 @@ OCR：
 python manage.py process_activity_ocr --limit 20
 ```
 
-## 9. 推播與提醒
+## 10. 推播與提醒
 
 推薦推播 dry-run：
 
@@ -296,7 +334,7 @@ python manage.py push_activity_change_notifications --dry-run
 python manage.py push_activity_change_notifications
 ```
 
-## 10. 驗收 smoke
+## 11. 驗收 smoke
 
 LINE 自然語言與 tracking 回歸：
 
@@ -317,7 +355,7 @@ python manage.py shell -c "from events.models import Store; print(Store.objects.
 python manage.py shell -c "from django.test import Client; c=Client(); urls=['/dashboard/','/operations/','/operations/jobs/','/activityList/','/tagReview/','/push','/User','/crawlJobs/','/activityChanges/','/lineQuerySimulator/']; [print(u, c.get(u).status_code) for u in urls]"
 ```
 
-## 11. 注意事項
+## 12. 注意事項
 
 - `.env` 不提交。
 - `Database\db.sqlite3` 是本資料夾獨立 DB。
@@ -325,4 +363,3 @@ python manage.py shell -c "from django.test import Client; c=Client(); urls=['/d
 - LINE 沒反應時，先看 Django server 是否收到 `/callback`，再看 ngrok 與 LINE Developers webhook URL。
 - 改 ngrok domain 後，要同步更新 `.env` 的 `PUBLIC_BASE_URL` 與 LINE Developers webhook URL。
 - AI 服務選擇規則：`LOCAL=not/false/0/no/off` 或 `AI_BASE_URL` 空白/`not` 時，直接使用 OpenAI cloud；`LOCAL=true` 且 `AI_BASE_URL` 有值時，才會先試本地端再 fallback。AI 對話、AI Tag、AI 摘要與 OCR 都共用這套規則。
-

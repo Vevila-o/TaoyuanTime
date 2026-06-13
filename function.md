@@ -103,12 +103,14 @@
 | `rule_classify_line_intent` | 用規則快速分類使用者意圖（不呼叫 AI） |
 | `is_activity_query` | 判斷訊息是否為活動查詢 |
 | `high_confidence_activity_query` | 判斷是否為高確信度活動查詢（不需 AI 確認） |
+| `is_generic_activity_restart_request` | 判斷「幫我找活動」「有什麼活動」等泛用新搜尋，避免沿用上一輪地區或 keyword context |
 | `is_lifestyle_activity_query` | 判斷是否為生活情境活動查詢（帶小孩/雨天/約會） |
 | `has_child_lifestyle_intent` | 判斷訊息是否有帶小孩出門的活動意圖 |
 | `has_rainy_lifestyle_intent` | 判斷訊息是否有雨天活動意圖 |
 | `has_date_lifestyle_intent` | 判斷訊息是否有約會活動意圖 |
 | `looks_like_refinement` | 判斷訊息是否為針對上一輪結果的搜尋精煉 |
 | `contains_known_tag` | 判斷文字是否包含已知的有效標籤 |
+| `has_new_subject_with_description_phrase` | 判斷「書法展在幹嘛」這類新主體加內容詢問，避免誤當上一輪卡片追問 |
 
 ### 搜尋與條件處理
 | 函數 | 說明 |
@@ -127,6 +129,7 @@
 | `merge_search_conditions` | 合併基底查詢條件與新的精煉條件 |
 | `combine_context_query` | 合併上一輪和本輪查詢字串 |
 | `should_replace_context_query` | 判斷短新主題是否應丟掉上一輪髒掉的 keyword context |
+| `activity_matches_keyword_subject` | 針對新主體內容詢問過濾活動搜尋結果，保留真正命中核心 keyword 的卡片 |
 | `exact_keyword_title_matches` | 找出 keyword 明確命中活動標題的候選活動 |
 | `promote_exact_keyword_title_matches` | 在 AI rerank 後保護精準標題命中活動，避免被擠出前三張 |
 | `apply_nearby_preference` | 若使用者要求附近且有偏好地區，套用到條件 |

@@ -219,7 +219,6 @@ LINE 行為：
 | 必勝客－中壢新中北店 | 2026/03/10－2026/11/30 | 使用優惠代碼 26705，可享指定人氣饗宴餐 399 元。 |
 | 肯德基－中壢環中東二店 | 2026/03/10－2026/11/30 | 使用優惠代碼 26763，可享指定雙料冠軍爭霸戰套餐 299 元。 |
 
-
 #### 6/12 OCR → AI Repair+Tag → Readiness 閉環與資料補救
 
 後台完整更新流程改成：
@@ -294,3 +293,59 @@ python manage.py test tests.test_search_profiles tests.test_line_semantic_query
 - `這個會不會很遠` 回覆上一張活動地點與導航提示。
 - `啊第二個呢` 回覆上一輪第 2 張活動。
 - `那小孩浴場呢` 會重設 `last_query`，且第一張卡片是小孩浴場。
+
+#### 6/13 LINE AI 對話上下文事件紀錄
+
+這次測試發現 LINE 活動對話不能只靠「第幾輪」判斷狀態，必須看使用者本句是在：
+
+- 追問上一輪活動卡片
+- 精煉上一輪搜尋條件
+- 要更多卡片
+- 重新開始找活動
+- 換成新的活動主題
+
+事件 1：泛用重新找活動被當成 refine。
+
+```text
+使用者：幫我找中原的活動
+使用者：中壢的
+使用者：幫我找活動
+錯誤：幫我找中原的活動，中壢的，幫我找活動
+正確：把「幫我找活動」視為重新找活動或一般推薦，不沿用中原 / 中壢 context
+```
+
+修正重點：
+
+- `幫我找活動`、`找活動`、`有什麼活動` 這類沒有地區、標籤、生活情境的新請求，直接清掉上一輪 context。
+- 這不是純死規則取代 AI，而是高風險入口的 deterministic guard，避免 AI router 誤判後污染 `LineConversationState.last_query`。
+- 已補 regression test：`test_generic_activity_request_resets_previous_location_context`。
+
+事件 2：新主體加追問語氣被誤判成上一輪卡片追問。
+
+```text
+上一輪卡片：中原文創園區《即刻救原3-珍綜再見》
+使用者：書法展在幹嘛
+錯誤：沿用上一輪中原 / 中壢 context，甚至把《即刻救原3》一起回傳
+正確：把「書法展」視為新的搜尋主體，不是「這個活動在幹嘛」
+```
+
+修正重點：
+
+- `書法展在幹嘛` 這種句子雖然有「在幹嘛」，但前面有明確新主體，不應自動指向上一輪單一卡片。
+- 若句中有 `這個`、`那個`、`剛剛`、序號或活動名稱，才偏向上一輪卡片追問。
+- 若有新主體加內容詢問詞，會清掉舊 query，並用核心詞過濾搜尋結果，避免舊活動或泛相近卡片混入。
+- 已補 regression test：`test_new_subject_with_description_phrase_replaces_previous_context`。
+
+本次驗證：
+
+```powershell
+python manage.py test tests.test_line_semantic_query
+python manage.py test tests
+python manage.py check
+```
+
+結果：
+
+- `tests.test_line_semantic_query`：34 tests OK
+- 全測試：126 tests OK
+- Django check：OK

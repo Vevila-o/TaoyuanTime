@@ -534,9 +534,11 @@ def generate_barcode_image(card_number):
     # file_path 會是完整路徑，我們只需要檔案名稱來組網址
     filename = os.path.basename(file_path)
     
-    # ⚠️ 重要：設定您的 ngrok 網址或公開網址
-    # 若在本地測試，這裡必須是 https://xxxx.ngrok-free.app/media/barcodes/xxxx.png
-    base_url = "https://bc0f-211-23-197-194.ngrok-free.app" 
+    # 公開網址改由 .env 的 PUBLIC_BASE_URL 控制；ngrok / 正式網域不要寫死在程式。
+    # LINE 伺服器必須能從這個公開網址讀到 /media/barcodes/*.png。
+    base_url = (settings.PUBLIC_BASE_URL or '').rstrip('/')
+    if not base_url:
+        raise ValueError('PUBLIC_BASE_URL is required to expose citizen-card barcode images.')
     return f"{base_url}{settings.MEDIA_URL}barcodes/{filename}"
 
 
