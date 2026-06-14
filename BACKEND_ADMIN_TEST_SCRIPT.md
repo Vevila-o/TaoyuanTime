@@ -59,7 +59,43 @@ python manage.py cleanup_demo_data --apply
 
 正式資料不靠標題手動辨識，cleanup 只會清掉 `source_key=demo` 的活動與 `demo-` 開頭的 LINE 使用者。
 
-## 3. LINE 對話邏輯 smoke test
+## 3. 指令與 UI 對照表
+
+| 目的 | 命令列 | 後台 UI 操作 |
+|---|---|---|
+| 建立固定 demo 資料 | `python manage.py seed_demo_data --reset` | 無 UI 按鈕，這是展示前準備指令 |
+| 清除 demo 資料 dry-run | `python manage.py cleanup_demo_data` | 無 UI 按鈕，先用命令確認會刪哪些資料 |
+| 清除 demo 資料 apply | `python manage.py cleanup_demo_data --apply` | 無 UI 按鈕，展示後回溯用 |
+| 後台 smoke test | `python manage.py smoke_admin_backend` | 無 UI 按鈕；等同自動打開主要後台頁面檢查 |
+| LINE 極端對話 smoke | `python manage.py smoke_extreme_line_flow` | 可輔助用「LINE 查詢模擬」手動測，但正式 smoke 仍用命令 |
+| 開始完整更新 | 可用爬蟲 pipeline 指令備援 | 側欄「爬蟲任務」→ 確認「抓取上限」為 `1` → 來源可留「全部來源」→ 按「開始完整更新」 |
+| 查看完整更新進度 | - | 側欄「爬蟲任務」→ 任務進度表 → 按任務列右側「詳情」 |
+| 啟動等待任務 | - | 側欄「爬蟲任務」→ 展開「維護工具」→ 按「啟動下一筆」 |
+| 清除 queued 任務 | - | 側欄「爬蟲任務」→ 展開「維護工具」→ 按「清除 queued」 |
+| 標記卡住任務 | - | 側欄「爬蟲任務」→ 展開「維護工具」→ 按「標記可能中斷」；或任務 running 時按該列「標記中斷」 |
+| 建立小批測試任務 | - | 側欄「爬蟲任務」→ 展開「維護工具」→ 按「建立測試任務」 |
+| 補 AI 摘要 | - | 側欄「營運工具」→ 補救工具 → 按「補 AI 摘要」 |
+| 補搜尋語意 | - | 側欄「營運工具」→ 補救工具 → 按「補搜尋語意」 |
+| 處理可 OCR 圖片 | - | 側欄「營運工具」→ 補救工具 → 按「處理可 OCR 圖片」 |
+| 產生 AI Tag 建議 | - | 側欄「營運工具」→ 展開「維護工具」→ 按「產生 AI Tag 建議」 |
+| 直接套用 AI Tag | - | 側欄「營運工具」→ 展開「維護工具」→ 按「直接套用 AI Tag」 |
+| 從既有圖片建立資產 | - | 側欄「營運工具」→ 展開「維護工具」→ 按「從既有圖片建立資產」 |
+| 檢查官方連結 | - | 側欄「營運工具」→ 展開「維護工具」→ 按「檢查官方連結」 |
+| LINE 查詢模擬 | - | 側欄「LINE 查詢模擬」；或「營運工具」→ 展開「維護工具」→ 按「LINE 查詢模擬」 |
+| 官方連結待確認篩選 | - | 側欄「活動管理」→ readiness 下拉選「官方連結待確認」→ 按「篩選」 |
+| 官方連結失效篩選 | - | 側欄「活動管理」→ readiness 下拉選「官方連結疑似失效」→ 按「篩選」 |
+| 圖片 fallback 篩選 | - | 側欄「活動管理」→ readiness 下拉選「圖片需 fallback」→ 按「篩選」 |
+| LINE 不可見篩選 | - | 側欄「活動管理」→ readiness 下拉選「LINE 不可見」→ 按「篩選」 |
+| 推薦被排除篩選 | - | 側欄「活動管理」→ readiness 下拉選「推薦被排除」→ 按「篩選」 |
+| Tag 審核 | - | 側欄「Tag 審核」；或「活動管理」→ 按「Tag 待審」 |
+| 審核單筆 Tag | - | 側欄「Tag 審核」→ 找到建議 → 按「核准」或「拒絕」 |
+| 編輯活動 | - | 側欄「活動管理」→ 活動列右側按「編輯」 |
+| 上架 / 下架活動 | - | 側欄「活動管理」→ 活動列右側按「上架」或「下架」 |
+| 單筆活動 AI Tag | - | 活動編輯頁 → 按「AI Tag 直接套用此活動」 |
+| 單筆 ready 切換 | - | 活動編輯頁 → 按「標記/關閉 LINE ready」、「標記/關閉推薦 ready」、「標記/關閉 AI ready」 |
+| 推播測試 | - | 側欄「推播管理」→ 建立推播任務 → 可先按「預覽受眾」或「dry-run」 |
+
+## 4. LINE 對話邏輯 smoke test
 
 ```powershell
 python manage.py smoke_extreme_line_flow
@@ -67,7 +103,7 @@ python manage.py smoke_extreme_line_flow
 
 會測口語查詢、追問、無結果、追蹤連結紀錄等 LINE 後端邏輯。
 
-## 4. 現場小批爬蟲測試
+## 5. 現場小批爬蟲測試
 
 後台 UI 路徑：
 
@@ -85,7 +121,7 @@ python manage.py run_crawler_pipeline --primary-limit 1 --secondary-limit 1 --ma
 
 現場主流程建議使用 `seed_demo_data --reset`，真爬蟲 limit=1 當備案或加分展示，避免外站與網路狀況影響展示。
 
-## 5. 單項後台功能測試
+## 6. 單項後台功能測試
 
 ```powershell
 python manage.py test tests.test_admin_activity_list tests.test_admin_diagnostics tests.test_admin_backend_smoke tests.test_demo_seed_data
@@ -102,7 +138,7 @@ python manage.py test tests.test_admin_activity_list tests.test_admin_diagnostic
 - 後台主要頁面可開啟
 - Demo seed/cleanup 可重跑與可回溯
 
-## 6. 上台前資料狀態檢查
+## 7. 上台前資料狀態檢查
 
 目前判斷標準：
 
