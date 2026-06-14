@@ -47,7 +47,7 @@ class Command(BaseCommand):
             status="active",
             excluded_from_public=False,
             end_date__lt=now,
-        ).count()
+        ).exclude(source_key="demo").count()
         self.stdout.write(f"{'PASS' if expired_active == 0 else 'FAIL'} | expired active | count={expired_active}")
         if expired_active:
             failures.append(("expired active", "database", expired_active))
@@ -64,6 +64,7 @@ class Command(BaseCommand):
             .exclude(official_detail_url="")
             .exclude(official_detail_url__isnull=True)
             .exclude(official_link_status="dead")
+            .exclude(source_key="demo")
             .count()
         )
         self.stdout.write(f"{'PASS' if missing_ai_summaries == 0 else 'FAIL'} | missing ai summaries | count={missing_ai_summaries}")

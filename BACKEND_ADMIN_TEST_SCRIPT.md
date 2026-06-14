@@ -25,7 +25,41 @@ python manage.py smoke_admin_backend
 
 全部顯示 `PASS` 才適合進入展示。
 
-## 2. LINE 對話邏輯 smoke test
+## 2. Demo 資料準備與回溯
+
+展示前建立固定 demo 資料：
+
+```powershell
+python manage.py seed_demo_data --reset
+```
+
+這會建立一組可重跑的展示資料，來源都標記為 `source_key=demo`，包含：
+
+- 正常可推薦活動
+- 待人工審核活動
+- AI 摘要待補活動
+- 官方連結待確認活動
+- 官方連結失效活動
+- 過期自動下架活動
+- 圖片 fallback 活動
+- Demo LINE 使用者與訂閱
+- Tag 待審建議
+
+展示後先 dry-run 確認會刪哪些 demo 資料：
+
+```powershell
+python manage.py cleanup_demo_data
+```
+
+確認無誤後清除 demo 資料：
+
+```powershell
+python manage.py cleanup_demo_data --apply
+```
+
+正式資料不靠標題手動辨識，cleanup 只會清掉 `source_key=demo` 的活動與 `demo-` 開頭的 LINE 使用者。
+
+## 3. LINE 對話邏輯 smoke test
 
 ```powershell
 python manage.py smoke_extreme_line_flow
@@ -33,7 +67,7 @@ python manage.py smoke_extreme_line_flow
 
 會測口語查詢、追問、無結果、追蹤連結紀錄等 LINE 後端邏輯。
 
-## 3. 現場小批爬蟲測試
+## 4. 現場小批爬蟲測試
 
 後台 UI 路徑：
 
@@ -49,10 +83,12 @@ python manage.py smoke_extreme_line_flow
 python manage.py run_crawler_pipeline --primary-limit 1 --secondary-limit 1 --max-runtime 30 --skip-dynamic --activate
 ```
 
-## 4. 單項後台功能測試
+現場主流程建議使用 `seed_demo_data --reset`，真爬蟲 limit=1 當備案或加分展示，避免外站與網路狀況影響展示。
+
+## 5. 單項後台功能測試
 
 ```powershell
-python manage.py test tests.test_admin_activity_list tests.test_admin_diagnostics tests.test_admin_backend_smoke
+python manage.py test tests.test_admin_activity_list tests.test_admin_diagnostics tests.test_admin_backend_smoke tests.test_demo_seed_data
 ```
 
 涵蓋：
@@ -64,8 +100,9 @@ python manage.py test tests.test_admin_activity_list tests.test_admin_diagnostic
 - 過期 active 活動經 readiness 重算後會自動下架，但資料保留
 - Tag 審核只顯示可推 LINE / 可推薦的活動候選
 - 後台主要頁面可開啟
+- Demo seed/cleanup 可重跑與可回溯
 
-## 5. 上台前資料狀態檢查
+## 6. 上台前資料狀態檢查
 
 目前判斷標準：
 
@@ -77,3 +114,4 @@ python manage.py test tests.test_admin_activity_list tests.test_admin_diagnostic
 - `過期仍上架`：應為 0；完整更新或 readiness 重算會把過期 active 活動改成 inactive，活動資料不刪除
 - `Tag 審核`：只顯示 active、未過期、未排除、recommendation ready、有官方頁、非 dead link 的 pending 建議
 - `AI 摘要待補`：不應包含可 LINE / 可推薦活動，若 smoke test 顯示缺漏，先跑完整更新或單筆 AI 摘要補齊
+- `Demo 摘要待補`：`source_key=demo` 是展示用缺口，後台 smoke invariant 會排除，不代表正式資料異常

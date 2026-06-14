@@ -40,7 +40,24 @@ http://127.0.0.1:8000/dashboard/
 
 ```powershell
 python manage.py check
+python manage.py smoke_admin_backend
+python manage.py smoke_extreme_line_flow
 python manage.py test tests.test_line_semantic_query
+```
+
+### 建議先建立 demo 資料
+
+為了避免現場受外站、網路或爬蟲結果影響，主展示建議使用固定 demo 資料：
+
+```powershell
+python manage.py seed_demo_data --reset
+```
+
+這不是修改正式爬蟲流程，而是建立一組 `source_key=demo` 的展示活動，讓後台和 LINE 都有穩定資料可以操作。展示後可清除：
+
+```powershell
+python manage.py cleanup_demo_data
+python manage.py cleanup_demo_data --apply
 ```
 
 展示前可以先用自己的 LINE 帳號測一次：
@@ -124,6 +141,10 @@ http://127.0.0.1:8000/crawlJobs/
 展示說法：
 
 > 這裡不是單純爬資料而已，系統還會判斷資料能不能推薦、能不能顯示在 LINE 卡片，以及官方連結是否失效。
+
+現場建議說明：
+
+> 為了展示穩定，今天的示範資料是用 demo seed 模擬「爬蟲匯入後」的狀態；真實系統仍可透過一鍵完整更新或小批爬蟲取得資料。
 
 ---
 
@@ -590,6 +611,7 @@ AI 不是只做聊天，而是用在標籤、摘要、搜尋理解與對話狀�
 
 如果時間只有 5 到 7 分鐘，建議照這個順序：
 
+0. 先跑 `python manage.py seed_demo_data --reset`，確保展示資料一致。
 1. 開後台 dashboard，說明這是一套完整系統。
 2. 開爬蟲任務頁，展示一鍵更新與任務紀錄。
 3. LINE 輸入 `推薦活動`，展示活動卡片。
@@ -598,6 +620,7 @@ AI 不是只做聊天，而是用在標籤、摘要、搜尋理解與對話狀�
 6. LINE 輸入 `有沒有腳踏車活動`，展示無明確結果時先否定再推薦。
 7. 點卡片的導航或加入行事曆。
 8. LINE 輸入 `數位市民卡`，展示城市服務延伸。
+9. 展示後跑 `python manage.py cleanup_demo_data --apply`，清掉 demo 資料。
 
 ---
 
@@ -611,4 +634,3 @@ AI 不是只做聊天，而是用在標籤、摘要、搜尋理解與對話狀�
 - LINE 是使用者最容易接觸的入口。
 - 系統有誠實回覆與相近推薦機制。
 - 未來可以延伸成智慧城市公共資訊服務。
-
