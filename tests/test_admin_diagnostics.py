@@ -109,7 +109,8 @@ class AdminDiagnosticsTests(TestCase):
         recompute_activity_readiness(activity, save=True)
         activity.refresh_from_db()
 
-        self.assertTrue(activity.line_ready)
+        self.assertFalse(activity.line_ready)
+        self.assertFalse(activity.is_public_item)
         self.assertFalse(activity.recommendation_ready)
         self.assertEqual(activity.final_state, "needs_review")
 
@@ -134,6 +135,32 @@ class AdminDiagnosticsTests(TestCase):
         self.assertFalse(activity.line_ready)
         self.assertFalse(activity.recommendation_ready)
         self.assertEqual(activity.final_state, "needs_data")
+
+    def test_recompute_clears_stale_missing_data_recommendation_reason(self):
+        activity = Activity.objects.create(
+            title="已補齊日期活動",
+            description="活動內容",
+            status="active",
+            is_activity=True,
+            source_url="https://example.com/date-fixed",
+            official_detail_url="https://example.com/date-fixed",
+            start_date=timezone.now() + timedelta(days=7),
+            end_date=timezone.now() + timedelta(days=8),
+            district="中壢區",
+            location="中壢藝術館",
+            line_ready=True,
+            recommendation_ready=False,
+            exclude_from_recommendation_reason="missing_date",
+            final_state="needs_review",
+        )
+
+        recompute_activity_readiness(activity, save=True)
+        activity.refresh_from_db()
+
+        self.assertEqual(activity.exclude_from_recommendation_reason, "")
+        self.assertTrue(activity.line_ready)
+        self.assertTrue(activity.recommendation_ready)
+        self.assertEqual(activity.final_state, "published")
 
     def test_recompute_auto_inactivates_expired_active_activity(self):
         activity = Activity.objects.create(

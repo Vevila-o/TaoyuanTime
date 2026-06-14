@@ -128,6 +128,8 @@ def line_visibility_reasons(activity, now=None):
         reasons.append("line_not_ready")
     if activity.quality_level == "rejected":
         reasons.append("quality_rejected")
+    if activity.exclude_from_recommendation_reason == "manual_review_required":
+        reasons.append("manual_review_required")
     return reasons
 
 
@@ -240,23 +242,37 @@ def recompute_activity_readiness(activity, save=True):
         activity.exclude_reason = ""
     excluded = bool(activity.excluded_from_public)
     official_url = bool((activity.official_detail_url or activity.source_url or "").strip())
+    invalid_date_range = False
+    if activity.start_date and activity.end_date and activity.end_date < activity.start_date:
+        invalid_date_range = True
+
     has_location = bool((activity.location or activity.district or "").strip())
     has_date = bool(activity.start_date)
     date_expired = is_expired(activity, now)
     if date_expired and activity.status == "active":
         activity.status = "inactive"
     inactive = activity.status == "inactive"
-    recommendation_reason = (activity.exclude_from_recommendation_reason or "").strip()
+
+    recommendation_reasons = parse_listish(activity.exclude_from_recommendation_reason)
+    stale_recommendation_reasons = {
+        "missing_date": has_date,
+        "missing_location": has_location,
+        "date_range_invalid": not invalid_date_range,
+    }
+    recommendation_reasons = [
+        reason for reason in recommendation_reasons
+        if not stale_recommendation_reasons.get(reason, False)
+    ]
+    activity.exclude_from_recommendation_reason = ",".join(recommendation_reasons)
+    recommendation_reason = activity.exclude_from_recommendation_reason.strip()
     recommendation_blocked = bool(recommendation_reason)
     manual_review_required = recommendation_reason == "manual_review_required"
-    
-    invalid_date_range = False
-    if activity.start_date and activity.end_date and activity.end_date < activity.start_date:
-        invalid_date_range = True
 
     line_ready = bool(
         is_activity and activity.title and official_url and
-        activity.description and has_date and has_location and not excluded and not invalid_date_range and not date_expired and not inactive
+        activity.description and has_date and has_location and not excluded and
+        not invalid_date_range and not date_expired and not inactive and
+        not manual_review_required
     )
     
     search_ready = bool(
@@ -308,7 +324,8 @@ def recompute_activity_readiness(activity, save=True):
             "status",
             "line_ready", "recommendation_ready", 
             "is_public_item", "ai_ready", "final_state", "quality_warnings",
-            "excluded_from_public", "exclude_reason", "updated_at"
+            "excluded_from_public", "exclude_reason", "exclude_from_recommendation_reason",
+            "updated_at"
         ])
         
     return activity

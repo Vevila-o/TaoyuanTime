@@ -19,7 +19,7 @@
 
     <div class="row g-3 mb-4">
       <div class="col-md-4"><div class="stat-card blue"><div class="label">可服務活動</div><div class="number">{{ serviceable_active_count }}</div><div class="trend muted">上架 {{ active_count }} / 總數 {{ total_count }}</div></div></div>
-      <div class="col-md-4"><div class="stat-card orange"><div class="label">LINE 使用者</div><div class="number">{{ user_count }}</div><div class="trend muted">訂閱 {{ subscription_count }}</div></div></div>
+      <div class="col-md-4"><div class="stat-card orange"><div class="label">LINE 使用者</div><div class="number">{{ user_count }}</div><div class="trend muted">訂閱 {{ subscription_count }}{% if test_user_count %} · 測試 {{ test_user_count }} 已排除{% endif %}</div></div></div>
       <div class="col-md-4"><div class="stat-card"><div class="label">推播成功率</div><div class="number">{{ push_success_rate }}%</div><div class="trend muted">總筆數 {{ push_total }}</div></div></div>
     </div>
 

@@ -82,8 +82,11 @@ def dashboard(request):
   active_count = Activity.objects.filter(status='active').count()
   total_count = Activity.objects.count()
   line_ready_count = Activity.objects.filter(excluded_from_public=False, line_ready=True).count()
-  subscription_count = Subscription.objects.count()
-  user_count = UserProfile.objects.count()
+  test_user_filter = Q(line_user_id__startswith='codex') | Q(line_user_id__startswith='line-test') | Q(line_user_id='debug-user')
+  test_user_count = UserProfile.objects.filter(test_user_filter).count()
+  user_count = UserProfile.objects.exclude(test_user_filter).count()
+  total_user_count = UserProfile.objects.count()
+  subscription_count = Subscription.objects.exclude(user__line_user_id__startswith='codex').exclude(user__line_user_id__startswith='line-test').exclude(user__line_user_id='debug-user').count()
   push_total = PushDeliveryLog.objects.count()
   push_sent = PushDeliveryLog.objects.filter(status='sent').count()
   push_success_rate = round((push_sent / push_total) * 100, 1) if push_total else 0
@@ -119,7 +122,8 @@ def dashboard(request):
     'expired_active_count': Activity.objects.filter(status='active', excluded_from_public=False, end_date__lt=now).count(),
     'missing_detail_count': Activity.objects.filter(status='active', excluded_from_public=False, line_ready=True).filter(Q(official_detail_url__isnull=True) | Q(official_detail_url='')).count(),
     'placeholder_image_count': Activity.objects.filter(status='active', excluded_from_public=False, line_ready=True).filter(Q(image_url='') | Q(image_url__icontains='placehold.co')).count(),
-    'test_user_count': UserProfile.objects.filter(Q(line_user_id__startswith='codex') | Q(line_user_id__startswith='line-test') | Q(line_user_id='debug-user')).count(),
+    'test_user_count': test_user_count,
+    'total_user_count': total_user_count,
     'subscription_count': subscription_count,
     'user_count': user_count,
     'push_total': push_total,
