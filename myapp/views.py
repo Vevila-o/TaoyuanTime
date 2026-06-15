@@ -160,7 +160,7 @@ def handle_citizen_card_postback(event, action, params):
     elif action == 'request_location':
         line_bot_api.reply_message(
             event.reply_token,
-            build_citizen_store_message()
+            TextSendMessage(text="請點選下方選單的「＋」或「位置」按鈕，分享您的位置給我們，我將立刻為您搜尋附近的特約商店！")
         )
 
 
@@ -195,7 +195,7 @@ def handle_citizen_card_text(event, text):
     if text == "附近的市民卡特約商店":
         line_bot_api.reply_message(
             event.reply_token,
-            build_citizen_store_message()
+            TextSendMessage(text="請點選下方選單的「＋」或「位置」按鈕，分享您的位置給我們，我將立刻為您搜尋附近的特約商店！")
         )
         return True
 
