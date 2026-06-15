@@ -638,6 +638,21 @@ def build_query_help_message():
          '你可以直接說「要去中壢玩」、「泥巴相關活動」或「週末親子活動」。'
   )
 
+def get_bot_introduction_text():
+    return (
+        "👋 您好！我是您的桃園活動小幫手。\n\n"
+        "【關於桃園】\n"
+        "桃園是一個充滿活力與藝文氣息的城市，無論是假日休閒、文化體驗還是親子共遊，這裡都有無限可能。讓我陪伴您一同探索桃園的美好！\n\n"
+
+        "【系統功能介紹】\n"
+        "✨ 偏好設定：選擇您關注的活動類型，開啟專屬推薦。\n"
+        "✨ 活動推薦：隨時查看系統為您挑選的最新活動。\n"
+        "✨ 訂閱設定：追蹤感興趣的活動，不錯過任何通知。\n"
+        "✨ 市民卡綁定：自動推薦市民卡優惠活動與附近的特約商店。\n"
+        "✨ 智慧搜尋：直接告訴我地區或關鍵字，馬上找出適合您的活動。\n\n"
+        "👉 立即點選選單或設定偏好，開始您的桃園探索之旅吧！"
+    )
+
 
 def out_of_taoyuan_query(text):
   compact = re.sub(r'\s+', '', text or '')
@@ -1075,7 +1090,7 @@ def handle_line_text_message(user, text):
     return TextSendMessage(text='已清除搜尋記錄，請重新輸入你想找的活動。')
 
   if text in PREFERENCE_COMMANDS:
-    return build_preference_message(user)
+    return build_preference_message(user)   
 
   if text in RECOMMENDATION_COMMANDS:
     recommendation_state = get_valid_conversation_state(user)
@@ -1106,6 +1121,9 @@ def handle_line_text_message(user, text):
       query_context='已訂閱活動',
       include_intro=True,
     )
+  
+  if text in SMALLTALK_WORDS:
+    return TextSendMessage(text=get_bot_introduction_text())
 
   if text.lower() in SMALLTALK_WORDS:
     return build_query_help_message()

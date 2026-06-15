@@ -333,7 +333,7 @@ def handle_location(event):
 
 
 # 產生偏好設定 Flex Message（全版標籤選擇面板）>>在line_service.py
-# def get_preference_flex_message(user_profile, show_only=None):
+def get_preference_flex_message(user_profile, show_only=None):
     current_tags = list(user_profile.preferred_tags.values_list('name', flat=True))
 
     all_sections = [
