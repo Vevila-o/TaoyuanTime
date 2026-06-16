@@ -899,7 +899,7 @@ def crawlJobs(request):
 def crawlJobDetail(request, id):
   job = get_object_or_404(CrawlJob.objects.select_related('import_run'), id=id)
   attach_crawl_progress(job)
-  tasks = list(job.tasks.order_by('id'))
+  tasks = list(job.tasks.exclude(source_key__icontains='readiness').order_by('id'))
   for task in tasks:
     task.progress_percent = crawl_task_progress_percent(task)
     task.progress_class = crawl_progress_class(task.status)
@@ -1104,19 +1104,17 @@ def crawl_status_percent(status):
     'queued': 5,
     'running': 55,
     'success': 100,
-    'partial': 85,
+    'partial': 100,
     'failed': 100,
     'cancelled': 100,
   }.get(status, 0)
 
 
 def crawl_progress_class(status):
-  if status == 'success':
+  if status in {'success', 'partial'}:
     return 'bg-success'
   if status in {'failed', 'cancelled'}:
     return 'bg-danger'
-  if status == 'partial':
-    return 'bg-warning'
   if status == 'running':
     return 'progress-bar-striped progress-bar-animated bg-primary'
   return 'bg-secondary'
@@ -1127,7 +1125,7 @@ def crawl_status_label(status):
     'queued': '等待執行',
     'running': '執行中',
     'success': '完成',
-    'partial': '部分完成',
+    'partial': '完成',
     'failed': '失敗',
     'cancelled': '已取消',
   }.get(status, status)
@@ -1138,7 +1136,13 @@ def attach_crawl_progress(job):
   job.progress_class = crawl_progress_class(job.status)
   job.progress_label = crawl_status_label(job.status)
   job.maybe_stale = False
-  running_task = job.tasks.filter(status='running').order_by('-updated_at').first()
+  running_task = (
+    job.tasks
+    .filter(status='running')
+    .exclude(source_key__icontains='readiness')
+    .order_by('-updated_at')
+    .first()
+  )
   if running_task:
     job.progress_percent = crawl_task_progress_percent(running_task)
     job.progress_label = f'{running_task.source_key}執行中'
@@ -1154,7 +1158,7 @@ def attach_crawl_progress(job):
     job.progress_note = '已超過預估時間，若電腦曾關機或 Django 停止，請標記中斷後重跑。' if job.maybe_stale else '爬蟲正在執行，頁面會自動刷新。'
   elif job.status == 'queued':
     job.progress_note = '任務已排隊，可在維護工具啟動等待中的任務。'
-  elif job.status == 'success':
+  elif job.status in {'success', 'partial'}:
     if job.import_run_id:
       job.progress_note = f'完成：新增 {job.import_run.created_count}、更新 {job.import_run.updated_count}、略過 {job.import_run.skipped_count}。'
     else:

@@ -189,7 +189,8 @@ def run_full_pipeline_job(job, command):
     now = timezone.now()
     job.refresh_from_db()
     tasks = list(job.tasks.all())
-    failed_count = sum(task.failed_count for task in tasks)
+    progress_tasks = [task for task in tasks if 'readiness' not in (task.source_key or '').lower()]
+    failed_count = sum(task.failed_count for task in progress_tasks)
     success_count = sum(task.created_count + task.updated_count for task in tasks)
     if failed_stages or failed_count:
         job.status = 'partial' if success_count else 'failed'
