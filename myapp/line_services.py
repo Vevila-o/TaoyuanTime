@@ -1122,11 +1122,8 @@ def handle_line_text_message(user, text):
       include_intro=True,
     )
   
-  if text in SMALLTALK_WORDS:
-    return TextSendMessage(text=get_bot_introduction_text())
-
   if text.lower() in SMALLTALK_WORDS:
-    return build_query_help_message()
+    return TextSendMessage(text=get_bot_introduction_text())
 
   if out_of_taoyuan_query(text):
     return build_scope_limit_message()
